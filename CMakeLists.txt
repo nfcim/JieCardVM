@@ -6,8 +6,6 @@ set(CMAKE_C_STANDARD 11)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -g -D_GNU_SOURCE")
 
-set(CMAKE_BINARY_DIR obj)
-
 # public headers
 include_directories("include")
 

@@ -2,7 +2,7 @@
 // Created by Harry Chen on 2019/3/25.
 //
 
-#include "vm.h"
+#include <vm.h>
 
 #include "instruction.h"
 

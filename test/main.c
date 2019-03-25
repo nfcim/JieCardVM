@@ -2,10 +2,9 @@
 // Created by Harry Chen on 2019/3/25.
 //
 
-#include <vm.h>
-
 #include <stdio.h>
 
+#include <vm.h>
 
 int main() {
     puts("JieCardVM is running!");
