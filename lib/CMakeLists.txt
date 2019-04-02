@@ -7,4 +7,5 @@ add_library(${CMAKE_PROJECT_NAME} STATIC
         ../include/vm.h
         vm.c
         rtdata.c
+        instructions.c
 )

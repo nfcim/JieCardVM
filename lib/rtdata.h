@@ -19,6 +19,11 @@ typedef struct {
 } Frame;
 
 
+jbyte FReadByte(Frame *f);
+jshort FReadShort(Frame *f);
+jint FReadInt(Frame *f);
+
+
 //<editor-fold desc="OperandStackOperations">
 
 jbyte OSPopByte(OperandStack *s);
