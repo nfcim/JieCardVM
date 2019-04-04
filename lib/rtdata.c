@@ -68,3 +68,32 @@ jint OSGetInt(OperandStack *s) {
 }
 
 //</editor-fold>
+
+//<editor-fold desc="VariableTableOperations">
+
+jbyte VTGetByte(VariableTable *t, uint8_t index) {
+    return t->base[index];
+}
+
+jshort VTGetShort(VariableTable *t, uint8_t index) {
+    return t->base[index];
+}
+
+jint VTGetInt(VariableTable *t, uint8_t index) {
+    return (t->base[index] << 8) | t->base[index + 1];
+}
+
+void VTSetByte(VariableTable *t, uint8_t index, jbyte val) {
+    t->base[index] = val;
+}
+
+void VTSetShort(VariableTable *t, uint8_t index, jshort val) {
+    t->base[index] = val;
+}
+
+void VTSetInt(VariableTable *t, uint8_t index, jint val) {
+    t->base[index] = val >> 8;
+    t->base[index + 1] = val & 0xFF;
+}
+
+//</editor-fold>
