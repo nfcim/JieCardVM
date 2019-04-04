@@ -6,16 +6,18 @@
 #include "types.h"
 
 
-#define OPERAND_STACK_SIZE 128
-
-
 typedef struct {
-    size_t size;
-    uint8_t data[OPERAND_STACK_SIZE];
+    uint8_t *base;  // base memory
+    uint8_t *next;  // next slot
 } OperandStack;
 
 typedef struct {
+    jshort *base;   // base memory
+} VariableTable;
+
+typedef struct {
     OperandStack operandStack;
+    VariableTable variableTable;
 } Frame;
 
 
@@ -28,10 +30,13 @@ jint FReadInt(Frame *f);
 
 jbyte OSPopByte(OperandStack *s);
 void OSPushByte(OperandStack *s, jbyte val);
+jbyte OSGetByte(OperandStack *s);
 jshort OSPopShort(OperandStack *s);
 void OSPushShort(OperandStack *s, jshort val);
+jshort OSGetShort(OperandStack *s);
 jint OSPopInt(OperandStack *s);
 void OSPushInt(OperandStack *s, jint val);
+jint OSGetInt(OperandStack *s);
 
 //</editor-fold>
 
