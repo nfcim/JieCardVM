@@ -20,7 +20,6 @@ typedef struct {
     VariableTable variableTable;
 } Frame;
 
-// TODO: These operations should be written in macro.
 
 jbyte FrameReadByte(Frame *f);
 
