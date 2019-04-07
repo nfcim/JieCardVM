@@ -20,4 +20,8 @@ u4 ByteCodeReadU4(void) {
   return (v1 << 24 | (v2 << 16) | (v3 << 8) | v4);
 }
 
-void ByteCodeBranch(int16_t offset) { pc += offset; }
+void ByteCodeOffset(int16_t offset) { pc += offset; }
+
+u1 *ByteCodeGetPC(void) { return pc; }
+
+void ByteCodeSetPC(u1 *new_pc) { pc = new_pc; }
