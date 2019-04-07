@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(jiecardvm LANGUAGES C)
+project(jiecardvm LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
