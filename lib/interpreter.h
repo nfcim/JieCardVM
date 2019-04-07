@@ -3,11 +3,11 @@
 
 #include "types.h"
 
-jbyte ByteCodeReadByte(void);
+u1 ByteCodeReadU1(void);
 
-jshort ByteCodeReadShort(void);
+u2 ByteCodeReadU2(void);
 
-jint ByteCodeReadInt(void);
+u4 ByteCodeReadU4(void);
 
 void ByteCodeBranch(int16_t offset);
 

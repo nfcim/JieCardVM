@@ -6,8 +6,8 @@
 #include "types.h"
 
 typedef struct {
-  uint16_t *base; // base memory
-  uint16_t *next; // next slot
+  u2 *base; // base memory
+  u2 *next; // next slot
 } OperandStack;
 
 typedef struct {
@@ -37,13 +37,13 @@ jint OSGetInt(OperandStack *s);
 
 //<editor-fold desc="VariableTableOperations">
 
-jshort VTGetShort(VariableTable *t, uint8_t index);
+jshort VTGetShort(VariableTable *t, u1 index);
 
-jint VTGetInt(VariableTable *t, uint8_t index);
+jint VTGetInt(VariableTable *t, u1 index);
 
-void VTSetShort(VariableTable *t, uint8_t index, jshort val);
+void VTSetShort(VariableTable *t, u1 index, jshort val);
 
-void VTSetInt(VariableTable *t, uint8_t index, jint val);
+void VTSetInt(VariableTable *t, u1 index, jint val);
 
 //</editor-fold>
 

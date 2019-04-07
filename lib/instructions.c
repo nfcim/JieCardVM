@@ -40,46 +40,46 @@ void ins_iconst_5(Frame *f) { OSPushInt(&f->operandStack, 5); }
 // ins 10
 
 void ins_bspush(Frame *f) {
-  jbyte val = ByteCodeReadByte();
-  OSPushShort(&f->operandStack, val);
+  jbyte v = ByteCodeReadU1();
+  OSPushShort(&f->operandStack, v);
 }
 
 void ins_sspush(Frame *f) {
-  jshort val = ByteCodeReadShort();
-  OSPushShort(&f->operandStack, val);
+  jshort v = ByteCodeReadU2();
+  OSPushShort(&f->operandStack, v);
 }
 
 void ins_bipush(Frame *f) {
-  jbyte val = ByteCodeReadByte();
-  OSPushInt(&f->operandStack, val);
+  jbyte v = ByteCodeReadU1();
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_sipush(Frame *f) {
-  jshort val = ByteCodeReadShort();
-  OSPushInt(&f->operandStack, val);
+  jshort v = ByteCodeReadU2();
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_iipush(Frame *f) {
-  jint val = ByteCodeReadInt();
-  OSPushInt(&f->operandStack, val);
+  jint v = ByteCodeReadU4();
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_aload(Frame *f) {
-  uint8_t index = ByteCodeReadByte();
+  u1 index = ByteCodeReadU1();
   jshort addr = VTGetShort(&f->variableTable, index);
   OSPushShort(&f->operandStack, addr);
 }
 
 void ins_sload(Frame *f) {
-  uint8_t index = ByteCodeReadByte();
-  jshort val = VTGetShort(&f->variableTable, index);
-  OSPushShort(&f->operandStack, val);
+  u1 index = ByteCodeReadU1();
+  jshort v = VTGetShort(&f->variableTable, index);
+  OSPushShort(&f->operandStack, v);
 }
 
 void ins_iload(Frame *f) {
-  uint8_t index = ByteCodeReadByte();
-  jint val = VTGetInt(&f->variableTable, index);
-  OSPushInt(&f->operandStack, val);
+  u1 index = ByteCodeReadU1();
+  jint v = VTGetInt(&f->variableTable, index);
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_aload_0(Frame *f) {
@@ -103,45 +103,45 @@ void ins_aload_3(Frame *f) {
 }
 
 void ins_sload_0(Frame *f) {
-  jshort val = VTGetShort(&f->variableTable, 0);
-  OSPushShort(&f->operandStack, val);
+  jshort v = VTGetShort(&f->variableTable, 0);
+  OSPushShort(&f->operandStack, v);
 }
 
 void ins_sload_1(Frame *f) {
-  jshort val = VTGetShort(&f->variableTable, 1);
-  OSPushShort(&f->operandStack, val);
+  jshort v = VTGetShort(&f->variableTable, 1);
+  OSPushShort(&f->operandStack, v);
 }
 
 void ins_sload_2(Frame *f) {
-  jshort val = VTGetShort(&f->variableTable, 2);
-  OSPushShort(&f->operandStack, val);
+  jshort v = VTGetShort(&f->variableTable, 2);
+  OSPushShort(&f->operandStack, v);
 }
 
 void ins_sload_3(Frame *f) {
-  jshort val = VTGetShort(&f->variableTable, 3);
-  OSPushShort(&f->operandStack, val);
+  jshort v = VTGetShort(&f->variableTable, 3);
+  OSPushShort(&f->operandStack, v);
 }
 
 // ins 20
 
 void ins_iload_0(Frame *f) {
-  jint val = VTGetInt(&f->variableTable, 0);
-  OSPushInt(&f->operandStack, val);
+  jint v = VTGetInt(&f->variableTable, 0);
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_iload_1(Frame *f) {
-  jint val = VTGetInt(&f->variableTable, 1);
-  OSPushInt(&f->operandStack, val);
+  jint v = VTGetInt(&f->variableTable, 1);
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_iload_2(Frame *f) {
-  jint val = VTGetInt(&f->variableTable, 2);
-  OSPushInt(&f->operandStack, val);
+  jint v = VTGetInt(&f->variableTable, 2);
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_iload_3(Frame *f) {
-  jint val = VTGetInt(&f->variableTable, 3);
-  OSPushInt(&f->operandStack, val);
+  jint v = VTGetInt(&f->variableTable, 3);
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_aaload(Frame *f) {
@@ -161,21 +161,21 @@ void ins_iaload(Frame *f) {
 }
 
 void ins_astore(Frame *f) {
-  uint8_t index = ByteCodeReadByte();
+  u1 index = ByteCodeReadU1();
   jshort addr = OSPopShort(&f->operandStack);
   VTSetShort(&f->variableTable, index, addr);
 }
 
 void ins_sstore(Frame *f) {
-  uint8_t index = ByteCodeReadByte();
-  jshort val = OSPopShort(&f->operandStack);
-  VTSetShort(&f->variableTable, index, val);
+  u1 index = ByteCodeReadU1();
+  jshort v = OSPopShort(&f->operandStack);
+  VTSetShort(&f->variableTable, index, v);
 }
 
 void ins_istore(Frame *f) {
-  uint8_t index = ByteCodeReadByte();
-  jint val = OSPopInt(&f->operandStack);
-  VTSetInt(&f->variableTable, index, val);
+  u1 index = ByteCodeReadU1();
+  jint v = OSPopInt(&f->operandStack);
+  VTSetInt(&f->variableTable, index, v);
 }
 
 void ins_astore_0(Frame *f) {
@@ -199,45 +199,45 @@ void ins_astore_3(Frame *f) {
 }
 
 void ins_sstore_0(Frame *f) {
-  jshort val = OSPopShort(&f->operandStack);
-  VTSetShort(&f->variableTable, 0, val);
+  jshort v = OSPopShort(&f->operandStack);
+  VTSetShort(&f->variableTable, 0, v);
 }
 
 // ins 30
 
 void ins_sstore_1(Frame *f) {
-  jshort val = OSPopShort(&f->operandStack);
-  VTSetShort(&f->variableTable, 1, val);
+  jshort v = OSPopShort(&f->operandStack);
+  VTSetShort(&f->variableTable, 1, v);
 }
 
 void ins_sstore_2(Frame *f) {
-  jshort val = OSPopShort(&f->operandStack);
-  VTSetShort(&f->variableTable, 2, val);
+  jshort v = OSPopShort(&f->operandStack);
+  VTSetShort(&f->variableTable, 2, v);
 }
 
 void ins_sstore_3(Frame *f) {
-  jshort val = OSPopShort(&f->operandStack);
-  VTSetShort(&f->variableTable, 3, val);
+  jshort v = OSPopShort(&f->operandStack);
+  VTSetShort(&f->variableTable, 3, v);
 }
 
 void ins_istore_0(Frame *f) {
-  jint val = OSPopInt(&f->operandStack);
-  VTSetInt(&f->variableTable, 0, val);
+  jint v = OSPopInt(&f->operandStack);
+  VTSetInt(&f->variableTable, 0, v);
 }
 
 void ins_istore_1(Frame *f) {
-  jint val = OSPopInt(&f->operandStack);
-  VTSetInt(&f->variableTable, 1, val);
+  jint v = OSPopInt(&f->operandStack);
+  VTSetInt(&f->variableTable, 1, v);
 }
 
 void ins_istore_2(Frame *f) {
-  jint val = OSPopInt(&f->operandStack);
-  VTSetInt(&f->variableTable, 2, val);
+  jint v = OSPopInt(&f->operandStack);
+  VTSetInt(&f->variableTable, 2, v);
 }
 
 void ins_istore_3(Frame *f) {
-  jint val = OSPopInt(&f->operandStack);
-  VTSetInt(&f->variableTable, 3, val);
+  jint v = OSPopInt(&f->operandStack);
+  VTSetInt(&f->variableTable, 3, v);
 }
 
 void ins_aastore(Frame *f) {
@@ -261,19 +261,19 @@ void ins_pop(Frame *f) { OSPopShort(&f->operandStack); }
 void ins_pop2(Frame *f) { OSPopInt(&f->operandStack); }
 
 void ins_dup(Frame *f) {
-  jshort val = OSGetShort(&f->operandStack);
-  OSPushShort(&f->operandStack, val);
+  jshort v = OSGetShort(&f->operandStack);
+  OSPushShort(&f->operandStack, v);
 }
 
 void ins_dup2(Frame *f) {
-  jint val = OSGetInt(&f->operandStack);
-  OSPushInt(&f->operandStack, val);
+  jint v = OSGetInt(&f->operandStack);
+  OSPushInt(&f->operandStack, v);
 }
 
 void ins_dup_x(Frame *f) {
-  uint8_t mn = ByteCodeReadByte();
-  uint8_t m = (mn >> 4) * 2;
-  uint8_t n = (mn & 0xF) * 2;
+  u1 mn = ByteCodeReadU1();
+  u1 m = (mn >> 4) * 2;
+  u1 n = (mn & 0xF) * 2;
   memmove(f->operandStack.next - n + m, f->operandStack.next - n, n);
   memcpy(f->operandStack.next - n, f->operandStack.next, m);
   f->operandStack.next += m;
@@ -282,10 +282,10 @@ void ins_dup_x(Frame *f) {
 // ins 40
 
 void ins_swap_x(Frame *f) {
-  uint8_t buf[2];
-  uint8_t mn = ByteCodeReadByte();
-  uint8_t m = (mn >> 4) * 2;
-  uint8_t n = (mn & 0xF) * 2;
+  u1 buf[2];
+  u1 mn = ByteCodeReadU1();
+  u1 m = (mn >> 4) * 2;
+  u1 n = (mn & 0xF) * 2;
   memcpy(buf, f->operandStack.next - m, m);
   memmove(f->operandStack.next - n, f->operandStack.next - n - m, n);
   memcpy(f->operandStack.next - n - m, buf, m);
@@ -405,14 +405,14 @@ void ins_sushr(Frame *f) {
   jshort v2 = OSPopShort(&f->operandStack);
   jshort v1 = OSPopShort(&f->operandStack);
   v2 &= 0x1F;
-  OSPushShort(&f->operandStack, (uint16_t)v1 >> v2);
+  OSPushShort(&f->operandStack, (u2)v1 >> v2);
 }
 
 void ins_iushr(Frame *f) {
   jint v2 = OSPopInt(&f->operandStack);
   jint v1 = OSPopInt(&f->operandStack);
   v2 &= 0x1F;
-  OSPushInt(&f->operandStack, (uint32_t)v1 >> v2);
+  OSPushInt(&f->operandStack, (u4)v1 >> v2);
 }
 
 void ins_sand(Frame *f) {
@@ -452,17 +452,17 @@ void ins_ixor(Frame *f) {
 }
 
 void ins_sinc(Frame *f) {
-  uint8_t index = ByteCodeReadByte();
-  jbyte val = ByteCodeReadByte();
+  u1 index = ByteCodeReadU1();
+  jbyte v = ByteCodeReadU1();
   jshort var = VTGetShort(&f->variableTable, index);
-  VTSetShort(&f->variableTable, index, var + val);
+  VTSetShort(&f->variableTable, index, var + v);
 }
 
 void ins_iinc(Frame *f) {
-  uint8_t index = ByteCodeReadByte();
-  jbyte val = ByteCodeReadByte();
+  u1 index = ByteCodeReadU1();
+  jbyte v = ByteCodeReadU1();
   jint var = VTGetInt(&f->variableTable, index);
-  VTSetInt(&f->variableTable, index, var + val);
+  VTSetInt(&f->variableTable, index, var + v);
 }
 
 void ins_s2b(Frame *f) {
@@ -494,7 +494,7 @@ void ins_icmp(Frame *f) {
 // ins 60
 
 void ins_ifeq(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v = OSPopShort(&f->operandStack);
   if (v == 0) {
     ByteCodeBranch(branch);
@@ -502,7 +502,7 @@ void ins_ifeq(Frame *f) {
 }
 
 void ins_ifne(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v = OSPopShort(&f->operandStack);
   if (v != 0) {
     ByteCodeBranch(branch);
@@ -510,7 +510,7 @@ void ins_ifne(Frame *f) {
 }
 
 void ins_iflt(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v = OSPopShort(&f->operandStack);
   if (v < 0) {
     ByteCodeBranch(branch);
@@ -518,7 +518,7 @@ void ins_iflt(Frame *f) {
 }
 
 void ins_ifge(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v = OSPopShort(&f->operandStack);
   if (v >= 0) {
     ByteCodeBranch(branch);
@@ -526,7 +526,7 @@ void ins_ifge(Frame *f) {
 }
 
 void ins_ifgt(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v = OSPopShort(&f->operandStack);
   if (v > 0) {
     ByteCodeBranch(branch);
@@ -534,7 +534,7 @@ void ins_ifgt(Frame *f) {
 }
 
 void ins_ifle(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v = OSPopShort(&f->operandStack);
   if (v <= 0) {
     ByteCodeBranch(branch);
@@ -542,41 +542,41 @@ void ins_ifle(Frame *f) {
 }
 
 void ins_ifnull(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
-  uint16_t v = OSPopShort(&f->operandStack);
+  jbyte branch = ByteCodeReadU1();
+  u2 v = OSPopShort(&f->operandStack);
   if (v == 0) {
     ByteCodeBranch(branch);
   }
 }
 
 void ins_ifnonnull(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
-  uint16_t v = (uint16_t)OSPopShort(&f->operandStack);
+  jbyte branch = ByteCodeReadU1();
+  u2 v = (u2)OSPopShort(&f->operandStack);
   if (v > 0) {
     ByteCodeBranch(branch);
   }
 }
 
 void ins_if_acmpeq(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
-  uint16_t v2 = (uint16_t)OSPopShort(&f->operandStack);
-  uint16_t v1 = (uint16_t)OSPopShort(&f->operandStack);
+  jbyte branch = ByteCodeReadU1();
+  u2 v2 = (u2)OSPopShort(&f->operandStack);
+  u2 v1 = (u2)OSPopShort(&f->operandStack);
   if (v1 == v2) {
     ByteCodeBranch(branch);
   }
 }
 
 void ins_if_acmpne(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
-  uint16_t v2 = (uint16_t)OSPopShort(&f->operandStack);
-  uint16_t v1 = (uint16_t)OSPopShort(&f->operandStack);
+  jbyte branch = ByteCodeReadU1();
+  u2 v2 = (u2)OSPopShort(&f->operandStack);
+  u2 v1 = (u2)OSPopShort(&f->operandStack);
   if (v1 != v2) {
     ByteCodeBranch(branch);
   }
 }
 
 void ins_if_scmpeq(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v2 = OSPopShort(&f->operandStack);
   jshort v1 = OSPopShort(&f->operandStack);
   if (v1 == v2) {
@@ -585,7 +585,7 @@ void ins_if_scmpeq(Frame *f) {
 }
 
 void ins_if_scmpne(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v2 = OSPopShort(&f->operandStack);
   jshort v1 = OSPopShort(&f->operandStack);
   if (v1 != v2) {
@@ -594,7 +594,7 @@ void ins_if_scmpne(Frame *f) {
 }
 
 void ins_if_scmplt(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v2 = OSPopShort(&f->operandStack);
   jshort v1 = OSPopShort(&f->operandStack);
   if (v1 < v2) {
@@ -603,7 +603,7 @@ void ins_if_scmplt(Frame *f) {
 }
 
 void ins_if_scmpge(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v2 = OSPopShort(&f->operandStack);
   jshort v1 = OSPopShort(&f->operandStack);
   if (v1 >= v2) {
@@ -612,7 +612,7 @@ void ins_if_scmpge(Frame *f) {
 }
 
 void ins_if_scmpgt(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v2 = OSPopShort(&f->operandStack);
   jshort v1 = OSPopShort(&f->operandStack);
   if (v1 > v2) {
@@ -621,7 +621,7 @@ void ins_if_scmpgt(Frame *f) {
 }
 
 void ins_if_scmple(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   jshort v2 = OSPopShort(&f->operandStack);
   jshort v1 = OSPopShort(&f->operandStack);
   if (v1 <= v2) {
@@ -632,6 +632,6 @@ void ins_if_scmple(Frame *f) {
 // ins 70
 
 void ins_if_goto(Frame *f) {
-  jbyte branch = ByteCodeReadByte();
+  jbyte branch = ByteCodeReadU1();
   ByteCodeBranch(branch);
 }
