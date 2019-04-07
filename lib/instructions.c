@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "rtdata.h"
+#include "interpreter.h"
 
 // ins 00
 
@@ -70,44 +71,44 @@ void ins_iconst_5(Frame *f) {
 // ins 10
 
 void ins_bspush(Frame *f) {
-    jbyte val = FrameReadByte(f);
+    jbyte val = ByteCodeReadByte();
     OSPushShort(&f->operandStack, val);
 }
 
 void ins_sspush(Frame *f) {
-    jshort val = FrameReadShort(f);
+    jshort val = ByteCodeReadShort();
     OSPushShort(&f->operandStack, val);
 }
 
 void ins_bipush(Frame *f) {
-    jbyte val = FrameReadByte(f);
+    jbyte val = ByteCodeReadByte();
     OSPushInt(&f->operandStack, val);
 }
 
 void ins_sipush(Frame *f) {
-    jshort val = FrameReadShort(f);
+    jshort val = ByteCodeReadShort();
     OSPushInt(&f->operandStack, val);
 }
 
 void ins_iipush(Frame *f) {
-    jint val = FrameReadInt(f);
+    jint val = ByteCodeReadInt();
     OSPushInt(&f->operandStack, val);
 }
 
 void ins_aload(Frame *f) {
-    uint8_t index = FrameReadByte(f);
+    uint8_t index = ByteCodeReadByte();
     jshort addr = VTGetShort(&f->variableTable, index);
     OSPushShort(&f->operandStack, addr);
 }
 
 void ins_sload(Frame *f) {
-    uint8_t index = FrameReadByte(f);
+    uint8_t index = ByteCodeReadByte();
     jshort val = VTGetShort(&f->variableTable, index);
     OSPushShort(&f->operandStack, val);
 }
 
 void ins_iload(Frame *f) {
-    uint8_t index = FrameReadByte(f);
+    uint8_t index = ByteCodeReadByte();
     jint val = VTGetInt(&f->variableTable, index);
     OSPushInt(&f->operandStack, val);
 }
@@ -191,19 +192,19 @@ void ins_iaload(Frame *f) {
 }
 
 void ins_astore(Frame *f) {
-    uint8_t index = FrameReadByte(f);
+    uint8_t index = ByteCodeReadByte();
     jshort addr = OSPopShort(&f->operandStack);
     VTSetShort(&f->variableTable, index, addr);
 }
 
 void ins_sstore(Frame *f) {
-    uint8_t index = FrameReadByte(f);
+    uint8_t index = ByteCodeReadByte();
     jshort val = OSPopShort(&f->operandStack);
     VTSetShort(&f->variableTable, index, val);
 }
 
 void ins_istore(Frame *f) {
-    uint8_t index = FrameReadByte(f);
+    uint8_t index = ByteCodeReadByte();
     jint val = OSPopInt(&f->operandStack);
     VTSetInt(&f->variableTable, index, val);
 }
@@ -305,7 +306,7 @@ void ins_dup2(Frame *f) {
 }
 
 void ins_dup_x(Frame *f) {
-    uint8_t mn = FrameReadByte(f);
+    uint8_t mn = ByteCodeReadByte();
     uint8_t m = (mn >> 4) * 2;
     uint8_t n = (mn & 0xF) * 2;
     memmove(f->operandStack.next - n + m, f->operandStack.next - n, n);
@@ -317,7 +318,7 @@ void ins_dup_x(Frame *f) {
 
 void ins_swap_x(Frame *f) {
     uint8_t buf[2];
-    uint8_t mn = FrameReadByte(f);
+    uint8_t mn = ByteCodeReadByte();
     uint8_t m = (mn >> 4) * 2;
     uint8_t n = (mn & 0xF) * 2;
     memcpy(buf, f->operandStack.next - m, m);
@@ -486,15 +487,15 @@ void ins_ixor(Frame *f) {
 }
 
 void ins_sinc(Frame *f) {
-    uint8_t index = FrameReadByte(f);
-    jbyte val = FrameReadByte(f);
+    uint8_t index = ByteCodeReadByte();
+    jbyte val = ByteCodeReadByte();
     jshort var = VTGetShort(&f->variableTable, index);
     VTSetShort(&f->variableTable, index, var + val);
 }
 
 void ins_iinc(Frame *f) {
-    uint8_t index = FrameReadByte(f);
-    jbyte val = FrameReadByte(f);
+    uint8_t index = ByteCodeReadByte();
+    jbyte val = ByteCodeReadByte();
     jint var = VTGetInt(&f->variableTable, index);
     VTSetInt(&f->variableTable, index, var + val);
 }
@@ -522,5 +523,5 @@ void ins_i2s(Frame *f) {
 void ins_icmp(Frame *f) {
     jint v2 = OSPopInt(&f->operandStack);
     jint v1 = OSPopInt(&f->operandStack);
-    OSPushInt(&f->operandStack, v1 < v2 ? -1 : (v1 == v2 ? 0 : 1));
+    OSPushShort(&f->operandStack, v1 < v2 ? -1 : (v1 == v2 ? 0 : 1));
 }

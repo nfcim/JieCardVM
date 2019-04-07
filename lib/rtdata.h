@@ -21,13 +21,6 @@ typedef struct {
 } Frame;
 
 
-jbyte FrameReadByte(Frame *f);
-
-jshort FrameReadShort(Frame *f);
-
-jint FrameReadInt(Frame *f);
-
-
 //<editor-fold desc="OperandStackOperations">
 
 jshort OSPopShort(OperandStack *s);
