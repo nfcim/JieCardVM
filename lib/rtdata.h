@@ -7,8 +7,8 @@
 
 
 typedef struct {
-    uint8_t *base;  // base memory
-    uint8_t *next;  // next slot
+    uint16_t *base;  // base memory
+    uint16_t *next;  // next slot
 } OperandStack;
 
 typedef struct {
@@ -30,12 +30,6 @@ jint FrameReadInt(Frame *f);
 
 //<editor-fold desc="OperandStackOperations">
 
-jbyte OSPopByte(OperandStack *s);
-
-void OSPushByte(OperandStack *s, jbyte val);
-
-jbyte OSGetByte(OperandStack *s);
-
 jshort OSPopShort(OperandStack *s);
 
 void OSPushShort(OperandStack *s, jshort val);
@@ -53,13 +47,9 @@ jint OSGetInt(OperandStack *s);
 
 //<editor-fold desc="VariableTableOperations">
 
-jbyte VTGetByte(VariableTable *t, uint8_t index);
-
 jshort VTGetShort(VariableTable *t, uint8_t index);
 
 jint VTGetInt(VariableTable *t, uint8_t index);
-
-void VTSetByte(VariableTable *t, uint8_t index, jbyte val);
 
 void VTSetShort(VariableTable *t, uint8_t index, jshort val);
 

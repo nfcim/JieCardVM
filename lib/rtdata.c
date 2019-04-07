@@ -3,88 +3,50 @@
 
 //<editor-fold desc="OperandStackOperations">
 
-jbyte OSPopByte(OperandStack *s) {
+jshort OSPopShort(OperandStack *s) {
     return *(--s->next);
 }
 
-void OSPushByte(OperandStack *s, jbyte val) {
+void OSPushShort(OperandStack *s, jshort val) {
     *s->next++ = val;
 }
 
-jbyte OSGetByte(OperandStack *s) {
+jshort OSGetShort(OperandStack *s) {
     return *(s->next - 1);
 }
 
-jshort OSPopShort(OperandStack *s) {
-    uint8_t v1, v2;
-    v1 = *(--s->next);
-    v2 = *(--s->next);
-    return (v1 << 8) | v2;
-}
-
-void OSPushShort(OperandStack *s, jshort val) {
-    uint8_t v1, v2;
-    v1 = val >> 8;
-    v2 = val & 0xFF;
-    *s->next++ = v2;
-    *s->next++ = v1;
-}
-
-jshort OSGetShort(OperandStack *s) {
-    uint8_t v1, v2;
-    v1 = *(s->next - 1);
-    v2 = *(s->next - 2);
-    return (v1 << 8) | v2;
-}
-
 jint OSPopInt(OperandStack *s) {
-    uint8_t v1, v2, v3, v4;
+    uint16_t v1, v2;
     v1 = *(--s->next);
     v2 = *(--s->next);
-    v3 = *(--s->next);
-    v4 = *(--s->next);
-    return (v1 << 24) | (v2 << 16) | (v3 << 8) | v4;
+    return (v1 << 16) | v2;
 }
 
 void OSPushInt(OperandStack *s, jint val) {
-    uint8_t v1, v2, v3, v4;
-    v1 = val >> 24;
-    v2 = (val >> 16) & 0xFF;
-    v3 = (val >> 8) & 0xFF;
-    v4 = val & 0xFF;
-    *s->next++ = v4;
-    *s->next++ = v3;
+    uint8_t v1, v2;
+    v1 = (val >> 16) & 0xFFFF;
+    v2 = val & 0xFFFF;
     *s->next++ = v2;
     *s->next++ = v1;
 }
 
 jint OSGetInt(OperandStack *s) {
-    uint8_t v1, v2, v3, v4;
+    uint8_t v1, v2;
     v1 = *(s->next - 1);
     v2 = *(s->next - 2);
-    v3 = *(s->next - 3);
-    v4 = *(s->next - 4);
-    return (v1 << 24) | (v2 << 16) | (v3 << 8) | v4;
+    return (v1 << 16) | v2;
 }
 
 //</editor-fold>
 
 //<editor-fold desc="VariableTableOperations">
 
-jbyte VTGetByte(VariableTable *t, uint8_t index) {
-    return t->base[index];
-}
-
 jshort VTGetShort(VariableTable *t, uint8_t index) {
     return t->base[index];
 }
 
 jint VTGetInt(VariableTable *t, uint8_t index) {
-    return (t->base[index] << 8) | t->base[index + 1];
-}
-
-void VTSetByte(VariableTable *t, uint8_t index, jbyte val) {
-    t->base[index] = val;
+    return (t->base[index] << 16) | t->base[index + 1];
 }
 
 void VTSetShort(VariableTable *t, uint8_t index, jshort val) {
@@ -92,8 +54,8 @@ void VTSetShort(VariableTable *t, uint8_t index, jshort val) {
 }
 
 void VTSetInt(VariableTable *t, uint8_t index, jint val) {
-    t->base[index] = val >> 8;
-    t->base[index + 1] = val & 0xFF;
+    t->base[index] = val >> 16;
+    t->base[index + 1] = val & 0xFFFF;
 }
 
 //</editor-fold>
