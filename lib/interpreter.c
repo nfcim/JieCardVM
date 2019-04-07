@@ -21,3 +21,7 @@ jint ByteCodeReadInt(void) {
     uint8_t v4 = *pc++;
     return (jint) ((v1 << 24) | (v2 << 16) | (v3 << 8) | v4);
 }
+
+void ByteCodeBranch(int16_t offset) {
+    pc += offset;
+}
