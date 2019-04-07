@@ -8,7 +8,7 @@ void ins_nop(Frame *f) {
 }
 
 void ins_aconst_null(Frame *f) {
-    OSPushByte(&f->operandStack, 0);
+    OSPushShort(&f->operandStack, 0);
 }
 
 void ins_sconst_m1(Frame *f) {
@@ -313,6 +313,8 @@ void ins_dup_x(Frame *f) {
     f->operandStack.next += m;
 }
 
+// ins 40
+
 void ins_swap_x(Frame *f) {
     uint8_t buf[2];
     uint8_t mn = FrameReadByte(f);
@@ -323,44 +325,202 @@ void ins_swap_x(Frame *f) {
     memcpy(f->operandStack.next - n - m, buf, m);
 }
 
-// ins 40
-
 void ins_sadd(Frame *f) {
-    OperandStack *s;
-    jshort v1, v2, result;
-    s = &f->operandStack;
-    v2 = OSPopShort(s);
-    v1 = OSPopShort(s);
-    result = v1 + v2;
-    OSPushShort(s, result);
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    jshort result = v1 + v2;
+    OSPushShort(&f->operandStack, result);
 }
 
 void ins_iadd(Frame *f) {
-    OperandStack *s;
-    jint v1, v2, result;
-    s = &f->operandStack;
-    v2 = OSPopInt(s);
-    v1 = OSPopInt(s);
-    result = v1 + v2;
-    OSPushInt(s, result);
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    jint result = v1 + v2;
+    OSPushInt(&f->operandStack, result);
 }
 
 void ins_ssub(Frame *f) {
-    OperandStack *s;
-    jshort v1, v2, result;
-    s = &f->operandStack;
-    v2 = OSPopShort(s);
-    v1 = OSPopShort(s);
-    result = v1 - v2;
-    OSPushShort(s, result);
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    jshort result = v1 - v2;
+    OSPushShort(&f->operandStack, result);
 }
 
 void ins_isub(Frame *f) {
-    OperandStack *s;
-    jint v1, v2, result;
-    s = &f->operandStack;
-    v2 = OSPopInt(s);
-    v1 = OSPopInt(s);
-    result = v1 - v2;
-    OSPushInt(s, result);
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    jint result = v1 - v2;
+    OSPushInt(&f->operandStack, result);
+}
+
+void ins_smul(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    jshort result = v1 * v2;
+    OSPushShort(&f->operandStack, result);
+}
+
+void ins_imul(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    jint result = v1 * v2;
+    OSPushInt(&f->operandStack, result);
+}
+
+void ins_sdiv(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    jshort result = v1 / v2;
+    OSPushShort(&f->operandStack, result);
+}
+
+void ins_idiv(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    jint result = v1 / v2;
+    OSPushInt(&f->operandStack, result);
+}
+
+void ins_srem(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    jshort result = v1 % v2;
+    OSPushShort(&f->operandStack, result);
+}
+
+void ins_irem(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    jint result = v1 % v2;
+    OSPushInt(&f->operandStack, result);
+}
+
+void ins_sneg(Frame *f) {
+    jshort v = OSPopShort(&f->operandStack);
+    OSPushShort(&f->operandStack, -v);
+}
+
+void ins_ineg(Frame *f) {
+    jint v = OSPopInt(&f->operandStack);
+    OSPushInt(&f->operandStack, -v);
+}
+
+void ins_sshl(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    v2 &= 0x1F;
+    OSPushShort(&f->operandStack, v1 << v2);
+}
+
+void ins_ishl(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    v2 &= 0x1F;
+    OSPushInt(&f->operandStack, v1 << v2);
+}
+
+void ins_sshr(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    v2 &= 0x1F;
+    OSPushShort(&f->operandStack, v1 >> v2);
+}
+
+// ins 50
+
+void ins_ishr(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    v2 &= 0x1F;
+    OSPushInt(&f->operandStack, v1 >> v2);
+}
+
+void ins_sushr(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    v2 &= 0x1F;
+    OSPushShort(&f->operandStack, (uint16_t) v1 >> v2);
+}
+
+void ins_iushr(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    v2 &= 0x1F;
+    OSPushInt(&f->operandStack, (uint32_t) v1 >> v2);
+}
+
+void ins_sand(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    OSPushShort(&f->operandStack, v1 & v2);
+}
+
+void ins_iand(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    OSPushInt(&f->operandStack, v1 & v2);
+}
+
+void ins_sor(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    OSPushShort(&f->operandStack, v1 | v2);
+}
+
+void ins_ior(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    OSPushInt(&f->operandStack, v1 | v2);
+}
+
+void ins_sxor(Frame *f) {
+    jshort v2 = OSPopShort(&f->operandStack);
+    jshort v1 = OSPopShort(&f->operandStack);
+    OSPushShort(&f->operandStack, v1 ^ v2);
+}
+
+void ins_ixor(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    OSPushInt(&f->operandStack, v1 ^ v2);
+}
+
+void ins_sinc(Frame *f) {
+    uint8_t index = FrameReadByte(f);
+    jbyte val = FrameReadByte(f);
+    jshort var = VTGetShort(&f->variableTable, index);
+    VTSetShort(&f->variableTable, index, var + val);
+}
+
+void ins_iinc(Frame *f) {
+    uint8_t index = FrameReadByte(f);
+    jbyte val = FrameReadByte(f);
+    jint var = VTGetInt(&f->variableTable, index);
+    VTSetInt(&f->variableTable, index, var + val);
+}
+
+void ins_s2b(Frame *f) {
+    jshort v = OSPopShort(&f->operandStack);
+    OSPushShort(&f->operandStack, (jbyte) v);
+}
+
+void ins_s2i(Frame *f) {
+    jshort v = OSPopShort(&f->operandStack);
+    OSPushInt(&f->operandStack, (jint) v);
+}
+
+void ins_i2b(Frame *f) {
+    jint v = OSPopInt(&f->operandStack);
+    OSPushShort(&f->operandStack, (jbyte) v);
+}
+
+void ins_i2s(Frame *f) {
+    jint v = OSPopInt(&f->operandStack);
+    OSPushShort(&f->operandStack, (jshort) v);
+}
+
+void ins_icmp(Frame *f) {
+    jint v2 = OSPopInt(&f->operandStack);
+    jint v1 = OSPopInt(&f->operandStack);
+    OSPushInt(&f->operandStack, v1 < v2 ? -1 : (v1 == v2 ? 0 : 1));
 }
