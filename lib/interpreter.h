@@ -11,4 +11,4 @@ jint ByteCodeReadInt(void);
 
 void ByteCodeBranch(int16_t offset);
 
-#endif //JIECARDVM_INTERPRETER_H
+#endif // JIECARDVM_INTERPRETER_H

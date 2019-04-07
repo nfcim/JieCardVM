@@ -5,21 +5,19 @@
 
 #include "types.h"
 
-
 typedef struct {
-    uint16_t *base;  // base memory
-    uint16_t *next;  // next slot
+  uint16_t *base; // base memory
+  uint16_t *next; // next slot
 } OperandStack;
 
 typedef struct {
-    jshort *base;   // base memory
+  jshort *base; // base memory
 } VariableTable;
 
 typedef struct {
-    OperandStack operandStack;
-    VariableTable variableTable;
+  OperandStack operandStack;
+  VariableTable variableTable;
 } Frame;
-
 
 //<editor-fold desc="OperandStackOperations">
 
@@ -36,7 +34,6 @@ void OSPushInt(OperandStack *s, jint val);
 jint OSGetInt(OperandStack *s);
 
 //</editor-fold>
-
 
 //<editor-fold desc="VariableTableOperations">
 

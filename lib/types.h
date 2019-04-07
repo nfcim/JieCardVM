@@ -7,4 +7,4 @@ typedef int8_t jbyte;
 typedef int16_t jshort;
 typedef int32_t jint;
 
-#endif //JIECARDVM_TYPES_H
+#endif // JIECARDVM_TYPES_H
