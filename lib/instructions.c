@@ -640,3 +640,31 @@ void ins_goto_w(Frame *f) {
   jshort branch = BCReadU2();
   PCSetOffset(branch);
 }
+
+void ins_getfield_abs_w(Frame *f) {
+  u2 index = BCReadU2();
+  jshort objRef = OSPop(&f->operandStack);
+  jshort value = ODGet(objRef, index);
+  OSPush(&f->operandStack, value);
+}
+
+void ins_getfield_abs_this(Frame *f) {
+  u1 index = BCReadU1();
+  jshort objRef = VTGet(&f->variableTable, 0);
+  jshort value = ODGet(objRef, index);
+  OSPush(&f->operandStack, value);
+}
+
+void ins_putfield_abs_w(Frame *f) {
+  u2 index = BCReadU2();
+  jshort value = OSPop(&f->operandStack);
+  jshort objRef = OSPop(&f->operandStack);
+  ODSet(objRef, index, value);
+}
+
+void ins_putfield_abs_this(Frame *f) {
+  u1 index = BCReadU1();
+  jshort value = OSPop(&f->operandStack);
+  jshort objRef = VTGet(&f->variableTable, 0);
+  ODSet(objRef, index, value);
+}

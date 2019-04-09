@@ -108,18 +108,10 @@ void ins_if_scmpge_w(Frame *f);
 void ins_if_scmpgt_w(Frame *f);
 void ins_if_scmple_w(Frame *f);
 void ins_goto_w(Frame *f);
-void ins_getfield_a_w(Frame *f);
-void ins_getfield_b_w(Frame *f);
-void ins_getfield_s_w(Frame *f);
-void ins_getfield_a_this(Frame *f);
-void ins_getfield_b_this(Frame *f);
-void ins_getfield_s_this(Frame *f);
-void ins_putfield_a_w(Frame *f);
-void ins_putfield_b_w(Frame *f);
-void ins_putfield_s_w(Frame *f);
-void ins_putfield_a_this(Frame *f);
-void ins_putfield_b_this(Frame *f);
-void ins_putfield_s_this(Frame *f);
+void ins_getfield_abs_w(Frame *f);
+void ins_getfield_abs_this(Frame *f);
+void ins_putfield_abs_w(Frame *f);
+void ins_putfield_abs_this(Frame *f);
 
 void (*opcodes[256])(Frame *) = {
     ins_nop,
@@ -291,21 +283,21 @@ void (*opcodes[256])(Frame *) = {
     ins_if_scmpgt_w,
     ins_if_scmple_w,
     ins_goto_w,
-    ins_getfield_a_w,
-    ins_getfield_b_w,
-    ins_getfield_s_w,
+    ins_getfield_abs_w, // getfield_a_w
+    ins_getfield_abs_w, // getfield_b_w
+    ins_getfield_abs_w, // getfield_s_w
     ins_invalid,
-    ins_getfield_a_this,
-    ins_getfield_b_this,
-    ins_getfield_s_this,
+    ins_getfield_abs_this, // getfield_a_this
+    ins_getfield_abs_this, // getfield_b_this
+    ins_getfield_abs_this, // getfield_s_this
     ins_invalid,
-    ins_putfield_a_w,
-    ins_putfield_b_w,
-    ins_putfield_s_w,
+    ins_putfield_abs_w, // putfield_a_w
+    ins_putfield_abs_w, // putfield_b_w
+    ins_putfield_abs_w, // putfield_s_w
     ins_invalid,
-    ins_putfield_a_this,
-    ins_putfield_b_this,
-    ins_putfield_s_this,
+    ins_putfield_abs_this, // putfield_a_this
+    ins_putfield_abs_this, // putfield_b_this
+    ins_putfield_abs_this, // putfield_s_this
     ins_invalid,
     ins_invalid,
     ins_invalid,
