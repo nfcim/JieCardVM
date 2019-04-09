@@ -15,29 +15,19 @@ void ins_sconst_4(Frame *f);
 void ins_sconst_5(Frame *f);
 void ins_bspush(Frame *f);
 void ins_sspush(Frame *f);
-void ins_aload(Frame *f);
-void ins_sload(Frame *f);
-void ins_aload_0(Frame *f);
-void ins_aload_1(Frame *f);
-void ins_aload_2(Frame *f);
-void ins_aload_3(Frame *f);
-void ins_sload_0(Frame *f);
-void ins_sload_1(Frame *f);
-void ins_sload_2(Frame *f);
-void ins_sload_3(Frame *f);
+void ins_asload(Frame *f);
+void ins_asload_0(Frame *f);
+void ins_asload_1(Frame *f);
+void ins_asload_2(Frame *f);
+void ins_asload_3(Frame *f);
 void ins_aaload(Frame *f);
 void ins_baload(Frame *f);
 void ins_saload(Frame *f);
-void ins_astore(Frame *f);
-void ins_sstore(Frame *f);
-void ins_astore_0(Frame *f);
-void ins_astore_1(Frame *f);
-void ins_astore_2(Frame *f);
-void ins_astore_3(Frame *f);
-void ins_sstore_0(Frame *f);
-void ins_sstore_1(Frame *f);
-void ins_sstore_2(Frame *f);
-void ins_sstore_3(Frame *f);
+void ins_asstore(Frame *f);
+void ins_asstore_0(Frame *f);
+void ins_asstore_1(Frame *f);
+void ins_asstore_2(Frame *f);
+void ins_asstore_3(Frame *f);
 void ins_aastore(Frame *f);
 void ins_bastore(Frame *f);
 void ins_sastore(Frame *f);
@@ -85,20 +75,10 @@ void ins_slookupswitch(Frame *f);
 void ins_areturn(Frame *f);
 void ins_sreturn(Frame *f);
 void ins_return(Frame *f);
-void ins_getstatic_a(Frame *f);
-void ins_getstatic_b(Frame *f);
-void ins_getstatic_s(Frame *f);
-void ins_putstatic_a(Frame *f);
-void ins_putstatic_b(Frame *f);
-void ins_putstatic_s(Frame *f);
-void ins_getfield_a(Frame *f);
-void ins_getfield_b(Frame *f);
-void ins_getfield_s(Frame *f);
-void ins_getfield_i(Frame *f);
-void ins_putfield_a(Frame *f);
-void ins_putfield_b(Frame *f);
-void ins_putfield_s(Frame *f);
-void ins_putfield_i(Frame *f);
+void ins_getstatic_abs(Frame *f);
+void ins_putstatic_abs(Frame *f);
+void ins_getfield_abs(Frame *f);
+void ins_putfield_abs(Frame *f);
 void ins_invokevirtual(Frame *f);
 void ins_invokespecial(Frame *f);
 void ins_invokestatic(Frame *f);
@@ -163,17 +143,17 @@ void (*opcodes[256])(Frame *) = {
     ins_invalid,
     ins_invalid,
     ins_invalid,
-    ins_aload,
-    ins_sload,
+    ins_asload, // aload
+    ins_asload, // sload
     ins_invalid,
-    ins_aload_0,
-    ins_aload_1,
-    ins_aload_2,
-    ins_aload_3,
-    ins_sload_0,
-    ins_sload_1,
-    ins_sload_2,
-    ins_sload_3,
+    ins_asload_0, // aload_0
+    ins_asload_1, // aload_1
+    ins_asload_2, // aload_2
+    ins_asload_3, // aload_3
+    ins_asload_0, // sload_0
+    ins_asload_1, // sload_1
+    ins_asload_2, // sload_2
+    ins_asload_3, // sload_3
     ins_invalid,
     ins_invalid,
     ins_invalid,
@@ -182,17 +162,17 @@ void (*opcodes[256])(Frame *) = {
     ins_baload,
     ins_saload,
     ins_invalid,
-    ins_astore,
-    ins_sstore,
+    ins_asstore, // astore
+    ins_asstore, // sstore
     ins_invalid,
-    ins_astore_0,
-    ins_astore_1,
-    ins_astore_2,
-    ins_astore_3,
-    ins_sstore_0,
-    ins_sstore_1,
-    ins_sstore_2,
-    ins_sstore_3,
+    ins_asstore_0, // astore_0
+    ins_asstore_1, // astore_1
+    ins_asstore_2, // astore_2
+    ins_asstore_3, // astore_3
+    ins_asstore_0, // sstore_0
+    ins_asstore_1, // sstore_1
+    ins_asstore_2, // sstore_2
+    ins_asstore_3, // sstore_3
     ins_invalid,
     ins_invalid,
     ins_invalid,
@@ -265,22 +245,22 @@ void (*opcodes[256])(Frame *) = {
     ins_sreturn,
     ins_invalid,
     ins_return,
-    ins_getstatic_a,
-    ins_getstatic_b,
-    ins_getstatic_s,
+    ins_getstatic_abs, // getstatic_a
+    ins_getstatic_abs, // getstatic_b
+    ins_getstatic_abs, // getstatic_s
     ins_invalid,
-    ins_putstatic_a,
-    ins_putstatic_b,
-    ins_putstatic_s,
+    ins_putstatic_abs, // putstatic_a
+    ins_putstatic_abs, // putstatic_b
+    ins_putstatic_abs, // putstatic_s
     ins_invalid,
-    ins_getfield_a,
-    ins_getfield_b,
-    ins_getfield_s,
-    ins_getfield_i,
-    ins_putfield_a,
-    ins_putfield_b,
-    ins_putfield_s,
-    ins_putfield_i,
+    ins_getfield_abs, // getfield_a
+    ins_getfield_abs, // getfield_b
+    ins_getfield_abs, // getfield_s
+    ins_invalid,
+    ins_putfield_abs, // putfield_a
+    ins_putfield_abs, // putfield_b
+    ins_putfield_abs, // putfield_s
+    ins_invalid,
     ins_invokevirtual,
     ins_invokespecial,
     ins_invokestatic,

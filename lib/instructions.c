@@ -4,7 +4,7 @@
 
 void ins_nop(Frame *f) {}
 
-void ins_aconst_null(Frame *f) { OSPush(&f->operandStack, 0); }
+void ins_aconst_null(Frame *f) { OSPush(&f->operandStack, JNULL); }
 
 void ins_sconst_m1(Frame *f) { OSPush(&f->operandStack, -1); }
 
@@ -30,54 +30,28 @@ void ins_sspush(Frame *f) {
   OSPush(&f->operandStack, v);
 }
 
-void ins_aload(Frame *f) {
-  u1 index = BCReadU1();
-  jshort addr = VTGet(&f->variableTable, index);
-  OSPush(&f->operandStack, addr);
-}
-
-void ins_sload(Frame *f) {
+void ins_asload(Frame *f) {
   u1 index = BCReadU1();
   jshort v = VTGet(&f->variableTable, index);
   OSPush(&f->operandStack, v);
 }
 
-void ins_aload_0(Frame *f) {
-  jshort addr = VTGet(&f->variableTable, 0);
-  OSPush(&f->operandStack, addr);
-}
-
-void ins_aload_1(Frame *f) {
-  jshort addr = VTGet(&f->variableTable, 1);
-  OSPush(&f->operandStack, addr);
-}
-
-void ins_aload_2(Frame *f) {
-  jshort addr = VTGet(&f->variableTable, 2);
-  OSPush(&f->operandStack, addr);
-}
-
-void ins_aload_3(Frame *f) {
-  jshort addr = VTGet(&f->variableTable, 3);
-  OSPush(&f->operandStack, addr);
-}
-
-void ins_sload_0(Frame *f) {
+void ins_asload_0(Frame *f) {
   jshort v = VTGet(&f->variableTable, 0);
   OSPush(&f->operandStack, v);
 }
 
-void ins_sload_1(Frame *f) {
+void ins_asload_1(Frame *f) {
   jshort v = VTGet(&f->variableTable, 1);
   OSPush(&f->operandStack, v);
 }
 
-void ins_sload_2(Frame *f) {
+void ins_asload_2(Frame *f) {
   jshort v = VTGet(&f->variableTable, 2);
   OSPush(&f->operandStack, v);
 }
 
-void ins_sload_3(Frame *f) {
+void ins_asload_3(Frame *f) {
   jshort v = VTGet(&f->variableTable, 3);
   OSPush(&f->operandStack, v);
 }
@@ -94,54 +68,28 @@ void ins_saload(Frame *f) {
   // TODO
 }
 
-void ins_astore(Frame *f) {
-  u1 index = BCReadU1();
-  jshort addr = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, index, addr);
-}
-
-void ins_sstore(Frame *f) {
+void ins_asstore(Frame *f) {
   u1 index = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   VTSet(&f->variableTable, index, v);
 }
 
-void ins_astore_0(Frame *f) {
-  jshort addr = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, 0, addr);
-}
-
-void ins_astore_1(Frame *f) {
-  jshort addr = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, 1, addr);
-}
-
-void ins_astore_2(Frame *f) {
-  jshort addr = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, 2, addr);
-}
-
-void ins_astore_3(Frame *f) {
-  jshort addr = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, 3, addr);
-}
-
-void ins_sstore_0(Frame *f) {
+void ins_asstore_0(Frame *f) {
   jshort v = OSPop(&f->operandStack);
   VTSet(&f->variableTable, 0, v);
 }
 
-void ins_sstore_1(Frame *f) {
+void ins_asstore_1(Frame *f) {
   jshort v = OSPop(&f->operandStack);
   VTSet(&f->variableTable, 1, v);
 }
 
-void ins_sstore_2(Frame *f) {
+void ins_asstore_2(Frame *f) {
   jshort v = OSPop(&f->operandStack);
   VTSet(&f->variableTable, 2, v);
 }
 
-void ins_sstore_3(Frame *f) {
+void ins_asstore_3(Frame *f) {
   jshort v = OSPop(&f->operandStack);
   VTSet(&f->variableTable, 3, v);
 }
@@ -186,8 +134,6 @@ void ins_dup_x(Frame *f) {
   memcpy(f->operandStack.next - n, f->operandStack.next, m);
   f->operandStack.next += m;
 }
-
-// ins 40
 
 void ins_swap_x(Frame *f) {
   u1 buf[2];
@@ -426,7 +372,7 @@ void ins_if_scmple(Frame *f) {
   }
 }
 
-void ins_if_goto(Frame *f) {
+void ins_goto(Frame *f) {
   jbyte branch = BCReadU1();
   PCSetOffset(branch);
 }
@@ -482,13 +428,215 @@ void ins_return(Frame *f) {
 }
 
 void ins_getstatic_abs(Frame *f) {
-  jshort index = BCReadU2();
+  u2 index = BCReadU2();
   jshort v = CPGetData(index);
   OSPush(&f->operandStack, v);
 }
 
 void ins_putstatic_abs(Frame *f) {
-  jshort index = BCReadU2();
+  u2 index = BCReadU2();
   jshort v = OSPop(&f->operandStack);
   CPSetData(index, v);
+}
+
+void ins_getfield_abs(Frame *f) {
+  u1 index = BCReadU1();
+  jshort objRef = OSPop(&f->operandStack);
+  jshort value = ODGet(objRef, index);
+  OSPush(&f->operandStack, value);
+}
+
+void ins_putfield_abs(Frame *f) {
+  u1 index = BCReadU1();
+  jshort value = OSPop(&f->operandStack);
+  jshort objRef = OSPop(&f->operandStack);
+  ODSet(objRef, index, value);
+}
+
+void ins_invokevirtual(Frame *f) {
+  // TODO
+}
+
+void ins_invokespecial(Frame *f) {
+  // TODO
+}
+
+void ins_invokestatic(Frame *f) {
+  // TODO
+}
+
+void ins_invokeinterface(Frame *f) {
+  // TODO
+}
+
+void ins_new(Frame *f) {
+  // TODO
+}
+
+void ins_newarray(Frame *f) {
+  // TODO
+}
+
+void ins_anewarray(Frame *f) {
+  // TODO
+}
+
+void ins_arraylength(Frame *f) {
+  // TODO
+}
+
+void ins_athrow(Frame *f) {
+  // TODO
+}
+
+void ins_checkcast(Frame *f) {
+  // TODO
+}
+
+void ins_sinc_w(Frame *f) {
+  u1 index = BCReadU1();
+  jshort v = BCReadU2();
+  jshort var = VTGet(&f->variableTable, index);
+  VTSet(&f->variableTable, index, var + v);
+}
+
+void ins_ifeq_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v = OSPop(&f->operandStack);
+  if (v == 0) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_ifne_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v = OSPop(&f->operandStack);
+  if (v != 0) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_iflt_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v = OSPop(&f->operandStack);
+  if (v < 0) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_ifge_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v = OSPop(&f->operandStack);
+  if (v >= 0) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_ifgt_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v = OSPop(&f->operandStack);
+  if (v > 0) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_ifle_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v = OSPop(&f->operandStack);
+  if (v <= 0) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_ifnull_w(Frame *f) {
+  jshort branch = BCReadU2();
+  u2 v = OSPop(&f->operandStack);
+  if (v == 0) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_ifnonnull_w(Frame *f) {
+  jshort branch = BCReadU2();
+  u2 v = (u2)OSPop(&f->operandStack);
+  if (v > 0) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_if_acmpeq_w(Frame *f) {
+  jshort branch = BCReadU2();
+  u2 v2 = (u2)OSPop(&f->operandStack);
+  u2 v1 = (u2)OSPop(&f->operandStack);
+  if (v1 == v2) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_if_acmpne_w(Frame *f) {
+  jshort branch = BCReadU2();
+  u2 v2 = (u2)OSPop(&f->operandStack);
+  u2 v1 = (u2)OSPop(&f->operandStack);
+  if (v1 != v2) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_if_scmpeq_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v2 = OSPop(&f->operandStack);
+  jshort v1 = OSPop(&f->operandStack);
+  if (v1 == v2) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_if_scmpne_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v2 = OSPop(&f->operandStack);
+  jshort v1 = OSPop(&f->operandStack);
+  if (v1 != v2) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_if_scmplt_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v2 = OSPop(&f->operandStack);
+  jshort v1 = OSPop(&f->operandStack);
+  if (v1 < v2) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_if_scmpge_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v2 = OSPop(&f->operandStack);
+  jshort v1 = OSPop(&f->operandStack);
+  if (v1 >= v2) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_if_scmpgt_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v2 = OSPop(&f->operandStack);
+  jshort v1 = OSPop(&f->operandStack);
+  if (v1 > v2) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_if_scmple_w(Frame *f) {
+  jshort branch = BCReadU2();
+  jshort v2 = OSPop(&f->operandStack);
+  jshort v1 = OSPop(&f->operandStack);
+  if (v1 <= v2) {
+    PCSetOffset(branch);
+  }
+}
+
+void ins_goto_w(Frame *f) {
+  jshort branch = BCReadU2();
+  PCSetOffset(branch);
 }

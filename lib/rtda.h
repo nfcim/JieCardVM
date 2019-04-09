@@ -43,4 +43,8 @@ u2 CPGetData(u2 index);
 
 void CPSetData(u2 index, u2 val);
 
+jshort ODGet(jshort objRef, jshort index);
+
+jshort ODSet(jshort objRef, jshort index, jshort value);
+
 #endif // JIECARDVM_RTDA_H
