@@ -1,193 +1,403 @@
 #ifndef JIECARDVM_INSTRUCTION_H
 #define JIECARDVM_INSTRUCTION_H
 
-enum {
-  aaload = 0x24,
-  aastore = 0x37,
-  aconst_null = 0x1,
-  aload = 0x15,
-  aload_0 = 0x18,
-  aload_1 = 0x19,
-  aload_2 = 0x1A,
-  aload_3 = 0x1B,
-  anewarray = 0x91,
-  areturn = 0x77,
-  arraylength = 0x92,
-  astore = 0x28,
-  astore_0 = 0x2B,
-  astore_1 = 0x2C,
-  astore_2 = 0x2D,
-  astore_3 = 0x2E,
-  athrow = 0x93,
-  baload = 0x25,
-  bastore = 0x38,
-  bipush = 0x12,
-  bspush = 0x10,
-  checkcast = 0x94,
-  dup = 0x3D,
-  dup_x = 0x3F,
-  dup2 = 0x3E,
-  getfield_a = 0x83,
-  getfield_b = 0x84,
-  getfield_s = 0x85,
-  getfield_i = 0x86,
-  getfield_a_this = 0xAD,
-  getfield_b_this = 0xAE,
-  getfield_s_this = 0xAF,
-  getfield_i_this = 0xB0,
-  getfield_a_w = 0xA9,
-  getfield_b_w = 0xAA,
-  getfield_s_w = 0xAB,
-  getfield_i_w = 0xAC,
-  getstatic_a = 0x7B,
-  getstatic_b = 0x7C,
-  getstatic_s = 0x7D,
-  getstatic_i = 0x7E,
-  goto_ = 0x70,
-  goto_w = 0xA8,
-  i2b = 0x5D,
-  i2s = 0x5E,
-  iadd = 0x42,
-  iaload = 0x27,
-  iand = 0x54,
-  iastore = 0x3A,
-  icmp = 0x5F,
-  iconst_m1 = 0x9,
-  iconst_0 = 0xA,
-  iconst_1 = 0xB,
-  iconst_2 = 0xC,
-  iconst_3 = 0xD,
-  iconst_4 = 0xE,
-  iconst_5 = 0xF,
-  idiv = 0x48,
-  if_acmpeq = 0x68,
-  if_acmpne = 0x69,
-  if_acmpeq_w = 0xA0,
-  if_acmpne_w = 0xA1,
-  if_scmpeq = 0x6A,
-  if_scmpne = 0x6B,
-  if_scmplt = 0x6C,
-  if_scmpge = 0x6D,
-  if_scmpgt = 0x6E,
-  if_scmple = 0x6F,
-  if_scmpeq_w = 0xA2,
-  if_scmpne_w = 0xA3,
-  if_scmplt_w = 0xA4,
-  if_scmpge_w = 0xA5,
-  if_scmpgt_w = 0xA6,
-  if_scmple_w = 0xA7,
-  ifeq = 0x60,
-  ifne = 0x61,
-  iflt = 0x62,
-  ifge = 0x63,
-  ifgt = 0x64,
-  ifle = 0x65,
-  ifeq_w = 0x98,
-  ifne_w = 0x99,
-  iflt_w = 0x9A,
-  ifge_w = 0x9B,
-  ifgt_w = 0x9C,
-  ifle_w = 0x9D,
-  ifnonnull = 0x67,
-  ifnonnull_w = 0x9F,
-  ifnull = 0x66,
-  ifnull_w = 0x9E,
-  iinc = 0x5A,
-  iinc_w = 0x97,
-  iipush = 0x14,
-  iload = 0x17,
-  iload_0 = 0x20,
-  iload_1 = 0x21,
-  iload_2 = 0x22,
-  iload_3 = 0x23,
-  ilookupswitch = 0x76,
-  imul = 0x46,
-  ineg = 0x4C,
-  instanceof
-  = 0x95,
-  invokeinterface = 0x8E,
-  invokespecial = 0x8C,
-  invokestatic = 0x8D,
-  invokevirtual = 0x8B,
-  ior = 0x56,
-  irem = 0x4A,
-  ireturn = 0x79,
-  ishl = 0x4E,
-  ishr = 0x50,
-  istore = 0x2A,
-  istore_0 = 0x33,
-  istore_1 = 0x34,
-  istore_2 = 0x35,
-  istore_3 = 0x36,
-  isub = 0x44,
-  itableswitch = 0x74,
-  iushr = 0x52,
-  ixor = 0x58,
-  jsr = 0x71,
-  new_ = 0x8F,
-  newarray = 0x90,
-  nop = 0x0,
-  pop = 0x3B,
-  pop2 = 0x3C,
-  putfield_a = 0x87,
-  putfield_b = 0x88,
-  putfield_s = 0x89,
-  putfield_i = 0x8A,
-  putfield_a_this = 0xB5,
-  putfield_b_this = 0xB6,
-  putfield_s_this = 0xB7,
-  putfield_i_this = 0xB8,
-  putfield_a_w = 0xB1,
-  putfield_b_w = 0xB2,
-  putfield_s_w = 0xB3,
-  putfield_i_w = 0xB4,
-  putstatic_a = 0x7F,
-  putstatic_b = 0x80,
-  putstatic_s = 0x81,
-  putstatic_i = 0x82,
-  ret = 0x72,
-  return_ = 0x7A,
-  s2b = 0x5B,
-  s2i = 0x5C,
-  sadd = 0x41,
-  saload = 0x26,
-  sand = 0x53,
-  sastore = 0x39,
-  sconst_m1 = 0x2,
-  sconst_0 = 0x3,
-  sconst_1 = 0x4,
-  sconst_2 = 0x5,
-  sconst_3 = 0x6,
-  sconst_4 = 0x7,
-  sconst_5 = 0x8,
-  sdiv = 0x47,
-  sinc = 0x59,
-  sinc_w = 0x96,
-  sipush = 0x13,
-  sload = 0x16,
-  sload_0 = 0x1C,
-  sload_1 = 0x1D,
-  sload_2 = 0x1E,
-  sload_3 = 0x1F,
-  slookupswitch = 0x75,
-  smul = 0x45,
-  sneg = 0x4B,
-  sor = 0x55,
-  srem = 0x49,
-  sreturn = 0x78,
-  sshl = 0x4D,
-  sshr = 0x4F,
-  sspush = 0x11,
-  sstore = 0x29,
-  sstore_0 = 0x2F,
-  sstore_1 = 0x30,
-  sstore_2 = 0x31,
-  sstore_3 = 0x32,
-  ssub = 0x43,
-  stableswitch = 0x73,
-  sushr = 0x51,
-  swap_x = 0x40,
-  sxor = 0x57,
+#include "rtda.h"
+
+void ins_invalid(Frame *f);
+void ins_nop(Frame *f);
+void ins_aconst_null(Frame *f);
+void ins_sconst_m1(Frame *f);
+void ins_sconst_0(Frame *f);
+void ins_sconst_1(Frame *f);
+void ins_sconst_2(Frame *f);
+void ins_sconst_3(Frame *f);
+void ins_sconst_4(Frame *f);
+void ins_sconst_5(Frame *f);
+void ins_bspush(Frame *f);
+void ins_sspush(Frame *f);
+void ins_aload(Frame *f);
+void ins_sload(Frame *f);
+void ins_aload_0(Frame *f);
+void ins_aload_1(Frame *f);
+void ins_aload_2(Frame *f);
+void ins_aload_3(Frame *f);
+void ins_sload_0(Frame *f);
+void ins_sload_1(Frame *f);
+void ins_sload_2(Frame *f);
+void ins_sload_3(Frame *f);
+void ins_aaload(Frame *f);
+void ins_baload(Frame *f);
+void ins_saload(Frame *f);
+void ins_astore(Frame *f);
+void ins_sstore(Frame *f);
+void ins_astore_0(Frame *f);
+void ins_astore_1(Frame *f);
+void ins_astore_2(Frame *f);
+void ins_astore_3(Frame *f);
+void ins_sstore_0(Frame *f);
+void ins_sstore_1(Frame *f);
+void ins_sstore_2(Frame *f);
+void ins_sstore_3(Frame *f);
+void ins_aastore(Frame *f);
+void ins_bastore(Frame *f);
+void ins_sastore(Frame *f);
+void ins_pop(Frame *f);
+void ins_pop2(Frame *f);
+void ins_dup(Frame *f);
+void ins_dup2(Frame *f);
+void ins_dup_x(Frame *f);
+void ins_swap_x(Frame *f);
+void ins_sadd(Frame *f);
+void ins_ssub(Frame *f);
+void ins_smul(Frame *f);
+void ins_sdiv(Frame *f);
+void ins_srem(Frame *f);
+void ins_sneg(Frame *f);
+void ins_sshl(Frame *f);
+void ins_sshr(Frame *f);
+void ins_sushr(Frame *f);
+void ins_sand(Frame *f);
+void ins_sor(Frame *f);
+void ins_sxor(Frame *f);
+void ins_sinc(Frame *f);
+void ins_s2b(Frame *f);
+void ins_ifeq(Frame *f);
+void ins_ifne(Frame *f);
+void ins_iflt(Frame *f);
+void ins_ifge(Frame *f);
+void ins_ifgt(Frame *f);
+void ins_ifle(Frame *f);
+void ins_ifnull(Frame *f);
+void ins_ifnonnull(Frame *f);
+void ins_if_acmpeq(Frame *f);
+void ins_if_acmpne(Frame *f);
+void ins_if_scmpeq(Frame *f);
+void ins_if_scmpne(Frame *f);
+void ins_if_scmplt(Frame *f);
+void ins_if_scmpge(Frame *f);
+void ins_if_scmpgt(Frame *f);
+void ins_if_scmple(Frame *f);
+void ins_goto(Frame *f);
+void ins_jsr(Frame *f);
+void ins_ret(Frame *f);
+void ins_stableswitch(Frame *f);
+void ins_slookupswitch(Frame *f);
+void ins_areturn(Frame *f);
+void ins_sreturn(Frame *f);
+void ins_return(Frame *f);
+void ins_getstatic_a(Frame *f);
+void ins_getstatic_b(Frame *f);
+void ins_getstatic_s(Frame *f);
+void ins_putstatic_a(Frame *f);
+void ins_putstatic_b(Frame *f);
+void ins_putstatic_s(Frame *f);
+void ins_getfield_a(Frame *f);
+void ins_getfield_b(Frame *f);
+void ins_getfield_s(Frame *f);
+void ins_getfield_i(Frame *f);
+void ins_putfield_a(Frame *f);
+void ins_putfield_b(Frame *f);
+void ins_putfield_s(Frame *f);
+void ins_putfield_i(Frame *f);
+void ins_invokevirtual(Frame *f);
+void ins_invokespecial(Frame *f);
+void ins_invokestatic(Frame *f);
+void ins_invokeinterface(Frame *f);
+void ins_new(Frame *f);
+void ins_newarray(Frame *f);
+void ins_anewarray(Frame *f);
+void ins_arraylength(Frame *f);
+void ins_athrow(Frame *f);
+void ins_checkcast(Frame *f);
+void ins_instanceof(Frame *f);
+void ins_sinc_w(Frame *f);
+void ins_ifeq_w(Frame *f);
+void ins_ifne_w(Frame *f);
+void ins_iflt_w(Frame *f);
+void ins_ifge_w(Frame *f);
+void ins_ifgt_w(Frame *f);
+void ins_ifle_w(Frame *f);
+void ins_ifnull_w(Frame *f);
+void ins_ifnonnull_w(Frame *f);
+void ins_if_acmpeq_w(Frame *f);
+void ins_if_acmpne_w(Frame *f);
+void ins_if_scmpeq_w(Frame *f);
+void ins_if_scmpne_w(Frame *f);
+void ins_if_scmplt_w(Frame *f);
+void ins_if_scmpge_w(Frame *f);
+void ins_if_scmpgt_w(Frame *f);
+void ins_if_scmple_w(Frame *f);
+void ins_goto_w(Frame *f);
+void ins_getfield_a_w(Frame *f);
+void ins_getfield_b_w(Frame *f);
+void ins_getfield_s_w(Frame *f);
+void ins_getfield_a_this(Frame *f);
+void ins_getfield_b_this(Frame *f);
+void ins_getfield_s_this(Frame *f);
+void ins_putfield_a_w(Frame *f);
+void ins_putfield_b_w(Frame *f);
+void ins_putfield_s_w(Frame *f);
+void ins_putfield_a_this(Frame *f);
+void ins_putfield_b_this(Frame *f);
+void ins_putfield_s_this(Frame *f);
+
+void (*opcodes[256])(Frame *) = {
+    ins_nop,
+    ins_aconst_null,
+    ins_sconst_m1,
+    ins_sconst_0,
+    ins_sconst_1,
+    ins_sconst_2,
+    ins_sconst_3,
+    ins_sconst_4,
+    ins_sconst_5,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_bspush,
+    ins_sspush,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_aload,
+    ins_sload,
+    ins_invalid,
+    ins_aload_0,
+    ins_aload_1,
+    ins_aload_2,
+    ins_aload_3,
+    ins_sload_0,
+    ins_sload_1,
+    ins_sload_2,
+    ins_sload_3,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_aaload,
+    ins_baload,
+    ins_saload,
+    ins_invalid,
+    ins_astore,
+    ins_sstore,
+    ins_invalid,
+    ins_astore_0,
+    ins_astore_1,
+    ins_astore_2,
+    ins_astore_3,
+    ins_sstore_0,
+    ins_sstore_1,
+    ins_sstore_2,
+    ins_sstore_3,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_aastore,
+    ins_bastore,
+    ins_sastore,
+    ins_invalid,
+    ins_pop,
+    ins_pop2,
+    ins_dup,
+    ins_dup2,
+    ins_dup_x,
+    ins_swap_x,
+    ins_sadd,
+    ins_invalid,
+    ins_ssub,
+    ins_invalid,
+    ins_smul,
+    ins_invalid,
+    ins_sdiv,
+    ins_invalid,
+    ins_srem,
+    ins_invalid,
+    ins_sneg,
+    ins_invalid,
+    ins_sshl,
+    ins_invalid,
+    ins_sshr,
+    ins_invalid,
+    ins_sushr,
+    ins_invalid,
+    ins_sand,
+    ins_invalid,
+    ins_sor,
+    ins_invalid,
+    ins_sxor,
+    ins_invalid,
+    ins_sinc,
+    ins_invalid,
+    ins_s2b,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_ifeq,
+    ins_ifne,
+    ins_iflt,
+    ins_ifge,
+    ins_ifgt,
+    ins_ifle,
+    ins_ifnull,
+    ins_ifnonnull,
+    ins_if_acmpeq,
+    ins_if_acmpne,
+    ins_if_scmpeq,
+    ins_if_scmpne,
+    ins_if_scmplt,
+    ins_if_scmpge,
+    ins_if_scmpgt,
+    ins_if_scmple,
+    ins_goto,
+    ins_jsr,
+    ins_ret,
+    ins_stableswitch,
+    ins_invalid,
+    ins_slookupswitch,
+    ins_invalid,
+    ins_areturn,
+    ins_sreturn,
+    ins_invalid,
+    ins_return,
+    ins_getstatic_a,
+    ins_getstatic_b,
+    ins_getstatic_s,
+    ins_invalid,
+    ins_putstatic_a,
+    ins_putstatic_b,
+    ins_putstatic_s,
+    ins_invalid,
+    ins_getfield_a,
+    ins_getfield_b,
+    ins_getfield_s,
+    ins_getfield_i,
+    ins_putfield_a,
+    ins_putfield_b,
+    ins_putfield_s,
+    ins_putfield_i,
+    ins_invokevirtual,
+    ins_invokespecial,
+    ins_invokestatic,
+    ins_invokeinterface,
+    ins_new,
+    ins_newarray,
+    ins_anewarray,
+    ins_arraylength,
+    ins_athrow,
+    ins_checkcast,
+    ins_instanceof,
+    ins_sinc_w,
+    ins_invalid,
+    ins_ifeq_w,
+    ins_ifne_w,
+    ins_iflt_w,
+    ins_ifge_w,
+    ins_ifgt_w,
+    ins_ifle_w,
+    ins_ifnull_w,
+    ins_ifnonnull_w,
+    ins_if_acmpeq_w,
+    ins_if_acmpne_w,
+    ins_if_scmpeq_w,
+    ins_if_scmpne_w,
+    ins_if_scmplt_w,
+    ins_if_scmpge_w,
+    ins_if_scmpgt_w,
+    ins_if_scmple_w,
+    ins_goto_w,
+    ins_getfield_a_w,
+    ins_getfield_b_w,
+    ins_getfield_s_w,
+    ins_invalid,
+    ins_getfield_a_this,
+    ins_getfield_b_this,
+    ins_getfield_s_this,
+    ins_invalid,
+    ins_putfield_a_w,
+    ins_putfield_b_w,
+    ins_putfield_s_w,
+    ins_invalid,
+    ins_putfield_a_this,
+    ins_putfield_b_this,
+    ins_putfield_s_this,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
+    ins_invalid,
 };
 
 #endif // JIECARDVM_INSTRUCTION_H
