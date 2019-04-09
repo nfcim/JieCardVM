@@ -21,29 +21,19 @@ typedef struct {
 
 //<editor-fold desc="OperandStackOperations">
 
-jshort OSPopShort(OperandStack *s);
+jshort OSPop(OperandStack *s);
 
-void OSPushShort(OperandStack *s, jshort val);
+void OSPush(OperandStack *s, jshort val);
 
-jshort OSGetShort(OperandStack *s);
-
-jint OSPopInt(OperandStack *s);
-
-void OSPushInt(OperandStack *s, jint val);
-
-jint OSGetInt(OperandStack *s);
+jshort OSGet(OperandStack *s);
 
 //</editor-fold>
 
 //<editor-fold desc="VariableTableOperations">
 
-jshort VTGetShort(VariableTable *t, u1 index);
+jshort VTGet(VariableTable *t, u1 index);
 
-jint VTGetInt(VariableTable *t, u1 index);
-
-void VTSetShort(VariableTable *t, u1 index, jshort val);
-
-void VTSetInt(VariableTable *t, u1 index, jint val);
+void VTSet(VariableTable *t, u1 index, jshort val);
 
 //</editor-fold>
 

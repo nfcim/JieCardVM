@@ -15,4 +15,8 @@ u1 *ByteCodeGetPC(void);
 
 void ByteCodeSetPC(u1 *new_pc);
 
+u4 ContextGetData(u2 index);
+
+void ContextSetData(u2 index, u4 val);
+
 #endif // JIECARDVM_INTERPRETER_H

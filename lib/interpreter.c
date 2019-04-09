@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 static u1 *pc;
+static u4 *data;
 
 u1 ByteCodeReadU1(void) { return *pc++; }
 
@@ -25,3 +26,7 @@ void ByteCodeOffset(int16_t offset) { pc += offset; }
 u1 *ByteCodeGetPC(void) { return pc; }
 
 void ByteCodeSetPC(u1 *new_pc) { pc = new_pc; }
+
+u4 ContextGetData(u2 index) { return data[index]; }
+
+void ContextSetData(u2 index, u4 val) { data[index] = val; }
