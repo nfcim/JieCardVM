@@ -1,5 +1,5 @@
-#ifndef JIECARDVM_RTDATA_H
-#define JIECARDVM_RTDATA_H
+#ifndef JIECARDVM_RTDA_H
+#define JIECARDVM_RTDA_H
 
 #include <stdint.h>
 
@@ -19,22 +19,28 @@ typedef struct {
   VariableTable variableTable;
 } Frame;
 
-//<editor-fold desc="OperandStackOperations">
-
 jshort OSPop(OperandStack *s);
 
 void OSPush(OperandStack *s, jshort val);
 
 jshort OSGet(OperandStack *s);
 
-//</editor-fold>
-
-//<editor-fold desc="VariableTableOperations">
-
 jshort VTGet(VariableTable *t, u1 index);
 
 void VTSet(VariableTable *t, u1 index, jshort val);
 
-//</editor-fold>
+u1 BCReadU1(void);
 
-#endif // JIECARDVM_RTDATA_H
+u2 BCReadU2(void);
+
+u1 *PCGet(void);
+
+void PCSet(u1 *new_pc);
+
+void PCSetOffset(int16_t offset);
+
+u2 CPGetData(u2 index);
+
+void CPSetData(u2 index, u2 val);
+
+#endif // JIECARDVM_RTDA_H

@@ -1,7 +1,6 @@
 #include <string.h>
 
-#include "interpreter.h"
-#include "rtdata.h"
+#include "rtda.h"
 
 void ins_nop(Frame *f) {}
 
@@ -22,23 +21,23 @@ void ins_sconst_4(Frame *f) { OSPush(&f->operandStack, 4); }
 void ins_sconst_5(Frame *f) { OSPush(&f->operandStack, 5); }
 
 void ins_bspush(Frame *f) {
-  jbyte v = ByteCodeReadU1();
+  jbyte v = BCReadU1();
   OSPush(&f->operandStack, v);
 }
 
 void ins_sspush(Frame *f) {
-  jshort v = ByteCodeReadU2();
+  jshort v = BCReadU2();
   OSPush(&f->operandStack, v);
 }
 
 void ins_aload(Frame *f) {
-  u1 index = ByteCodeReadU1();
+  u1 index = BCReadU1();
   jshort addr = VTGet(&f->variableTable, index);
   OSPush(&f->operandStack, addr);
 }
 
 void ins_sload(Frame *f) {
-  u1 index = ByteCodeReadU1();
+  u1 index = BCReadU1();
   jshort v = VTGet(&f->variableTable, index);
   OSPush(&f->operandStack, v);
 }
@@ -96,13 +95,13 @@ void ins_saload(Frame *f) {
 }
 
 void ins_astore(Frame *f) {
-  u1 index = ByteCodeReadU1();
+  u1 index = BCReadU1();
   jshort addr = OSPop(&f->operandStack);
   VTSet(&f->variableTable, index, addr);
 }
 
 void ins_sstore(Frame *f) {
-  u1 index = ByteCodeReadU1();
+  u1 index = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   VTSet(&f->variableTable, index, v);
 }
@@ -180,7 +179,7 @@ void ins_dup2(Frame *f) {
 }
 
 void ins_dup_x(Frame *f) {
-  u1 mn = ByteCodeReadU1();
+  u1 mn = BCReadU1();
   u1 m = (mn >> 4) * 2;
   u1 n = (mn & 0xF) * 2;
   memmove(f->operandStack.next - n + m, f->operandStack.next - n, n);
@@ -192,7 +191,7 @@ void ins_dup_x(Frame *f) {
 
 void ins_swap_x(Frame *f) {
   u1 buf[2];
-  u1 mn = ByteCodeReadU1();
+  u1 mn = BCReadU1();
   u1 m = (mn >> 4) * 2;
   u1 n = (mn & 0xF) * 2;
   memcpy(buf, f->operandStack.next - m, m);
@@ -280,8 +279,8 @@ void ins_sxor(Frame *f) {
 }
 
 void ins_sinc(Frame *f) {
-  u1 index = ByteCodeReadU1();
-  jbyte v = ByteCodeReadU1();
+  u1 index = BCReadU1();
+  jbyte v = BCReadU1();
   jshort var = VTGet(&f->variableTable, index);
   VTSet(&f->variableTable, index, var + v);
 }
@@ -292,144 +291,144 @@ void ins_s2b(Frame *f) {
 }
 
 void ins_ifeq(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v == 0) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_ifne(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v != 0) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_iflt(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v < 0) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_ifge(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v >= 0) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_ifgt(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v > 0) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_ifle(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v <= 0) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_ifnull(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   u2 v = OSPop(&f->operandStack);
   if (v == 0) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_ifnonnull(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   u2 v = (u2)OSPop(&f->operandStack);
   if (v > 0) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_acmpeq(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   u2 v2 = (u2)OSPop(&f->operandStack);
   u2 v1 = (u2)OSPop(&f->operandStack);
   if (v1 == v2) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_acmpne(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   u2 v2 = (u2)OSPop(&f->operandStack);
   u2 v1 = (u2)OSPop(&f->operandStack);
   if (v1 != v2) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_scmpeq(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 == v2) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_scmpne(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 != v2) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_scmplt(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 < v2) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_scmpge(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 >= v2) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_scmpgt(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 > v2) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_scmple(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
+  jbyte branch = BCReadU1();
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 <= v2) {
-    ByteCodeOffset(branch);
+    PCSetOffset(branch);
   }
 }
 
 void ins_if_goto(Frame *f) {
-  jbyte branch = ByteCodeReadU1();
-  ByteCodeOffset(branch);
+  jbyte branch = BCReadU1();
+  PCSetOffset(branch);
 }
 
 void ins_jsr(Frame *f) {
@@ -441,33 +440,33 @@ void ins_ret(Frame *f) {
 }
 
 void ins_stableswitch(Frame *f) {
-  u1 *pc = ByteCodeGetPC();
+  u1 *pc = PCGet();
   jshort index = OSPop(&f->operandStack);
-  jshort defaultVal = ByteCodeReadU2();
-  jshort low = ByteCodeReadU2();
-  jshort high = ByteCodeReadU2();
+  jshort defaultVal = BCReadU2();
+  jshort low = BCReadU2();
+  jshort high = BCReadU2();
   if (index < low || index > high) {
-    ByteCodeSetPC(pc + defaultVal);
+    PCSet(pc + defaultVal);
   } else {
     u1 *offset = pc + 6 + (index - low) * 2;
-    ByteCodeSetPC(pc + ((*offset << 8) | *(offset + 1)));
+    PCSet(pc + ((*offset << 8) | *(offset + 1)));
   }
 }
 
 void ins_slookupswitch(Frame *f) {
-  u1 *pc = ByteCodeGetPC();
+  u1 *pc = PCGet();
   jshort key = OSPop(&f->operandStack);
-  jshort defaultVal = ByteCodeReadU2();
-  jshort nPairs = ByteCodeReadU2();
+  jshort defaultVal = BCReadU2();
+  jshort nPairs = BCReadU2();
   for (jshort i = 0; i < nPairs; ++i) {
-    jshort match = ByteCodeReadU2();
-    jshort offset = ByteCodeReadU2();
+    jshort match = BCReadU2();
+    jshort offset = BCReadU2();
     if (key == match) {
-      ByteCodeSetPC(pc + 4 + offset);
+      PCSet(pc + 4 + offset);
       return;
     }
   }
-  ByteCodeSetPC(pc + 4 + defaultVal);
+  PCSet(pc + 4 + defaultVal);
 }
 
 void ins_areturn(Frame *f) {
@@ -483,13 +482,13 @@ void ins_return(Frame *f) {
 }
 
 void ins_getstatic_abs(Frame *f) {
-  jshort index = ByteCodeReadU2();
-  jshort v = ContextGetData(index);
+  jshort index = BCReadU2();
+  jshort v = CPGetData(index);
   OSPush(&f->operandStack, v);
 }
 
 void ins_putstatic_abs(Frame *f) {
-  jshort index = ByteCodeReadU2();
+  jshort index = BCReadU2();
   jshort v = OSPop(&f->operandStack);
-  ContextSetData(index, v);
+  CPSetData(index, v);
 }
