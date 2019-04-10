@@ -30,3 +30,7 @@ void PCSet(u1 *new_pc) { pc = new_pc; }
 u2 CPGetData(u2 index) { return data[index]; }
 
 void CPSetData(u2 index, u2 val) { data[index] = val; }
+
+jshort ODGet(jshort objRef, jshort index) { return 0; }
+
+void ODSet(jshort objRef, jshort index, jshort value) {}

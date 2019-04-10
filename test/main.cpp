@@ -7,7 +7,7 @@
 
 
 TEST_CASE( "Running", "[test]" ) {
-    puts("JieCardVM is running!");
-    vm_init();
+  puts("JieCardVM is running!");
+  vm_init();
 }
 

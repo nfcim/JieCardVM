@@ -6,6 +6,7 @@ set(TEST_EXE ${CMAKE_PROJECT_NAME}_test)
 
 add_executable(${TEST_EXE}
         main.cpp
+        instructions.cpp
 )
 
 target_link_libraries(${TEST_EXE} ${CMAKE_PROJECT_NAME})

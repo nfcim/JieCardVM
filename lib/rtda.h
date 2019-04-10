@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 typedef struct {
@@ -45,6 +49,10 @@ void CPSetData(u2 index, u2 val);
 
 jshort ODGet(jshort objRef, jshort index);
 
-jshort ODSet(jshort objRef, jshort index, jshort value);
+void ODSet(jshort objRef, jshort index, jshort value);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif // JIECARDVM_RTDA_H
