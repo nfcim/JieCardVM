@@ -1,17 +1,16 @@
 #include "context.h"
+#include "lfs.h"
 #include "utils.h"
-#include "../littlefs/lfs.h"
 
 static char aidBuffer[33];
 
 static lfs_t lfs;
-static struct lfs_config lfsConfig = {};
 
-void CTXInit(void) {
-  int err = lfs_mount(&lfs, &lfsConfig);
-  if (err) {  // the first boot
-    lfs_format(&lfs, &lfsConfig);
-    lfs_mount(&lfs, &lfsConfig);
+void CTXInit(const struct lfs_config *cfg) {
+  int err = lfs_mount(&lfs, cfg);
+  if (err) { // the first boot
+    lfs_format(&lfs, cfg);
+    lfs_mount(&lfs, cfg);
   }
 }
 
