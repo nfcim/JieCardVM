@@ -1,13 +1,13 @@
 #ifndef JIECARDVM_TYPES_H
 #define JIECARDVM_TYPES_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 
 #define JNULL 0xFFFF
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef int8_t jbyte;
 typedef int16_t jshort;

@@ -2,12 +2,11 @@
 #define JIECARDVM_RTDA_H
 
 #include <stdint.h>
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types.h"
 
 typedef struct {
   u2 *base; // base memory

@@ -1,11 +1,11 @@
 #ifndef JIECARDVM_INSTRUCTION_H
 #define JIECARDVM_INSTRUCTION_H
 
+#include "rtda.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "rtda.h"
 
 void ins_invalid(Frame *f);
 void ins_nop(Frame *f);
