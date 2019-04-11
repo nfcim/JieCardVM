@@ -7,7 +7,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -g -D_GNU_SOURCE")
 
 # public headers
-include_directories("include" "littlefs")
+include_directories("include" "littlefs" "lib")
 
 add_subdirectory(lib)
 add_subdirectory(test)

@@ -12,6 +12,7 @@ extern "C" {
 
 void CTXInit(const struct lfs_config *cfg);
 bool CTXCreateCAP(u1 *aid, u1 aidLength);
+bool CTXDeleteCAP(u1 *aid, u1 aidLength);
 
 #ifdef __cplusplus
 }

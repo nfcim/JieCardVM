@@ -1,5 +1,5 @@
-#include "../lib/instruction.h"
-#include "../lib/rtda.h"
+#include "instruction.h"
+#include "rtda.h"
 #include <catch.hpp>
 #include <cstring>
 
@@ -9,7 +9,7 @@ u1 bytecodes[100];
 
 Frame frame;
 
-void init() {
+static void init() {
   frame.operandStack.base = operands;
   frame.operandStack.next = operands;
   frame.variableTable.base = vt;
