@@ -42,7 +42,8 @@ bool CTXDeleteCAP(u1 *aid, u1 aidLength) {
       break;
     if (info.name[0] == '.')
       continue;
-    sprintf(path + aidLength * 2, "/%s", info.name);
+    strcpy(path + aidLength * 2, "/");
+    strcpy(path + aidLength * 2 + 1, info.name);
     err = lfs_remove(&lfs, path);
     if (err < 0)
       return false;
@@ -51,4 +52,39 @@ bool CTXDeleteCAP(u1 *aid, u1 aidLength) {
   path[aidLength * 2] = 0;
   err = lfs_remove(&lfs, path);
   return err == 0;
+}
+
+bool CTXAppendMethods(u1 *aid, u1 aidLength, u1 *bytecodes,
+                      u2 bytecodesLength) {
+  if (aidLength > 16)
+    return false;
+  btox(path, aid, aidLength);
+  strcpy(path + aidLength * 2, "/m");
+  lfs_file_t f;
+  int err =
+      lfs_file_open(&lfs, &f, path, LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND);
+  if (err != 0)
+    return false;
+  err = lfs_file_write(&lfs, &f, bytecodes, bytecodesLength);
+  if (err < 0)
+    return false;
+  err = lfs_file_close(&lfs, &f);
+  return err == 0;
+}
+
+ssize_t CTXReadMethods(u1 *aid, u1 aidLength, u1 *target, u2 offset,
+                       u2 length) {
+  if (aidLength > 16)
+    return false;
+  btox(path, aid, aidLength);
+  strcpy(path + aidLength * 2, "/m");
+  lfs_file_t f;
+  int err = lfs_file_open(&lfs, &f, path, LFS_O_RDONLY);
+  if (err != 0)
+    return err;
+  ssize_t read = lfs_file_read(&lfs, &f, target, length);
+  err = lfs_file_close(&lfs, &f);
+  if (err != 0)
+    return err;
+  return read;
 }
