@@ -16,7 +16,7 @@ static void init() {
   cfg.prog_size = 128;
   cfg.block_size = 1024;
   cfg.block_count = 1024;
-  cfg.lookahead = 32;
+  cfg.lookahead_size = 32;
   lfs_emubd_create(&cfg, "testdata");
   CTXInit(&cfg);
 }
