@@ -12,11 +12,13 @@ static void init() {
   cfg.prog = &lfs_emubd_prog;
   cfg.erase = &lfs_emubd_erase;
   cfg.sync = &lfs_emubd_sync;
-  cfg.read_size = 128;
-  cfg.prog_size = 128;
-  cfg.block_size = 1024;
-  cfg.block_count = 1024;
-  cfg.lookahead_size = 32;
+  cfg.read_size = 16;
+  cfg.prog_size = 16;
+  cfg.block_size = 512;
+  cfg.block_count = 400;
+  cfg.block_cycles = 50000;
+  cfg.cache_size = 128;
+  cfg.lookahead_size = 16;
   lfs_emubd_create(&cfg, "testdata");
   CTXInit(&cfg);
 }
