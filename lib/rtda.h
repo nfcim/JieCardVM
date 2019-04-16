@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#define MAX_BC_INDEX 512
+
 typedef struct {
   u2 *base; // base memory
   u2 *next; // next slot
@@ -21,6 +23,11 @@ typedef struct {
   OperandStack operandStack;
   VariableTable variableTable;
 } Frame;
+
+typedef struct {
+  u1 *base;
+  u2 index;
+} ByteCode;
 
 jshort OSPop(OperandStack *s);
 
@@ -36,11 +43,9 @@ u1 BCReadU1(void);
 
 u2 BCReadU2(void);
 
-u1 *PCGet(void);
+void BCJump(int16_t offset);
 
-void PCSet(u1 *new_pc);
-
-void PCSetOffset(int16_t offset);
+void BCSet(u1 *base);
 
 u2 CPGetData(u2 index);
 

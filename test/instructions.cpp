@@ -1,4 +1,4 @@
-#include "instruction.h"
+#include "instructions.h"
 #include "rtda.h"
 #include <catch.hpp>
 #include <cstring>
@@ -13,7 +13,7 @@ static void init() {
   frame.operandStack.base = operands;
   frame.operandStack.next = operands;
   frame.variableTable.base = vt;
-  PCSet(bytecodes);
+  BCSet(bytecodes);
 }
 
 TEST_CASE("aconst_null", "[instructions]") {

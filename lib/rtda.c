@@ -1,7 +1,6 @@
 #include "rtda.h"
 
-static u1 *pc;
-static u2 *data;
+static ByteCode byteCode;
 
 jshort OSPop(OperandStack *s) { return *(--s->next); }
 
@@ -13,23 +12,28 @@ jshort VTGet(VariableTable *t, u1 index) { return t->base[index]; }
 
 void VTSet(VariableTable *t, u1 index, jshort val) { t->base[index] = val; }
 
-u1 BCReadU1(void) { return *pc++; }
+u1 BCReadU1(void) {
+  if (byteCode.index < MAX_BC_INDEX)
+    return byteCode.base[byteCode.index++];
+  return 0; // TODO
+}
 
 u2 BCReadU2(void) {
-  u1 v1 = *pc++;
-  u1 v2 = *pc++;
+  u1 v1 = BCReadU1();
+  u1 v2 = BCReadU1();
   return (v1 << 8) | v2;
 }
 
-void PCSetOffset(int16_t offset) { pc += offset; }
+void BCJump(int16_t offset) { byteCode.index += offset; }
 
-u1 *PCGet(void) { return pc; }
+void BCSet(u1 *base) {
+  byteCode.base = base;
+  byteCode.index = 0;
+}
 
-void PCSet(u1 *new_pc) { pc = new_pc; }
+u2 CPGetData(u2 index) { return 0; }
 
-u2 CPGetData(u2 index) { return data[index]; }
-
-void CPSetData(u2 index, u2 val) { data[index] = val; }
+void CPSetData(u2 index, u2 val) {}
 
 jshort ODGet(jshort objRef, jshort index) { return 0; }
 

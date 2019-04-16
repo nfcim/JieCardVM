@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include "instructions.h"
 #include "rtda.h"
 
 void ins_invalid(Frame *f) {}
@@ -242,7 +243,7 @@ void ins_ifeq(Frame *f) {
   jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v == 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -250,7 +251,7 @@ void ins_ifne(Frame *f) {
   jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v != 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -258,7 +259,7 @@ void ins_iflt(Frame *f) {
   jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v < 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -266,7 +267,7 @@ void ins_ifge(Frame *f) {
   jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v >= 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -274,7 +275,7 @@ void ins_ifgt(Frame *f) {
   jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v > 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -282,7 +283,7 @@ void ins_ifle(Frame *f) {
   jbyte branch = BCReadU1();
   jshort v = OSPop(&f->operandStack);
   if (v <= 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -290,7 +291,7 @@ void ins_ifnull(Frame *f) {
   jbyte branch = BCReadU1();
   u2 v = OSPop(&f->operandStack);
   if (v == 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -298,7 +299,7 @@ void ins_ifnonnull(Frame *f) {
   jbyte branch = BCReadU1();
   u2 v = (u2)OSPop(&f->operandStack);
   if (v > 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -307,7 +308,7 @@ void ins_if_acmpeq(Frame *f) {
   u2 v2 = (u2)OSPop(&f->operandStack);
   u2 v1 = (u2)OSPop(&f->operandStack);
   if (v1 == v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -316,7 +317,7 @@ void ins_if_acmpne(Frame *f) {
   u2 v2 = (u2)OSPop(&f->operandStack);
   u2 v1 = (u2)OSPop(&f->operandStack);
   if (v1 != v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -325,7 +326,7 @@ void ins_if_scmpeq(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 == v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -334,7 +335,7 @@ void ins_if_scmpne(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 != v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -343,7 +344,7 @@ void ins_if_scmplt(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 < v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -352,7 +353,7 @@ void ins_if_scmpge(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 >= v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -361,7 +362,7 @@ void ins_if_scmpgt(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 > v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -370,13 +371,13 @@ void ins_if_scmple(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 <= v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
 void ins_goto(Frame *f) {
   jbyte branch = BCReadU1();
-  PCSetOffset(branch);
+  BCJump(branch);
 }
 
 void ins_jsr(Frame *f) {
@@ -388,21 +389,20 @@ void ins_ret(Frame *f) {
 }
 
 void ins_stableswitch(Frame *f) {
-  u1 *pc = PCGet();
   jshort index = OSPop(&f->operandStack);
   jshort defaultVal = BCReadU2();
   jshort low = BCReadU2();
   jshort high = BCReadU2();
   if (index < low || index > high) {
-    PCSet(pc + defaultVal);
+    BCJump(defaultVal - 6);
   } else {
-    u1 *offset = pc + 6 + (index - low) * 2;
-    PCSet(pc + ((*offset << 8) | *(offset + 1)));
+    BCJump((index - low) * 2);
+    u2 offset = BCReadU2();
+    BCJump(offset - 6 - (index - low) * 2);
   }
 }
 
 void ins_slookupswitch(Frame *f) {
-  u1 *pc = PCGet();
   jshort key = OSPop(&f->operandStack);
   jshort defaultVal = BCReadU2();
   jshort nPairs = BCReadU2();
@@ -410,11 +410,11 @@ void ins_slookupswitch(Frame *f) {
     jshort match = BCReadU2();
     jshort offset = BCReadU2();
     if (key == match) {
-      PCSet(pc + 4 + offset);
+      BCJump(offset - 4 - 4 * i);
       return;
     }
   }
-  PCSet(pc + 4 + defaultVal);
+  BCJump(defaultVal - 4 - 4 * nPairs);
 }
 
 void ins_areturn(Frame *f) {
@@ -510,7 +510,7 @@ void ins_ifeq_w(Frame *f) {
   jshort branch = BCReadU2();
   jshort v = OSPop(&f->operandStack);
   if (v == 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -518,7 +518,7 @@ void ins_ifne_w(Frame *f) {
   jshort branch = BCReadU2();
   jshort v = OSPop(&f->operandStack);
   if (v != 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -526,7 +526,7 @@ void ins_iflt_w(Frame *f) {
   jshort branch = BCReadU2();
   jshort v = OSPop(&f->operandStack);
   if (v < 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -534,7 +534,7 @@ void ins_ifge_w(Frame *f) {
   jshort branch = BCReadU2();
   jshort v = OSPop(&f->operandStack);
   if (v >= 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -542,7 +542,7 @@ void ins_ifgt_w(Frame *f) {
   jshort branch = BCReadU2();
   jshort v = OSPop(&f->operandStack);
   if (v > 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -550,7 +550,7 @@ void ins_ifle_w(Frame *f) {
   jshort branch = BCReadU2();
   jshort v = OSPop(&f->operandStack);
   if (v <= 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -558,7 +558,7 @@ void ins_ifnull_w(Frame *f) {
   jshort branch = BCReadU2();
   u2 v = OSPop(&f->operandStack);
   if (v == 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -566,7 +566,7 @@ void ins_ifnonnull_w(Frame *f) {
   jshort branch = BCReadU2();
   u2 v = (u2)OSPop(&f->operandStack);
   if (v > 0) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -575,7 +575,7 @@ void ins_if_acmpeq_w(Frame *f) {
   u2 v2 = (u2)OSPop(&f->operandStack);
   u2 v1 = (u2)OSPop(&f->operandStack);
   if (v1 == v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -584,7 +584,7 @@ void ins_if_acmpne_w(Frame *f) {
   u2 v2 = (u2)OSPop(&f->operandStack);
   u2 v1 = (u2)OSPop(&f->operandStack);
   if (v1 != v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -593,7 +593,7 @@ void ins_if_scmpeq_w(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 == v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -602,7 +602,7 @@ void ins_if_scmpne_w(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 != v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -611,7 +611,7 @@ void ins_if_scmplt_w(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 < v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -620,7 +620,7 @@ void ins_if_scmpge_w(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 >= v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -629,7 +629,7 @@ void ins_if_scmpgt_w(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 > v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
@@ -638,13 +638,13 @@ void ins_if_scmple_w(Frame *f) {
   jshort v2 = OSPop(&f->operandStack);
   jshort v1 = OSPop(&f->operandStack);
   if (v1 <= v2) {
-    PCSetOffset(branch);
+    BCJump(branch);
   }
 }
 
 void ins_goto_w(Frame *f) {
   jshort branch = BCReadU2();
-  PCSetOffset(branch);
+  BCJump(branch);
 }
 
 void ins_getfield_abs_w(Frame *f) {

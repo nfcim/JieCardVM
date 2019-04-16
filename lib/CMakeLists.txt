@@ -4,7 +4,7 @@ add_library(${CMAKE_PROJECT_NAME} STATIC
         ../include/vm.h
         types.h
         rtda.h
-        instruction.h
+        instructions.h
         ../littlefs/lfs.h
         ../littlefs/lfs_util.h
         context.h

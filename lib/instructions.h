@@ -1,5 +1,5 @@
-#ifndef JIECARDVM_INSTRUCTION_H
-#define JIECARDVM_INSTRUCTION_H
+#ifndef JIECARDVM_INSTRUCTIONS_H
+#define JIECARDVM_INSTRUCTIONS_H
 
 #include "rtda.h"
 
@@ -123,4 +123,4 @@ extern void (*opcodes[256])(Frame *);
 };
 #endif
 
-#endif // JIECARDVM_INSTRUCTION_H
+#endif // JIECARDVM_INSTRUCTIONS_H
