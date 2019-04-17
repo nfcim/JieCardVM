@@ -177,6 +177,7 @@ int context_create_array(package_t *pkg, u2 length) {
   return package_metadata.array_cnt;
 }
 
+// TODO: add cache
 int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
   sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u", ref);
   lfs_file_t f;
@@ -202,6 +203,37 @@ int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
   *val = array_buffer[offset];
   if (type == ARRAY_T_SHORT)
     *(val + 1) = array_buffer[offset + 1];
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return CONTEXT_ERR_OK;
+}
+
+// TODO: add cache
+int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val) {
+  sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u", ref);
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  u2 offset = index;
+  if (type == ARRAY_T_SHORT)
+    offset *= 2;
+  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_SET);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  if (type == ARRAY_T_SHORT) {
+    err = lfs_file_write(&g_lfs, &f, &val, 2);
+  } else {
+    u1 data = (u1) val;
+    err = lfs_file_write(&g_lfs, &f, &data, 1);
+  }
+  if (err <= 0)
+    return CONTEXT_ERR_UNKNOWN;
 
   err = lfs_file_close(&g_lfs, &f);
   if (err < 0)

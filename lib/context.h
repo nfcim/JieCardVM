@@ -62,6 +62,8 @@ int context_create_array(package_t *pkg, u2 length);
 
 int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val);
 
+int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val);
+
 #ifdef __cplusplus
 }
 #endif

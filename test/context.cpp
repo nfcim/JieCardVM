@@ -83,14 +83,26 @@ TEST_CASE("context_create_array", "[context]") {
     REQUIRE(buffer[i] == 0);
 }
 
+TEST_CASE("context_write_array", "[context]") {
+  init();
+  int ret = context_write_array(&pkg, 1, ARRAY_T_BYTE, 1, 6);
+  REQUIRE(ret == CONTEXT_ERR_OK);
+  ret = context_write_array(&pkg, 2, ARRAY_T_SHORT, 256, 167);
+  REQUIRE(ret == CONTEXT_ERR_OK);
+}
+
 TEST_CASE("context_read_array", "[context]") {
   init();
-  jbyte data;
-  int ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 1, (u1 *) &data);
+  jbyte b;
+  jshort s;
+  int ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 1, (u1 *) &b);
   REQUIRE(ret == CONTEXT_ERR_OK);
-  REQUIRE(data == 0);
-  ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 256, (u1 *) &data);
+  REQUIRE(b == 6);
+  ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 256, (u1 *) &b);
   REQUIRE(ret == CONTEXT_ERR_NOENT);
+  ret = context_read_array(&pkg, 2, ARRAY_T_SHORT, 256, (u1 *) &s);
+  REQUIRE(ret == CONTEXT_ERR_OK);
+  REQUIRE(s == 167);
 }
 
 TEST_CASE("context_delete_cap", "[context]") {
