@@ -8,7 +8,7 @@ static char path[64];
 
 static lfs_t lfs;
 
-void CTXInit(const struct lfs_config *cfg) {
+void context_init(const struct lfs_config *cfg) {
   int err = lfs_mount(&lfs, cfg);
   if (err) { // the first boot
     lfs_format(&lfs, cfg);
@@ -16,18 +16,18 @@ void CTXInit(const struct lfs_config *cfg) {
   }
 }
 
-bool CTXCreateCAP(u1 *aid, u1 aidLength) {
+bool context_create_cap(u1 *aid, u1 aidLength) {
   if (aidLength > 16)
     return false;
-  btox(path, aid, aidLength);
+  bytes_to_hexstring(path, aid, aidLength);
   int err = lfs_mkdir(&lfs, path);
   return err == 0;
 }
 
-bool CTXDeleteCAP(u1 *aid, u1 aidLength) {
+bool context_delete_cap(u1 *aid, u1 aidLength) {
   if (aidLength > 16)
     return false;
-  btox(path, aid, aidLength);
+  bytes_to_hexstring(path, aid, aidLength);
 
   lfs_dir_t dir;
   int err = lfs_dir_open(&lfs, &dir, path);
@@ -54,11 +54,11 @@ bool CTXDeleteCAP(u1 *aid, u1 aidLength) {
   return err == 0;
 }
 
-bool CTXAppendMethods(u1 *aid, u1 aidLength, u1 *bytecodes,
-                      u2 bytecodesLength) {
+bool context_append_method(u1 *aid, u1 aidLength, u1 *bytecodes,
+                           u2 bytecodesLength) {
   if (aidLength > 16)
     return false;
-  btox(path, aid, aidLength);
+  bytes_to_hexstring(path, aid, aidLength);
   strcpy(path + aidLength * 2, "/m");
   lfs_file_t f;
   int err =
@@ -72,11 +72,11 @@ bool CTXAppendMethods(u1 *aid, u1 aidLength, u1 *bytecodes,
   return err == 0;
 }
 
-ssize_t CTXReadMethods(u1 *aid, u1 aidLength, u1 *target, u2 offset,
-                       u2 length) {
+ssize_t context_read_method(u1 *aid, u1 aidLength, u1 *target, u2 offset,
+                            u2 length) {
   if (aidLength > 16)
     return false;
-  btox(path, aid, aidLength);
+  bytes_to_hexstring(path, aid, aidLength);
   strcpy(path + aidLength * 2, "/m");
   lfs_file_t f;
   int err = lfs_file_open(&lfs, &f, path, LFS_O_RDONLY);

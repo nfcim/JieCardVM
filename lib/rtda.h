@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "types.h"
+#include "lfs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,47 +14,49 @@ extern "C" {
 typedef struct {
   u2 *base; // base memory
   u2 *next; // next slot
-} OperandStack;
+} operand_stack_t;
 
 typedef struct {
   jshort *base; // base memory
-} VariableTable;
+} variable_table_t;
 
 typedef struct {
-  OperandStack operandStack;
-  VariableTable variableTable;
+  operand_stack_t operand_stack;
+  variable_table_t variable_table;
+  struct lfs_file *method_file;
+  u2 method_offset;
 } Frame;
 
 typedef struct {
   u1 *base;
   u2 index;
-} ByteCode;
+} bytecode_t;
 
-jshort OSPop(OperandStack *s);
+jshort operand_stack_pop(operand_stack_t *s);
 
-void OSPush(OperandStack *s, jshort val);
+void operand_stack_push(operand_stack_t *s, jshort val);
 
-jshort OSGet(OperandStack *s);
+jshort operand_stack_get(operand_stack_t *s);
 
-jshort VTGet(VariableTable *t, u1 index);
+jshort variable_table_get(variable_table_t *t, u1 index);
 
-void VTSet(VariableTable *t, u1 index, jshort val);
+void variable_table_set(variable_table_t *t, u1 index, jshort val);
 
-u1 BCReadU1(void);
+u1 bytecode_read_u1(void);
 
-u2 BCReadU2(void);
+u2 bytecode_read_u2(void);
 
-void BCJump(int16_t offset);
+void bytecode_jump_offset(int16_t offset);
 
-void BCSet(u1 *base);
+void bytecode_set(u1 *base);
 
-u2 CPGetData(u2 index);
+u2 constant_pool_get(u2 index);
 
-void CPSetData(u2 index, u2 val);
+void constant_pool_set(u2 index, u2 val);
 
-jshort ODGet(jshort objRef, jshort index);
+jshort object_data_get(jshort objRef, jshort index);
 
-void ODSet(jshort objRef, jshort index, jshort value);
+void object_data_set(jshort objRef, jshort index, jshort value);
 
 #ifdef __cplusplus
 };

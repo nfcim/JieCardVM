@@ -20,14 +20,14 @@ static void init() {
   cfg.cache_size = 128;
   cfg.lookahead_size = 16;
   lfs_emubd_create(&cfg, "testdata");
-  CTXInit(&cfg);
+  context_init(&cfg);
 }
 
 static void finalize() { lfs_emubd_destroy(&cfg); }
 
 TEST_CASE("CTXCreateCAP", "[context]") {
   init();
-  bool ret = CTXCreateCAP((u1 *)"\xF0\x00\x01", 3);
+  bool ret = context_create_cap((u1 *)"\xF0\x00\x01", 3);
   REQUIRE(ret == true);
   finalize();
 }
@@ -36,9 +36,10 @@ TEST_CASE("CTXAppendMethods", "[context]") {
   init();
   u1 bytecodes[] = {0x7B, 0x30, 0x11, 0x01, 0xC8, 0x31, 0x1D, 0x1E,
                     0x41, 0x32, 0x1F, 0x1E, 0x43, 0x30, 0x1D, 0x78};
-  bool ret = CTXAppendMethods((u1 *)"\xF0\x00\x01", 3, bytecodes, sizeof(bytecodes));
+  bool ret = context_append_method((u1 *)"\xF0\x00\x01", 3, bytecodes,
+                                   sizeof(bytecodes));
   REQUIRE(ret == true);
-  CTXAppendMethods((u1 *)"\xF0\x00\x01", 3, bytecodes, sizeof(bytecodes));
+  context_append_method((u1 *)"\xF0\x00\x01", 3, bytecodes, sizeof(bytecodes));
   REQUIRE(ret == true);
   finalize();
 }
@@ -46,7 +47,7 @@ TEST_CASE("CTXAppendMethods", "[context]") {
 TEST_CASE("CTXReadMethods", "[context]") {
   init();
   u1 bytecodes[100];
-  ssize_t ret = CTXReadMethods((u1 *)"\xF0\x00\x01", 3, bytecodes, 0, 256);
+  ssize_t ret = context_read_method((u1 *)"\xF0\x00\x01", 3, bytecodes, 0, 256);
   REQUIRE(ret == 32);
   REQUIRE(bytecodes[0] == 0x7B);
   REQUIRE(bytecodes[10] == 0x1F);
@@ -56,7 +57,7 @@ TEST_CASE("CTXReadMethods", "[context]") {
 
 TEST_CASE("CTXDeleteCAP", "[context]") {
   init();
-  bool ret = CTXDeleteCAP((u1 *)"\xF0\x00\x01", 3);
+  bool ret = context_delete_cap((u1 *)"\xF0\x00\x01", 3);
   REQUIRE(ret == true);
   finalize();
 }

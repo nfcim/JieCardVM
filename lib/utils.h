@@ -7,7 +7,14 @@
 extern "C" {
 #endif
 
-void btox(char *xp, const uint8_t *bb, int n);
+/**
+ * Convert bytes to hex string.
+ *
+ * @param xp Pointer to output buffer
+ * @param bb Pointer to input bytes
+ * @param n  Input length in bytes
+ */
+void bytes_to_hexstring(char *xp, const uint8_t *bb, int n);
 
 #ifdef __cplusplus
 }

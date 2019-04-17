@@ -11,11 +11,13 @@
 extern "C" {
 #endif
 
-void CTXInit(const struct lfs_config *cfg);
-bool CTXCreateCAP(u1 *aid, u1 aidLength);
-bool CTXDeleteCAP(u1 *aid, u1 aidLength);
-bool CTXAppendMethods(u1 *aid, u1 aidLength, u1 *bytecodes, u2 bytecodesLength);
-ssize_t CTXReadMethods(u1 *aid, u1 aidLength, u1 *target, u2 offset, u2 length);
+void context_init(const struct lfs_config *cfg);
+bool context_create_cap(u1 *aid, u1 aidLength);
+bool context_delete_cap(u1 *aid, u1 aidLength);
+bool context_append_method(u1 *aid, u1 aidLength, u1 *bytecodes,
+                           u2 bytecodesLength);
+ssize_t context_read_method(u1 *aid, u1 aidLength, u1 *target, u2 offset,
+                            u2 length);
 
 #ifdef __cplusplus
 }

@@ -7,56 +7,56 @@ void ins_invalid(Frame *f) {}
 
 void ins_nop(Frame *f) {}
 
-void ins_aconst_null(Frame *f) { OSPush(&f->operandStack, JNULL); }
+void ins_aconst_null(Frame *f) { operand_stack_push(&f->operand_stack, JNULL); }
 
-void ins_sconst_m1(Frame *f) { OSPush(&f->operandStack, -1); }
+void ins_sconst_m1(Frame *f) { operand_stack_push(&f->operand_stack, -1); }
 
-void ins_sconst_0(Frame *f) { OSPush(&f->operandStack, 0); }
+void ins_sconst_0(Frame *f) { operand_stack_push(&f->operand_stack, 0); }
 
-void ins_sconst_1(Frame *f) { OSPush(&f->operandStack, 1); }
+void ins_sconst_1(Frame *f) { operand_stack_push(&f->operand_stack, 1); }
 
-void ins_sconst_2(Frame *f) { OSPush(&f->operandStack, 2); }
+void ins_sconst_2(Frame *f) { operand_stack_push(&f->operand_stack, 2); }
 
-void ins_sconst_3(Frame *f) { OSPush(&f->operandStack, 3); }
+void ins_sconst_3(Frame *f) { operand_stack_push(&f->operand_stack, 3); }
 
-void ins_sconst_4(Frame *f) { OSPush(&f->operandStack, 4); }
+void ins_sconst_4(Frame *f) { operand_stack_push(&f->operand_stack, 4); }
 
-void ins_sconst_5(Frame *f) { OSPush(&f->operandStack, 5); }
+void ins_sconst_5(Frame *f) { operand_stack_push(&f->operand_stack, 5); }
 
 void ins_bspush(Frame *f) {
-  jbyte v = BCReadU1();
-  OSPush(&f->operandStack, v);
+  jbyte v = bytecode_read_u1();
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_sspush(Frame *f) {
-  jshort v = BCReadU2();
-  OSPush(&f->operandStack, v);
+  jshort v = bytecode_read_u2();
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_asload(Frame *f) {
-  u1 index = BCReadU1();
-  jshort v = VTGet(&f->variableTable, index);
-  OSPush(&f->operandStack, v);
+  u1 index = bytecode_read_u1();
+  jshort v = variable_table_get(&f->variable_table, index);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_asload_0(Frame *f) {
-  jshort v = VTGet(&f->variableTable, 0);
-  OSPush(&f->operandStack, v);
+  jshort v = variable_table_get(&f->variable_table, 0);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_asload_1(Frame *f) {
-  jshort v = VTGet(&f->variableTable, 1);
-  OSPush(&f->operandStack, v);
+  jshort v = variable_table_get(&f->variable_table, 1);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_asload_2(Frame *f) {
-  jshort v = VTGet(&f->variableTable, 2);
-  OSPush(&f->operandStack, v);
+  jshort v = variable_table_get(&f->variable_table, 2);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_asload_3(Frame *f) {
-  jshort v = VTGet(&f->variableTable, 3);
-  OSPush(&f->operandStack, v);
+  jshort v = variable_table_get(&f->variable_table, 3);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_aaload(Frame *f) {
@@ -72,29 +72,29 @@ void ins_saload(Frame *f) {
 }
 
 void ins_asstore(Frame *f) {
-  u1 index = BCReadU1();
-  jshort v = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, index, v);
+  u1 index = bytecode_read_u1();
+  jshort v = operand_stack_pop(&f->operand_stack);
+  variable_table_set(&f->variable_table, index, v);
 }
 
 void ins_asstore_0(Frame *f) {
-  jshort v = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, 0, v);
+  jshort v = operand_stack_pop(&f->operand_stack);
+  variable_table_set(&f->variable_table, 0, v);
 }
 
 void ins_asstore_1(Frame *f) {
-  jshort v = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, 1, v);
+  jshort v = operand_stack_pop(&f->operand_stack);
+  variable_table_set(&f->variable_table, 1, v);
 }
 
 void ins_asstore_2(Frame *f) {
-  jshort v = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, 2, v);
+  jshort v = operand_stack_pop(&f->operand_stack);
+  variable_table_set(&f->variable_table, 2, v);
 }
 
 void ins_asstore_3(Frame *f) {
-  jshort v = OSPop(&f->operandStack);
-  VTSet(&f->variableTable, 3, v);
+  jshort v = operand_stack_pop(&f->operand_stack);
+  variable_table_set(&f->variable_table, 3, v);
 }
 
 void ins_aastore(Frame *f) {
@@ -109,275 +109,275 @@ void ins_sastore(Frame *f) {
   // TODO
 }
 
-void ins_pop(Frame *f) { OSPop(&f->operandStack); }
+void ins_pop(Frame *f) { operand_stack_pop(&f->operand_stack); }
 
 void ins_pop2(Frame *f) {
-  OSPop(&f->operandStack);
-  OSPop(&f->operandStack);
+  operand_stack_pop(&f->operand_stack);
+  operand_stack_pop(&f->operand_stack);
 }
 
 void ins_dup(Frame *f) {
-  jshort v = OSGet(&f->operandStack);
-  OSPush(&f->operandStack, v);
+  jshort v = operand_stack_get(&f->operand_stack);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_dup2(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSGet(&f->operandStack);
-  OSPush(&f->operandStack, v2);
-  OSPush(&f->operandStack, v1);
-  OSPush(&f->operandStack, v2);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_get(&f->operand_stack);
+  operand_stack_push(&f->operand_stack, v2);
+  operand_stack_push(&f->operand_stack, v1);
+  operand_stack_push(&f->operand_stack, v2);
 }
 
 void ins_dup_x(Frame *f) {
-  u1 mn = BCReadU1();
+  u1 mn = bytecode_read_u1();
   u1 m = (mn >> 4) * 2;
   u1 n = (mn & 0xF) * 2;
-  memmove(f->operandStack.next - n + m, f->operandStack.next - n, n);
-  memcpy(f->operandStack.next - n, f->operandStack.next, m);
-  f->operandStack.next += m;
+  memmove(f->operand_stack.next - n + m, f->operand_stack.next - n, n);
+  memcpy(f->operand_stack.next - n, f->operand_stack.next, m);
+  f->operand_stack.next += m;
 }
 
 void ins_swap_x(Frame *f) {
   u1 buf[2];
-  u1 mn = BCReadU1();
+  u1 mn = bytecode_read_u1();
   u1 m = (mn >> 4) * 2;
   u1 n = (mn & 0xF) * 2;
-  memcpy(buf, f->operandStack.next - m, m);
-  memmove(f->operandStack.next - n, f->operandStack.next - n - m, n);
-  memcpy(f->operandStack.next - n - m, buf, m);
+  memcpy(buf, f->operand_stack.next - m, m);
+  memmove(f->operand_stack.next - n, f->operand_stack.next - n - m, n);
+  memcpy(f->operand_stack.next - n - m, buf, m);
 }
 
 void ins_sadd(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   jshort result = v1 + v2;
-  OSPush(&f->operandStack, result);
+  operand_stack_push(&f->operand_stack, result);
 }
 
 void ins_ssub(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   jshort result = v1 - v2;
-  OSPush(&f->operandStack, result);
+  operand_stack_push(&f->operand_stack, result);
 }
 
 void ins_smul(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   jshort result = v1 * v2;
-  OSPush(&f->operandStack, result);
+  operand_stack_push(&f->operand_stack, result);
 }
 
 void ins_sdiv(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   jshort result = v1 / v2;
-  OSPush(&f->operandStack, result);
+  operand_stack_push(&f->operand_stack, result);
 }
 
 void ins_srem(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   jshort result = v1 % v2;
-  OSPush(&f->operandStack, result);
+  operand_stack_push(&f->operand_stack, result);
 }
 
 void ins_sneg(Frame *f) {
-  jshort v = OSPop(&f->operandStack);
-  OSPush(&f->operandStack, -v);
+  jshort v = operand_stack_pop(&f->operand_stack);
+  operand_stack_push(&f->operand_stack, -v);
 }
 
 void ins_sshl(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   v2 &= 0x1F;
-  OSPush(&f->operandStack, v1 << v2);
+  operand_stack_push(&f->operand_stack, v1 << v2);
 }
 
 void ins_sshr(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   v2 &= 0x1F;
-  OSPush(&f->operandStack, v1 >> v2);
+  operand_stack_push(&f->operand_stack, v1 >> v2);
 }
 
 void ins_sushr(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   v2 &= 0x1F;
-  OSPush(&f->operandStack, (u2)v1 >> v2);
+  operand_stack_push(&f->operand_stack, (u2)v1 >> v2);
 }
 
 void ins_sand(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
-  OSPush(&f->operandStack, v1 & v2);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
+  operand_stack_push(&f->operand_stack, v1 & v2);
 }
 
 void ins_sor(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
-  OSPush(&f->operandStack, v1 | v2);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
+  operand_stack_push(&f->operand_stack, v1 | v2);
 }
 
 void ins_sxor(Frame *f) {
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
-  OSPush(&f->operandStack, v1 ^ v2);
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
+  operand_stack_push(&f->operand_stack, v1 ^ v2);
 }
 
 void ins_sinc(Frame *f) {
-  u1 index = BCReadU1();
-  jbyte v = BCReadU1();
-  jshort var = VTGet(&f->variableTable, index);
-  VTSet(&f->variableTable, index, var + v);
+  u1 index = bytecode_read_u1();
+  jbyte v = bytecode_read_u1();
+  jshort var = variable_table_get(&f->variable_table, index);
+  variable_table_set(&f->variable_table, index, var + v);
 }
 
 void ins_s2b(Frame *f) {
-  jshort v = OSPop(&f->operandStack);
-  OSPush(&f->operandStack, (jbyte)v);
+  jshort v = operand_stack_pop(&f->operand_stack);
+  operand_stack_push(&f->operand_stack, (jbyte)v);
 }
 
 void ins_ifeq(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v == 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifne(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v != 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_iflt(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v < 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifge(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v >= 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifgt(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v > 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifle(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v <= 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifnull(Frame *f) {
-  jbyte branch = BCReadU1();
-  u2 v = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  u2 v = operand_stack_pop(&f->operand_stack);
   if (v == 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifnonnull(Frame *f) {
-  jbyte branch = BCReadU1();
-  u2 v = (u2)OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  u2 v = (u2)operand_stack_pop(&f->operand_stack);
   if (v > 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_acmpeq(Frame *f) {
-  jbyte branch = BCReadU1();
-  u2 v2 = (u2)OSPop(&f->operandStack);
-  u2 v1 = (u2)OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  u2 v2 = (u2)operand_stack_pop(&f->operand_stack);
+  u2 v1 = (u2)operand_stack_pop(&f->operand_stack);
   if (v1 == v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_acmpne(Frame *f) {
-  jbyte branch = BCReadU1();
-  u2 v2 = (u2)OSPop(&f->operandStack);
-  u2 v1 = (u2)OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  u2 v2 = (u2)operand_stack_pop(&f->operand_stack);
+  u2 v1 = (u2)operand_stack_pop(&f->operand_stack);
   if (v1 != v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmpeq(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 == v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmpne(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 != v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmplt(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 < v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmpge(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 >= v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmpgt(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 > v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmple(Frame *f) {
-  jbyte branch = BCReadU1();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jbyte branch = bytecode_read_u1();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 <= v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_goto(Frame *f) {
-  jbyte branch = BCReadU1();
-  BCJump(branch);
+  jbyte branch = bytecode_read_u1();
+  bytecode_jump_offset(branch);
 }
 
 void ins_jsr(Frame *f) {
@@ -389,32 +389,32 @@ void ins_ret(Frame *f) {
 }
 
 void ins_stableswitch(Frame *f) {
-  jshort index = OSPop(&f->operandStack);
-  jshort defaultVal = BCReadU2();
-  jshort low = BCReadU2();
-  jshort high = BCReadU2();
+  jshort index = operand_stack_pop(&f->operand_stack);
+  jshort defaultVal = bytecode_read_u2();
+  jshort low = bytecode_read_u2();
+  jshort high = bytecode_read_u2();
   if (index < low || index > high) {
-    BCJump(defaultVal - 6);
+    bytecode_jump_offset(defaultVal - 6);
   } else {
-    BCJump((index - low) * 2);
-    u2 offset = BCReadU2();
-    BCJump(offset - 6 - (index - low) * 2);
+    bytecode_jump_offset((index - low) * 2);
+    u2 offset = bytecode_read_u2();
+    bytecode_jump_offset(offset - 6 - (index - low) * 2);
   }
 }
 
 void ins_slookupswitch(Frame *f) {
-  jshort key = OSPop(&f->operandStack);
-  jshort defaultVal = BCReadU2();
-  jshort nPairs = BCReadU2();
+  jshort key = operand_stack_pop(&f->operand_stack);
+  jshort defaultVal = bytecode_read_u2();
+  jshort nPairs = bytecode_read_u2();
   for (jshort i = 0; i < nPairs; ++i) {
-    jshort match = BCReadU2();
-    jshort offset = BCReadU2();
+    jshort match = bytecode_read_u2();
+    jshort offset = bytecode_read_u2();
     if (key == match) {
-      BCJump(offset - 4 - 4 * i);
+      bytecode_jump_offset(offset - 4 - 4 * i);
       return;
     }
   }
-  BCJump(defaultVal - 4 - 4 * nPairs);
+  bytecode_jump_offset(defaultVal - 4 - 4 * nPairs);
 }
 
 void ins_areturn(Frame *f) {
@@ -430,29 +430,29 @@ void ins_return(Frame *f) {
 }
 
 void ins_getstatic_abs(Frame *f) {
-  u2 index = BCReadU2();
-  jshort v = CPGetData(index);
-  OSPush(&f->operandStack, v);
+  u2 index = bytecode_read_u2();
+  jshort v = constant_pool_get(index);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_putstatic_abs(Frame *f) {
-  u2 index = BCReadU2();
-  jshort v = OSPop(&f->operandStack);
-  CPSetData(index, v);
+  u2 index = bytecode_read_u2();
+  jshort v = operand_stack_pop(&f->operand_stack);
+  constant_pool_set(index, v);
 }
 
 void ins_getfield_abs(Frame *f) {
-  u1 index = BCReadU1();
-  jshort objRef = OSPop(&f->operandStack);
-  jshort value = ODGet(objRef, index);
-  OSPush(&f->operandStack, value);
+  u1 index = bytecode_read_u1();
+  jshort objRef = operand_stack_pop(&f->operand_stack);
+  jshort value = object_data_get(objRef, index);
+  operand_stack_push(&f->operand_stack, value);
 }
 
 void ins_putfield_abs(Frame *f) {
-  u1 index = BCReadU1();
-  jshort value = OSPop(&f->operandStack);
-  jshort objRef = OSPop(&f->operandStack);
-  ODSet(objRef, index, value);
+  u1 index = bytecode_read_u1();
+  jshort value = operand_stack_pop(&f->operand_stack);
+  jshort objRef = operand_stack_pop(&f->operand_stack);
+  object_data_set(objRef, index, value);
 }
 
 void ins_invokevirtual(Frame *f) {
@@ -500,179 +500,179 @@ void ins_instanceof(Frame *f) {
 }
 
 void ins_sinc_w(Frame *f) {
-  u1 index = BCReadU1();
-  jshort v = BCReadU2();
-  jshort var = VTGet(&f->variableTable, index);
-  VTSet(&f->variableTable, index, var + v);
+  u1 index = bytecode_read_u1();
+  jshort v = bytecode_read_u2();
+  jshort var = variable_table_get(&f->variable_table, index);
+  variable_table_set(&f->variable_table, index, var + v);
 }
 
 void ins_ifeq_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v == 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifne_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v != 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_iflt_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v < 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifge_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v >= 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifgt_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v > 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifle_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v = operand_stack_pop(&f->operand_stack);
   if (v <= 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifnull_w(Frame *f) {
-  jshort branch = BCReadU2();
-  u2 v = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  u2 v = operand_stack_pop(&f->operand_stack);
   if (v == 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_ifnonnull_w(Frame *f) {
-  jshort branch = BCReadU2();
-  u2 v = (u2)OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  u2 v = (u2)operand_stack_pop(&f->operand_stack);
   if (v > 0) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_acmpeq_w(Frame *f) {
-  jshort branch = BCReadU2();
-  u2 v2 = (u2)OSPop(&f->operandStack);
-  u2 v1 = (u2)OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  u2 v2 = (u2)operand_stack_pop(&f->operand_stack);
+  u2 v1 = (u2)operand_stack_pop(&f->operand_stack);
   if (v1 == v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_acmpne_w(Frame *f) {
-  jshort branch = BCReadU2();
-  u2 v2 = (u2)OSPop(&f->operandStack);
-  u2 v1 = (u2)OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  u2 v2 = (u2)operand_stack_pop(&f->operand_stack);
+  u2 v1 = (u2)operand_stack_pop(&f->operand_stack);
   if (v1 != v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmpeq_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 == v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmpne_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 != v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmplt_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 < v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmpge_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 >= v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmpgt_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 > v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_if_scmple_w(Frame *f) {
-  jshort branch = BCReadU2();
-  jshort v2 = OSPop(&f->operandStack);
-  jshort v1 = OSPop(&f->operandStack);
+  jshort branch = bytecode_read_u2();
+  jshort v2 = operand_stack_pop(&f->operand_stack);
+  jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 <= v2) {
-    BCJump(branch);
+    bytecode_jump_offset(branch);
   }
 }
 
 void ins_goto_w(Frame *f) {
-  jshort branch = BCReadU2();
-  BCJump(branch);
+  jshort branch = bytecode_read_u2();
+  bytecode_jump_offset(branch);
 }
 
 void ins_getfield_abs_w(Frame *f) {
-  u2 index = BCReadU2();
-  jshort objRef = OSPop(&f->operandStack);
-  jshort value = ODGet(objRef, index);
-  OSPush(&f->operandStack, value);
+  u2 index = bytecode_read_u2();
+  jshort objRef = operand_stack_pop(&f->operand_stack);
+  jshort value = object_data_get(objRef, index);
+  operand_stack_push(&f->operand_stack, value);
 }
 
 void ins_getfield_abs_this(Frame *f) {
-  u1 index = BCReadU1();
-  jshort objRef = VTGet(&f->variableTable, 0);
-  jshort value = ODGet(objRef, index);
-  OSPush(&f->operandStack, value);
+  u1 index = bytecode_read_u1();
+  jshort objRef = variable_table_get(&f->variable_table, 0);
+  jshort value = object_data_get(objRef, index);
+  operand_stack_push(&f->operand_stack, value);
 }
 
 void ins_putfield_abs_w(Frame *f) {
-  u2 index = BCReadU2();
-  jshort value = OSPop(&f->operandStack);
-  jshort objRef = OSPop(&f->operandStack);
-  ODSet(objRef, index, value);
+  u2 index = bytecode_read_u2();
+  jshort value = operand_stack_pop(&f->operand_stack);
+  jshort objRef = operand_stack_pop(&f->operand_stack);
+  object_data_set(objRef, index, value);
 }
 
 void ins_putfield_abs_this(Frame *f) {
-  u1 index = BCReadU1();
-  jshort value = OSPop(&f->operandStack);
-  jshort objRef = VTGet(&f->variableTable, 0);
-  ODSet(objRef, index, value);
+  u1 index = bytecode_read_u1();
+  jshort value = operand_stack_pop(&f->operand_stack);
+  jshort objRef = variable_table_get(&f->variable_table, 0);
+  object_data_set(objRef, index, value);
 }
 
 void (*opcodes[256])(Frame *) = {

@@ -9,6 +9,7 @@ add_library(${CMAKE_PROJECT_NAME} STATIC
         ../littlefs/lfs_util.h
         context.h
         utils.h
+        globals.h
         vm.c
         rtda.c
         instructions.c
@@ -16,4 +17,5 @@ add_library(${CMAKE_PROJECT_NAME} STATIC
         ../littlefs/lfs_util.c
         context.c
         utils.c
+        globals.c
         )

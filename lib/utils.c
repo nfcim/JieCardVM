@@ -1,6 +1,6 @@
 #include "utils.h"
 
-void btox(char *xp, const uint8_t *bb, int n) {
+void bytes_to_hexstring(char *xp, const uint8_t *bb, int n) {
   const char xx[] = "0123456789ABCDEF";
   int nn = n * 2;
   while (--nn >= 0)
