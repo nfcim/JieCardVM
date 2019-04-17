@@ -7,7 +7,7 @@ u2 operands[100];
 jshort vt[100];
 u1 bytecodes[100];
 
-Frame frame;
+frame_t frame;
 
 static void init() {
   frame.operand_stack.base = operands;

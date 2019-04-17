@@ -24,7 +24,7 @@ typedef struct {
   operand_stack_t operand_stack;
   variable_table_t variable_table;
   u2 method_offset;
-} Frame;
+} frame_t;
 
 typedef struct {
   u1 *base;

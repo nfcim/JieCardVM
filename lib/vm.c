@@ -5,8 +5,9 @@
 #include <vm.h>
 #include <stdio.h>
 
-Frame frames[100], *currentFrame;
+frame_t frames[100], *currentFrame;
 u2 frameData[1024];
+package_t current_package;
 
 bool step(void) {
   u1 opcode = bytecode_read_u1();

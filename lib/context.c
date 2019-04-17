@@ -1,9 +1,9 @@
-#include "context.h"
-#include "globals.h"
-#include "lfs.h"
-#include "utils.h"
+#include <context.h>
+#include <globals.h>
+#include <lfs.h>
 #include <stdio.h>
 #include <string.h>
+#include <utils.h>
 
 static package_metadata_t package_metadata;
 static u1 array_buffer[ARRAY_BUFFER_SIZE];
@@ -229,7 +229,7 @@ int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val) {
   if (type == ARRAY_T_SHORT) {
     err = lfs_file_write(&g_lfs, &f, &val, 2);
   } else {
-    u1 data = (u1) val;
+    u1 data = (u1)val;
     err = lfs_file_write(&g_lfs, &f, &data, 1);
   }
   if (err <= 0)
