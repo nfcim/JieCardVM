@@ -23,7 +23,6 @@ typedef struct {
 typedef struct {
   operand_stack_t operand_stack;
   variable_table_t variable_table;
-  struct lfs_file *method_file;
   u2 method_offset;
 } Frame;
 

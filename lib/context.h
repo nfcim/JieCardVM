@@ -1,7 +1,6 @@
 #ifndef JIECARDVM_CONTEXT_H
 #define JIECARDVM_CONTEXT_H
 
-#include <stdbool.h>
 #include <stdio.h>
 
 #include "lfs.h"
@@ -11,13 +10,24 @@
 extern "C" {
 #endif
 
+enum context_error {
+  CONTEXT_ERR_OK = 0,         // No error
+  CONTEXT_ERR_EXIST = -1,     // Package already exists
+  CONTEXT_ERR_NOENT = -2,     // Package does not exist
+  CONTEXT_ERR_UNKNOWN = -128, // Unknown error
+};
+
+typedef struct {
+  char aid_hex[64]; // will be reused as path
+  u1 aid_hex_length;
+} package_t;
+
 void context_init(const struct lfs_config *cfg);
-bool context_create_cap(u1 *aid, u1 aidLength);
-bool context_delete_cap(u1 *aid, u1 aidLength);
-bool context_append_method(u1 *aid, u1 aidLength, u1 *bytecodes,
-                           u2 bytecodesLength);
-ssize_t context_read_method(u1 *aid, u1 aidLength, u1 *target, u2 offset,
-                            u2 length);
+int context_create_cap(package_t *pkg);
+int context_delete_cap(package_t *pkg);
+int context_append_method(package_t *pkg, u1 *data, u2 length);
+ssize_t context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
+int context_create_array(package_t *pkg);
 
 #ifdef __cplusplus
 }
