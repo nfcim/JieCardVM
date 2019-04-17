@@ -9,11 +9,13 @@ extern "C" {
 #endif
 
 #define ARRAY_BUFFER_SIZE 256
+#define ARRAY_BUFFER_SIZE_UMASK 0xFFFFFF00u
+#define ARRAY_BUFFER_SIZE_MASK 0xFFu
 
 enum context_error {
   CONTEXT_ERR_OK = 0,         // No error
   CONTEXT_ERR_EXIST = -1,     // Package already exists
-  CONTEXT_ERR_NOENT = -2,     // Package does not exist
+  CONTEXT_ERR_NOENT = -2,     // Entry does not exist
   CONTEXT_ERR_UNKNOWN = -128, // Unknown error
 };
 
@@ -23,8 +25,8 @@ typedef struct {
 } package_t;
 
 typedef struct {
-  u1 array_cnt;
-  u1 object_cnt;
+  u2 array_cnt;
+  u2 object_cnt;
 } package_metadata_t;
 
 /**
@@ -57,6 +59,8 @@ int context_append_method(package_t *pkg, u1 *data, u2 length);
 int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
 
 int context_create_array(package_t *pkg, u2 length);
+
+int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val);
 
 #ifdef __cplusplus
 }

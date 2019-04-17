@@ -83,6 +83,16 @@ TEST_CASE("context_create_array", "[context]") {
     REQUIRE(buffer[i] == 0);
 }
 
+TEST_CASE("context_read_array", "[context]") {
+  init();
+  jbyte data;
+  int ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 1, (u1 *) &data);
+  REQUIRE(ret == CONTEXT_ERR_OK);
+  REQUIRE(data == 0);
+  ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 256, (u1 *) &data);
+  REQUIRE(ret == CONTEXT_ERR_NOENT);
+}
+
 TEST_CASE("context_delete_cap", "[context]") {
   init();
   int ret = context_delete_cap(&pkg);

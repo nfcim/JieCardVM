@@ -15,6 +15,12 @@ typedef int16_t jshort;
 typedef uint8_t u1;
 typedef uint16_t u2;
 
+enum ARRAY_TYPE {
+  ARRAY_T_BOOLEAN = 10,
+  ARRAY_T_BYTE = 11,
+  ARRAY_T_SHORT = 12,
+};
+
 #ifdef __cplusplus
 };
 #endif
