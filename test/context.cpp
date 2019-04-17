@@ -1,5 +1,6 @@
 #include "context.h"
 #include "emubd/lfs_emubd.h"
+#include "globals.h"
 #include "lfs.h"
 #include <catch.hpp>
 
@@ -28,28 +29,28 @@ static void init() {
 
 static void finalize() { lfs_emubd_destroy(&cfg); }
 
-TEST_CASE("CTXCreateCAP", "[context]") {
+TEST_CASE("context_create_cap", "[context]") {
   init();
-  bool ret = context_create_cap(&pkg);
+  int ret = context_create_cap(&pkg);
   REQUIRE(ret == CONTEXT_ERR_OK);
   finalize();
 }
 
-TEST_CASE("CTXAppendMethods", "[context]") {
+TEST_CASE("context_append_method", "[context]") {
   init();
   u1 bytecodes[] = {0x7B, 0x30, 0x11, 0x01, 0xC8, 0x31, 0x1D, 0x1E,
                     0x41, 0x32, 0x1F, 0x1E, 0x43, 0x30, 0x1D, 0x78};
-  bool ret = context_append_method(&pkg, bytecodes, sizeof(bytecodes));
+  int ret = context_append_method(&pkg, bytecodes, sizeof(bytecodes));
   REQUIRE(ret == CONTEXT_ERR_OK);
   context_append_method(&pkg, bytecodes, sizeof(bytecodes));
   REQUIRE(ret == CONTEXT_ERR_OK);
   finalize();
 }
 
-TEST_CASE("CTXReadMethods", "[context]") {
+TEST_CASE("context_read_method", "[context]") {
   init();
   u1 bytecodes[100];
-  ssize_t ret = context_read_method(&pkg, bytecodes, 0, 256);
+  int ret = context_read_method(&pkg, bytecodes, 0, 256);
   REQUIRE(ret == 32);
   REQUIRE(bytecodes[0] == 0x7B);
   REQUIRE(bytecodes[10] == 0x1F);
@@ -57,9 +58,34 @@ TEST_CASE("CTXReadMethods", "[context]") {
   finalize();
 }
 
-TEST_CASE("CTXDeleteCAP", "[context]") {
+TEST_CASE("context_create_array", "[context]") {
+  u1 buffer[512];
   init();
-  bool ret = context_delete_cap(&pkg);
+  int ret = context_create_array(&pkg, 128);
+  REQUIRE(ret == 1);
+  lfs_file_t f;
+  ret = lfs_file_open(&g_lfs, &f, "F00001/a1", LFS_O_RDONLY);
+  REQUIRE(ret == 0);
+  memset(buffer, 0xFF, sizeof(buffer));
+  ret = lfs_file_read(&g_lfs, &f, buffer, 128);
+  REQUIRE(ret == 128);
+  for (int i = 0; i < 128; ++i)
+    REQUIRE(buffer[i] == 0);
+
+  ret = context_create_array(&pkg, 511);
+  REQUIRE(ret == 2);
+  ret = lfs_file_open(&g_lfs, &f, "F00001/a2", LFS_O_RDONLY);
+  REQUIRE(ret == 0);
+  memset(buffer, 0xFF, sizeof(buffer));
+  ret = lfs_file_read(&g_lfs, &f, buffer, 512);
+  REQUIRE(ret == 511);
+  for (int i = 0; i < 511; ++i)
+    REQUIRE(buffer[i] == 0);
+}
+
+TEST_CASE("context_delete_cap", "[context]") {
+  init();
+  int ret = context_delete_cap(&pkg);
   REQUIRE(ret == CONTEXT_ERR_OK);
   finalize();
 }

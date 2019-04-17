@@ -1,14 +1,14 @@
 #ifndef JIECARDVM_CONTEXT_H
 #define JIECARDVM_CONTEXT_H
 
-#include <stdio.h>
-
 #include "lfs.h"
 #include "types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define ARRAY_BUFFER_SIZE 256
 
 enum context_error {
   CONTEXT_ERR_OK = 0,         // No error
@@ -22,12 +22,41 @@ typedef struct {
   u1 aid_hex_length;
 } package_t;
 
-void context_init(const struct lfs_config *cfg);
+typedef struct {
+  u1 array_cnt;
+  u1 object_cnt;
+} package_metadata_t;
+
+/**
+ * Initialize the context
+ *
+ * @param lfs_cfg Config of little fs
+ */
+void context_init(const struct lfs_config *lfs_cfg);
+
+/**
+ * Create a new cap
+ *
+ * @param pkg Package Info
+ * @return CONTEXT_ERR_EXIST if the AID exists;
+ * CONTEXT_ERR_OK if the package is created.
+ */
 int context_create_cap(package_t *pkg);
+
+/**
+ * Delete a cap
+ *
+ * @param pkg Package Info
+ * @return CONTEXT_ERR_NOENT if the AID does not exist;
+ * CONTEXT_ERR_OK if the package is created.
+ */
 int context_delete_cap(package_t *pkg);
+
 int context_append_method(package_t *pkg, u1 *data, u2 length);
-ssize_t context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
-int context_create_array(package_t *pkg);
+
+int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
+
+int context_create_array(package_t *pkg, u2 length);
 
 #ifdef __cplusplus
 }
