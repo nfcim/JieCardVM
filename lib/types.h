@@ -19,6 +19,7 @@ enum ARRAY_TYPE {
   ARRAY_T_BOOLEAN = 10,
   ARRAY_T_BYTE = 11,
   ARRAY_T_SHORT = 12,
+  ARRAY_T_REFERENCE = 14,
 };
 
 #ifdef __cplusplus

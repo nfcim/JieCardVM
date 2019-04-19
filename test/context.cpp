@@ -61,25 +61,32 @@ TEST_CASE("context_read_method", "[context]") {
 TEST_CASE("context_create_array", "[context]") {
   u1 buffer[512];
   init();
-  int ret = context_create_array(&pkg, 128);
+  int ret = context_create_array(&pkg, ARRAY_T_BYTE, 0, 128);
   REQUIRE(ret == 1);
   lfs_file_t f;
   ret = lfs_file_open(&g_lfs, &f, "F00001/a1", LFS_O_RDONLY);
   REQUIRE(ret == 0);
   memset(buffer, 0xFF, sizeof(buffer));
+  array_metadata_t metadata;
+  lfs_file_read(&g_lfs, &f, &metadata, sizeof(metadata));
+  REQUIRE(metadata.length == 128);
+  REQUIRE(metadata.type == ARRAY_T_BYTE);
   ret = lfs_file_read(&g_lfs, &f, buffer, 128);
   REQUIRE(ret == 128);
   for (int i = 0; i < 128; ++i)
     REQUIRE(buffer[i] == 0);
 
-  ret = context_create_array(&pkg, 511);
+  ret = context_create_array(&pkg, ARRAY_T_SHORT, 0, 255);
   REQUIRE(ret == 2);
   ret = lfs_file_open(&g_lfs, &f, "F00001/a2", LFS_O_RDONLY);
   REQUIRE(ret == 0);
+  lfs_file_read(&g_lfs, &f, &metadata, sizeof(metadata));
+  REQUIRE(metadata.length == 255);
+  REQUIRE(metadata.type == ARRAY_T_SHORT);
   memset(buffer, 0xFF, sizeof(buffer));
   ret = lfs_file_read(&g_lfs, &f, buffer, 512);
-  REQUIRE(ret == 511);
-  for (int i = 0; i < 511; ++i)
+  REQUIRE(ret == 510);
+  for (int i = 0; i < 510; ++i)
     REQUIRE(buffer[i] == 0);
 }
 
@@ -87,7 +94,8 @@ TEST_CASE("context_write_array", "[context]") {
   init();
   int ret = context_write_array(&pkg, 1, ARRAY_T_BYTE, 1, 6);
   REQUIRE(ret == CONTEXT_ERR_OK);
-  ret = context_write_array(&pkg, 2, ARRAY_T_SHORT, 256, 167);
+
+  ret = context_write_array(&pkg, 2, ARRAY_T_SHORT, 128, 167);
   REQUIRE(ret == CONTEXT_ERR_OK);
 }
 
@@ -98,11 +106,15 @@ TEST_CASE("context_read_array", "[context]") {
   int ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 1, (u1 *) &b);
   REQUIRE(ret == CONTEXT_ERR_OK);
   REQUIRE(b == 6);
+
   ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 256, (u1 *) &b);
   REQUIRE(ret == CONTEXT_ERR_NOENT);
-  ret = context_read_array(&pkg, 2, ARRAY_T_SHORT, 256, (u1 *) &s);
+  ret = context_read_array(&pkg, 2, ARRAY_T_SHORT, 128, (u1 *) &s);
   REQUIRE(ret == CONTEXT_ERR_OK);
   REQUIRE(s == 167);
+
+  ret = context_read_array(&pkg, 2, ARRAY_T_SHORT, 300, (u1 *) &s);
+  REQUIRE(ret == CONTEXT_ERR_NOENT);
 }
 
 TEST_CASE("context_delete_cap", "[context]") {

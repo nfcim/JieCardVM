@@ -6,9 +6,10 @@
 #include <utils.h>
 
 static package_metadata_t package_metadata;
+static array_metadata_t array_metadata;
 static u1 array_buffer[ARRAY_BUFFER_SIZE];
 
-static int read_metadata(package_t *pkg) {
+static int read_package_metadata(package_t *pkg) {
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
@@ -26,7 +27,7 @@ static int read_metadata(package_t *pkg) {
   return CONTEXT_ERR_OK;
 }
 
-static int write_metadata(package_t *pkg) {
+static int write_package_metadata(package_t *pkg) {
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
@@ -62,7 +63,7 @@ int context_create_cap(package_t *pkg) {
 
   package_metadata.array_cnt = 0;
   package_metadata.object_cnt = 0;
-  err = write_metadata(pkg);
+  err = write_package_metadata(pkg);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -143,8 +144,8 @@ int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
   return read;
 }
 
-int context_create_array(package_t *pkg, u2 length) {
-  int err = read_metadata(pkg);
+int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length) {
+  int err = read_package_metadata(pkg);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -156,6 +157,15 @@ int context_create_array(package_t *pkg, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  array_metadata.type = type;
+  array_metadata.class_ref = class_ref;
+  array_metadata.length = length;
+  err = lfs_file_write(&g_lfs, &f, &array_metadata, sizeof(array_metadata));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  if (type == ARRAY_T_SHORT || type == ARRAY_T_REFERENCE)
+    length *= 2;
   memset(array_buffer, 0, sizeof(array_buffer));
   for (u2 i = 0; i < length; i += ARRAY_BUFFER_SIZE) {
     u2 size = length - i;
@@ -170,7 +180,7 @@ int context_create_array(package_t *pkg, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  err = write_metadata(pkg);
+  err = write_package_metadata(pkg);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -182,14 +192,26 @@ int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
   sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u", ref);
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
+  // TODO: what if the file does not exist
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  err = lfs_file_read(&g_lfs, &f, &array_metadata, sizeof(array_metadata));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+  // TODO: new return value
+  if ((type == ARRAY_T_BYTE && array_metadata.type != ARRAY_T_BYTE &&
+       array_metadata.type != ARRAY_T_BOOLEAN) ||
+      type != array_metadata.type)
+    return CONTEXT_ERR_UNKNOWN;
+  if (index >= array_metadata.length)
+    return CONTEXT_ERR_NOENT;
+
   u2 offset = index;
-  if (type == ARRAY_T_SHORT)
+  if (type == ARRAY_T_SHORT || type == ARRAY_T_REFERENCE)
     offset *= 2;
   err =
-      lfs_file_seek(&g_lfs, &f, offset & ARRAY_BUFFER_SIZE_UMASK, LFS_SEEK_SET);
+      lfs_file_seek(&g_lfs, &f, offset & ARRAY_BUFFER_SIZE_UMASK, LFS_SEEK_CUR);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -197,11 +219,9 @@ int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
   offset &= ARRAY_BUFFER_SIZE_MASK;
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
-  if (err < offset + 1)
-    return CONTEXT_ERR_NOENT;
 
   *val = array_buffer[offset];
-  if (type == ARRAY_T_SHORT)
+  if (type == ARRAY_T_SHORT || type == ARRAY_T_REFERENCE)
     *(val + 1) = array_buffer[offset + 1];
 
   err = lfs_file_close(&g_lfs, &f);
@@ -215,18 +235,26 @@ int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
 int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val) {
   sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u", ref);
   lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY);
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDWR);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  err = lfs_file_read(&g_lfs, &f, &array_metadata, sizeof(array_metadata));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+  if ((type == ARRAY_T_BYTE && array_metadata.type != ARRAY_T_BYTE &&
+       array_metadata.type != ARRAY_T_BOOLEAN) ||
+      type != array_metadata.type)
+    return CONTEXT_ERR_UNKNOWN;
+  // TODO: check ref type
   u2 offset = index;
-  if (type == ARRAY_T_SHORT)
+  if (type == ARRAY_T_SHORT || type == ARRAY_T_REFERENCE)
     offset *= 2;
-  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_SET);
+  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_CUR);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  if (type == ARRAY_T_SHORT) {
+  if (type == ARRAY_T_SHORT || type == ARRAY_T_REFERENCE) {
     err = lfs_file_write(&g_lfs, &f, &val, 2);
   } else {
     u1 data = (u1)val;

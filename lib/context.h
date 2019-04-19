@@ -25,9 +25,15 @@ typedef struct {
 } package_t;
 
 typedef struct {
-  u2 array_cnt;
-  u2 object_cnt;
+  u2 array_cnt;  // amount of arrays in the package
+  u2 object_cnt; // amount of objects in the package
 } package_metadata_t;
+
+typedef struct {
+  u1 type;      // type of array
+  u2 class_ref; // valid if type is T_REFERENCE
+  u2 length;    // length of array
+} array_metadata_t;
 
 /**
  * Initialize the context
@@ -58,7 +64,7 @@ int context_append_method(package_t *pkg, u1 *data, u2 length);
 
 int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
 
-int context_create_array(package_t *pkg, u2 length);
+int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length);
 
 int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val);
 
