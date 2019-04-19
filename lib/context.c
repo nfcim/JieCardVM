@@ -269,3 +269,21 @@ int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val) {
 
   return CONTEXT_ERR_OK;
 }
+
+int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata) {
+  sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u", ref);
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDWR);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_read(&g_lfs, &f, metadata, sizeof(array_metadata_t));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return CONTEXT_ERR_OK;
+}

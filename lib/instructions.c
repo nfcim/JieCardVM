@@ -9,7 +9,9 @@ void ins_invalid(frame_t *f) {}
 
 void ins_nop(frame_t *f) {}
 
-void ins_aconst_null(frame_t *f) { operand_stack_push(&f->operand_stack, JNULL); }
+void ins_aconst_null(frame_t *f) {
+  operand_stack_push(&f->operand_stack, JNULL);
+}
 
 void ins_sconst_m1(frame_t *f) { operand_stack_push(&f->operand_stack, -1); }
 
@@ -61,20 +63,28 @@ void ins_asload_3(frame_t *f) {
   operand_stack_push(&f->operand_stack, v);
 }
 
-void ins_asaload(frame_t *f) {
+void ins_aaload(frame_t *f) {
   jshort index = operand_stack_pop(&f->operand_stack);
   jshort ref = operand_stack_pop(&f->operand_stack);
-  jshort val;
-  context_read_array(&current_package, ref, ARRAY_T_SHORT, index, (u1 *)&val);
-  operand_stack_push(&f->operand_stack, val);
+  jshort v;
+  context_read_array(&current_package, ref, ARRAY_T_REFERENCE, index, (u1 *)&v);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_baload(frame_t *f) {
   jshort index = operand_stack_pop(&f->operand_stack);
   jshort ref = operand_stack_pop(&f->operand_stack);
-  jbyte val;
-  context_read_array(&current_package, ref, ARRAY_T_BYTE, index, (u1 *)&val);
-  operand_stack_push(&f->operand_stack, val);
+  jbyte v;
+  context_read_array(&current_package, ref, ARRAY_T_BYTE, index, (u1 *)&v);
+  operand_stack_push(&f->operand_stack, v);
+}
+
+void ins_saload(frame_t *f) {
+  jshort index = operand_stack_pop(&f->operand_stack);
+  jshort ref = operand_stack_pop(&f->operand_stack);
+  jshort v;
+  context_read_array(&current_package, ref, ARRAY_T_SHORT, index, (u1 *)&v);
+  operand_stack_push(&f->operand_stack, v);
 }
 
 void ins_asstore(frame_t *f) {
@@ -104,15 +114,24 @@ void ins_asstore_3(frame_t *f) {
 }
 
 void ins_aastore(frame_t *f) {
-  // TODO
+  jshort v = operand_stack_pop(&f->operand_stack);
+  jshort index = operand_stack_pop(&f->operand_stack);
+  jshort ref = operand_stack_pop(&f->operand_stack);
+  context_write_array(&current_package, ref, ARRAY_T_REFERENCE, index, v);
 }
 
 void ins_bastore(frame_t *f) {
-  // TODO
+  jbyte v = operand_stack_pop(&f->operand_stack);
+  jshort index = operand_stack_pop(&f->operand_stack);
+  jshort ref = operand_stack_pop(&f->operand_stack);
+  context_write_array(&current_package, ref, ARRAY_T_BYTE, index, v);
 }
 
 void ins_sastore(frame_t *f) {
-  // TODO
+  jshort v = operand_stack_pop(&f->operand_stack);
+  jshort index = operand_stack_pop(&f->operand_stack);
+  jshort ref = operand_stack_pop(&f->operand_stack);
+  context_write_array(&current_package, ref, ARRAY_T_SHORT, index, v);
 }
 
 void ins_pop(frame_t *f) { operand_stack_pop(&f->operand_stack); }
@@ -482,7 +501,14 @@ void ins_new(frame_t *f) {
 }
 
 void ins_newarray(frame_t *f) {
-  // TODO
+  u1 atype = bytecode_read_u1();
+  jshort count = operand_stack_pop(&f->operand_stack);
+  int ref = context_create_array(&current_package, atype, 0, count);
+  if (ref > 0)
+    operand_stack_push(&f->operand_stack, ref);
+  else {
+    // TODO: error
+  }
 }
 
 void ins_anewarray(frame_t *f) {
@@ -490,7 +516,10 @@ void ins_anewarray(frame_t *f) {
 }
 
 void ins_arraylength(frame_t *f) {
-  // TODO
+  jshort ref = operand_stack_pop(&f->operand_stack);
+  array_metadata_t metadata;
+  context_array_meta(&current_package, ref, &metadata);
+  operand_stack_push(&f->operand_stack, metadata.length);
 }
 
 void ins_athrow(frame_t *f) {
@@ -718,9 +747,9 @@ void (*opcodes[256])(frame_t *) = {
     ins_invalid,
     ins_invalid,
     ins_invalid,
-    ins_asaload, // aaload
-    ins_baload,  // baload
-    ins_asaload, // saload
+    ins_aaload,
+    ins_baload,
+    ins_saload,
     ins_invalid,
     ins_asstore, // astore
     ins_asstore, // sstore

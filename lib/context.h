@@ -54,7 +54,7 @@ int context_create_cap(package_t *pkg);
 /**
  * Delete a cap
  *
- * @param pkg Package Info
+ * @param pkg Package info
  * @return CONTEXT_ERR_NOENT if the AID does not exist;
  * CONTEXT_ERR_OK if the package is created.
  */
@@ -64,11 +64,23 @@ int context_append_method(package_t *pkg, u1 *data, u2 length);
 
 int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
 
+/**
+ * Create an array
+ *
+ * @param pkg Package info
+ * @param type Array type
+ * @param class_ref If the array is of type reference, the class_ref should be
+ * provided
+ * @param length Length of the array
+ * @return Arrayref
+ */
 int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length);
 
 int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val);
 
 int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val);
+
+int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata);
 
 #ifdef __cplusplus
 }

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define JNULL 0xFFFF
+#define JNULL 0
 
 #ifdef __cplusplus
 extern "C" {
