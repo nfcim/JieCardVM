@@ -859,3 +859,405 @@ TEST_CASE("slookupswitch", "[instructions]") {
   REQUIRE(_bytecode_get_index() == 20);
   finalize();
 }
+
+TEST_CASE("areturn", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("sreturn", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("return", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("getstatic_abs", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("putstatic_abs", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("getfield_abs", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("putfield_abs", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("invokevirtual", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("invokespecial", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("invokestatic", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("invokeinterface", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("new", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("newarray", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("anewarray", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("arraylength", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("athrow", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("checkcast", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("instanceof", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("sinc_w", "[instructions]") {
+  init();
+  bytecodes[0] = 2;
+  bytecodes[1] = 0x1;
+  bytecodes[2] = 0x1;
+  vt[2] = 0x101;
+  ins_sinc_w(&frame);
+  REQUIRE(variable_table_get(&frame.variable_table, 2) == (jshort)0x202);
+  finalize();
+}
+
+TEST_CASE("ifeq_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifeq_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)2);
+  ins_ifeq_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("ifne_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifne_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)2);
+  ins_ifne_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+}
+
+TEST_CASE("iflt_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)-5);
+  ins_iflt_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)2);
+  ins_iflt_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("ifge_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifge_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)3);
+  ins_ifge_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)-1);
+  ins_ifge_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("ifgt_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_ifgt_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifgt_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("ifle_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifle_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)-3);
+  ins_ifle_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)1);
+  ins_ifle_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("ifnull_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifnull_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)10);
+  ins_ifnull_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("ifnonnull_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_ifnonnull_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifnonnull_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("if_ascmpeq_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_ascmpeq_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_ascmpeq_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("if_ascmpne_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_ascmpne_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_ascmpne_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("if_scmplt_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_scmplt_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_scmplt_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("if_scmpge_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_scmpge_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)9);
+  ins_if_scmpge_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("if_scmpgt_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)9);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_scmpgt_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_scmpgt_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("if_scmple_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_scmple_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_if_scmple_w(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("goto_w", "[instructions]") {
+  init();
+  bytecodes[0] = 1;
+  bytecodes[1] = 1;
+  ins_goto_w(&frame);
+  REQUIRE(_bytecode_get_index() == 257);
+  finalize();
+}
+
+TEST_CASE("getstatic_abs_w", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("putstatic_abs_w", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("getfield_abs_w", "[instructions]") {
+  // TODO
+}
+
+TEST_CASE("putfield_abs_w", "[instructions]") {
+  // TODO
+}
