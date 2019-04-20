@@ -69,7 +69,9 @@ TEST_CASE("context_create_array", "[context]") {
   REQUIRE(ret == 0);
   memset(buffer, 0xFF, sizeof(buffer));
   array_metadata_t metadata;
-  lfs_file_read(&g_lfs, &f, &metadata, sizeof(metadata));
+  ret = lfs_getattr(&g_lfs, "F00001/a1", LFS_ATTR_METADATA, &metadata,
+                    sizeof(metadata));
+  REQUIRE(ret > 0);
   REQUIRE(metadata.length == 128);
   REQUIRE(metadata.type == ARRAY_T_BYTE);
   ret = lfs_file_read(&g_lfs, &f, buffer, 128);
@@ -81,7 +83,9 @@ TEST_CASE("context_create_array", "[context]") {
   REQUIRE(ret == 2);
   ret = lfs_file_open(&g_lfs, &f, "F00001/a2", LFS_O_RDONLY);
   REQUIRE(ret == 0);
-  lfs_file_read(&g_lfs, &f, &metadata, sizeof(metadata));
+  ret = lfs_getattr(&g_lfs, "F00001/a2", LFS_ATTR_METADATA, &metadata,
+                    sizeof(metadata));
+  REQUIRE(ret > 0);
   REQUIRE(metadata.length == 255);
   REQUIRE(metadata.type == ARRAY_T_SHORT);
   memset(buffer, 0xFF, sizeof(buffer));
@@ -104,17 +108,17 @@ TEST_CASE("context_read_array", "[context]") {
   init();
   jbyte b;
   jshort s;
-  int ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 1, (u1 *) &b);
+  int ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 1, (u1 *)&b);
   REQUIRE(ret == CONTEXT_ERR_OK);
   REQUIRE(b == 6);
 
-  ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 256, (u1 *) &b);
+  ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 256, (u1 *)&b);
   REQUIRE(ret == CONTEXT_ERR_NOENT);
-  ret = context_read_array(&pkg, 2, ARRAY_T_SHORT, 128, (u1 *) &s);
+  ret = context_read_array(&pkg, 2, ARRAY_T_SHORT, 128, (u1 *)&s);
   REQUIRE(ret == CONTEXT_ERR_OK);
   REQUIRE(s == 167);
 
-  ret = context_read_array(&pkg, 2, ARRAY_T_SHORT, 300, (u1 *) &s);
+  ret = context_read_array(&pkg, 2, ARRAY_T_SHORT, 300, (u1 *)&s);
   REQUIRE(ret == CONTEXT_ERR_NOENT);
 }
 

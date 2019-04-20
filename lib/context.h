@@ -12,6 +12,8 @@ extern "C" {
 #define ARRAY_BUFFER_SIZE_UMASK 0xFFFFFF00u
 #define ARRAY_BUFFER_SIZE_MASK 0xFFu
 
+#define LFS_ATTR_METADATA 0
+
 enum context_error {
   CONTEXT_ERR_OK = 0,         // No error
   CONTEXT_ERR_EXIST = -1,     // Package already exists
