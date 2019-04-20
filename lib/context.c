@@ -71,6 +71,8 @@ int context_create_cap(package_t *pkg) {
 }
 
 int context_delete_cap(package_t *pkg) {
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+
   lfs_dir_t dir;
   int err = lfs_dir_open(&g_lfs, &dir, pkg->aid_hex);
   if (err == LFS_ERR_NOENT)
@@ -92,11 +94,12 @@ int context_delete_cap(package_t *pkg) {
       return CONTEXT_ERR_UNKNOWN;
   }
 
-  lfs_dir_close(&g_lfs, &dir);
+  err = lfs_dir_close(&g_lfs, &dir);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
 
   pkg->aid_hex[pkg->aid_hex_length] = 0;
   err = lfs_remove(&g_lfs, pkg->aid_hex);
-
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 

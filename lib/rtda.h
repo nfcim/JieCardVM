@@ -1,23 +1,26 @@
 #ifndef JIECARDVM_RTDA_H
 #define JIECARDVM_RTDA_H
 
-#include <stdint.h>
-#include "types.h"
 #include "lfs.h"
+#include "types.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define MAX_BC_INDEX 512
+#define MAX_BYTECODE_INDEX 512
+#define TOTAL_FRAMES 100
 
 typedef struct {
   u2 *base; // base memory
-  u2 *next; // next slot
+  u1 index;
+  u1 max_stack;
 } operand_stack_t;
 
 typedef struct {
   jshort *base; // base memory
+  u1 max_locals;
 } variable_table_t;
 
 typedef struct {

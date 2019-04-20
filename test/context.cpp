@@ -4,9 +4,9 @@
 #include "lfs.h"
 #include <catch.hpp>
 
-struct lfs_config cfg;
-lfs_emubd_t bd;
-package_t pkg;
+static struct lfs_config cfg;
+static lfs_emubd_t bd;
+static package_t pkg;
 
 static void init() {
   cfg.context = &bd;
@@ -21,8 +21,9 @@ static void init() {
   cfg.block_cycles = 50000;
   cfg.cache_size = 128;
   cfg.lookahead_size = 16;
-  lfs_emubd_create(&cfg, "testdata");
+  lfs_emubd_create(&cfg, "testctx");
   context_init(&cfg);
+
   strcpy(pkg.aid_hex, "F00001");
   pkg.aid_hex_length = 6;
 }

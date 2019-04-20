@@ -1,20 +1,27 @@
 #include "rtda.h"
 
-static bytecode_t byteCode;
+static bytecode_t bytecode;
+static frame_t frames[TOTAL_FRAMES];
 
-jshort operand_stack_pop(operand_stack_t *s) { return *(--s->next); }
+jshort operand_stack_pop(operand_stack_t *s) { return s->base[--s->index]; }
 
-void operand_stack_push(operand_stack_t *s, jshort val) { *s->next++ = val; }
+void operand_stack_push(operand_stack_t *s, jshort val) {
+  s->base[s->index++] = val;
+}
 
-jshort operand_stack_get(operand_stack_t *s) { return *(s->next - 1); }
+jshort operand_stack_get(operand_stack_t *s) { return s->base[s->index - 1]; }
 
-jshort variable_table_get(variable_table_t *t, u1 index) { return t->base[index]; }
+jshort variable_table_get(variable_table_t *t, u1 index) {
+  return t->base[index];
+}
 
-void variable_table_set(variable_table_t *t, u1 index, jshort val) { t->base[index] = val; }
+void variable_table_set(variable_table_t *t, u1 index, jshort val) {
+  t->base[index] = val;
+}
 
 u1 bytecode_read_u1(void) {
-  if (byteCode.index < MAX_BC_INDEX)
-    return byteCode.base[byteCode.index++];
+  if (bytecode.index < MAX_BYTECODE_INDEX)
+    return bytecode.base[bytecode.index++];
   return 0; // TODO
 }
 
@@ -24,11 +31,11 @@ u2 bytecode_read_u2(void) {
   return (v1 << 8) | v2;
 }
 
-void bytecode_jump_offset(int16_t offset) { byteCode.index += offset; }
+void bytecode_jump_offset(int16_t offset) { bytecode.index += offset; }
 
 void bytecode_set(u1 *base) {
-  byteCode.base = base;
-  byteCode.index = 0;
+  bytecode.base = base;
+  bytecode.index = 0;
 }
 
 u2 constant_pool_get(u2 index) { return 0; }

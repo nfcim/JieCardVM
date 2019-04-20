@@ -155,22 +155,22 @@ void ins_dup2(frame_t *f) {
 }
 
 void ins_dup_x(frame_t *f) {
-  u1 mn = bytecode_read_u1();
-  u1 m = (mn >> 4) * 2;
-  u1 n = (mn & 0xF) * 2;
-  memmove(f->operand_stack.next - n + m, f->operand_stack.next - n, n);
-  memcpy(f->operand_stack.next - n, f->operand_stack.next, m);
-  f->operand_stack.next += m;
+//  u1 mn = bytecode_read_u1();
+//  u1 m = (mn >> 4) * 2;
+//  u1 n = (mn & 0xF) * 2;
+//  memmove(f->operand_stack.next - n + m, f->operand_stack.next - n, n);
+//  memcpy(f->operand_stack.next - n, f->operand_stack.next, m);
+//  f->operand_stack.next += m;
 }
 
 void ins_swap_x(frame_t *f) {
-  u1 buf[2];
-  u1 mn = bytecode_read_u1();
-  u1 m = (mn >> 4) * 2;
-  u1 n = (mn & 0xF) * 2;
-  memcpy(buf, f->operand_stack.next - m, m);
-  memmove(f->operand_stack.next - n, f->operand_stack.next - n - m, n);
-  memcpy(f->operand_stack.next - n - m, buf, m);
+//  u1 buf[2];
+//  u1 mn = bytecode_read_u1();
+//  u1 m = (mn >> 4) * 2;
+//  u1 n = (mn & 0xF) * 2;
+//  memcpy(buf, f->operand_stack.next - m, m);
+//  memmove(f->operand_stack.next - n, f->operand_stack.next - n - m, n);
+//  memcpy(f->operand_stack.next - n - m, buf, m);
 }
 
 void ins_sadd(frame_t *f) {
