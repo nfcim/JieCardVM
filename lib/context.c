@@ -10,17 +10,9 @@ static array_metadata_t array_metadata;
 static u1 array_buffer[ARRAY_BUFFER_SIZE];
 
 static int read_package_metadata(package_t *pkg) {
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
-  lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_read(&g_lfs, &f, &package_metadata, sizeof(package_metadata));
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_close(&g_lfs, &f);
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  int err = lfs_getattr(&g_lfs, pkg->aid_hex, LFS_ATTR_METADATA,
+                        &package_metadata, sizeof(package_metadata));
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -28,18 +20,9 @@ static int read_package_metadata(package_t *pkg) {
 }
 
 static int write_package_metadata(package_t *pkg) {
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
-  lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
-                          LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_write(&g_lfs, &f, &package_metadata, sizeof(package_metadata));
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_close(&g_lfs, &f);
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  int err = lfs_setattr(&g_lfs, pkg->aid_hex, LFS_ATTR_METADATA,
+                        &package_metadata, sizeof(package_metadata));
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -107,7 +90,7 @@ int context_delete_cap(package_t *pkg) {
 }
 
 int context_append_method(package_t *pkg, u1 *data, u2 length) {
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/b");
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
                           LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
@@ -126,7 +109,7 @@ int context_append_method(package_t *pkg, u1 *data, u2 length) {
 }
 
 int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/b");
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
   if (err < 0)
