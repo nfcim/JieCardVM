@@ -942,7 +942,18 @@ TEST_CASE("new", "[instructions]") {
 }
 
 TEST_CASE("newarray", "[instructions]") {
-  // TODO
+  init();
+  context_create_cap(&current_package);
+  operand_stack_push(&frame.operand_stack, 100);
+  bytecodes[0] = ARRAY_T_BYTE;
+  ins_newarray(&frame);
+  int ref = operand_stack_pop(&frame.operand_stack);
+  array_metadata_t metadata;
+  context_array_meta(&current_package, ref, &metadata);
+  REQUIRE(metadata.length == 100);
+  REQUIRE(metadata.type == ARRAY_T_BYTE);
+  context_delete_cap(&current_package);
+  finalize();
 }
 
 TEST_CASE("anewarray", "[instructions]") {
@@ -950,7 +961,14 @@ TEST_CASE("anewarray", "[instructions]") {
 }
 
 TEST_CASE("arraylength", "[instructions]") {
-  // TODO
+  init();
+  context_create_cap(&current_package);
+  int ref = context_create_array(&current_package, ARRAY_T_BYTE, 0, 100);
+  operand_stack_push(&frame.operand_stack, ref);
+  ins_arraylength(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == 100);
+  context_delete_cap(&current_package);
+  finalize();
 }
 
 TEST_CASE("athrow", "[instructions]") {
