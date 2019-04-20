@@ -52,6 +52,8 @@ void bytecode_jump_offset(int16_t offset);
 
 void bytecode_set(u1 *base);
 
+u2 _bytecode_get_index(void);
+
 u2 constant_pool_get(u2 index);
 
 void constant_pool_set(u2 index, u2 val);

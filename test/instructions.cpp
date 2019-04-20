@@ -325,3 +325,362 @@ TEST_CASE("swap_x", "[instructions]") {
   REQUIRE(frame.operand_stack.index == 0);
   finalize();
 }
+
+TEST_CASE("sadd", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x1);
+  operand_stack_push(&frame.operand_stack, (jshort)0x2);
+  ins_sadd(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x3);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("ssub", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x1);
+  operand_stack_push(&frame.operand_stack, (jshort)0x2);
+  ins_ssub(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)-0x1);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("smul", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x10);
+  operand_stack_push(&frame.operand_stack, (jshort)0x20);
+  ins_smul(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x200);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sdiv", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x10);
+  operand_stack_push(&frame.operand_stack, (jshort)0x20);
+  ins_sdiv(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x0);
+  REQUIRE(frame.operand_stack.index == 0);
+  operand_stack_push(&frame.operand_stack, (jshort)-32768);
+  operand_stack_push(&frame.operand_stack, (jshort)-1);
+  ins_sdiv(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)-32768);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("srem", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)10);
+  operand_stack_push(&frame.operand_stack, (jshort)20);
+  ins_srem(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)10);
+  REQUIRE(frame.operand_stack.index == 0);
+  operand_stack_push(&frame.operand_stack, (jshort)-21);
+  operand_stack_push(&frame.operand_stack, (jshort)-4);
+  ins_srem(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)-1);
+  REQUIRE(frame.operand_stack.index == 0);
+  operand_stack_push(&frame.operand_stack, (jshort)-32768);
+  operand_stack_push(&frame.operand_stack, (jshort)-1);
+  ins_srem(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sneg", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_sneg(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0);
+  REQUIRE(frame.operand_stack.index == 0);
+  operand_stack_push(&frame.operand_stack, (jshort)-10);
+  ins_sneg(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)10);
+  REQUIRE(frame.operand_stack.index == 0);
+  operand_stack_push(&frame.operand_stack, (jshort)-32768);
+  ins_sneg(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)-32768);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sshl", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x10);
+  operand_stack_push(&frame.operand_stack, (jshort)1);
+  ins_sshl(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x20);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sshr", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x21);
+  operand_stack_push(&frame.operand_stack, (jshort)1);
+  ins_sshr(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x10);
+  REQUIRE(frame.operand_stack.index == 0);
+  operand_stack_push(&frame.operand_stack, (jshort)-129);
+  operand_stack_push(&frame.operand_stack, (jshort)1);
+  ins_sshr(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)-65);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sushr", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x21);
+  operand_stack_push(&frame.operand_stack, (jshort)1);
+  ins_sushr(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x10);
+  REQUIRE(frame.operand_stack.index == 0);
+  operand_stack_push(&frame.operand_stack, (jshort)-129);
+  operand_stack_push(&frame.operand_stack, (jshort)1);
+  ins_sushr(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)32703);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sand", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x21);
+  operand_stack_push(&frame.operand_stack, (jshort)0x1F);
+  ins_sand(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x1);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sor", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x21);
+  operand_stack_push(&frame.operand_stack, (jshort)0x1F);
+  ins_sor(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x3F);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sxor", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x21);
+  operand_stack_push(&frame.operand_stack, (jshort)0x1F);
+  ins_sxor(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x3E);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("sinc", "[instructions]") {
+  init();
+  bytecodes[0] = 2;
+  bytecodes[1] = 100;
+  vt[2] = 123;
+  ins_sinc(&frame);
+  REQUIRE(variable_table_get(&frame.variable_table, 2) == (jshort)223);
+  finalize();
+}
+
+TEST_CASE("s2b", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)999);
+  ins_s2b(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jbyte)0xE7);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("ifeq", "[instructions]") {
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifeq(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)2);
+  ins_ifeq(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}
+
+TEST_CASE("ifne", "[instructions]") {
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifne(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)2);
+  ins_ifne(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 2);
+  finalize();
+}
+
+TEST_CASE("iflt", "[instructions]") {
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)-5);
+  ins_iflt(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)2);
+  ins_iflt(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}
+
+TEST_CASE("ifge", "[instructions]") {
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifge(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)3);
+  ins_ifge(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)-1);
+  ins_ifge(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}
+
+TEST_CASE("ifgt", "[instructions]") {
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_ifgt(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifgt(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}
+
+TEST_CASE("ifle", "[instructions]") {
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifle(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)-3);
+  ins_ifle(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)1);
+  ins_ifle(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}
+
+TEST_CASE("ifnull", "[instructions]") {
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifnull(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)10);
+  ins_ifnull(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}
+
+TEST_CASE("ifnonnull", "[instructions]") {
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_ifnonnull(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  ins_ifnonnull(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}
+
+TEST_CASE("if_ascmpeq", "[instructions]") {
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_ascmpeq(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_ascmpeq(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}
+
+TEST_CASE("if_ascmpne", "[instructions]") {
+  init();
+  bytecodes[0] = 3;
+  operand_stack_push(&frame.operand_stack, (jshort)0);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_ascmpne(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 3);
+  finalize();
+  init();
+  bytecodes[0] = 2;
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  operand_stack_push(&frame.operand_stack, (jshort)8);
+  ins_if_ascmpne(&frame);
+  REQUIRE(frame.operand_stack.index == 0);
+  REQUIRE(_bytecode_get_index() == 1);
+  finalize();
+}

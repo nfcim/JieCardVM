@@ -200,6 +200,7 @@ void ins_smul(frame_t *f) {
 }
 
 void ins_sdiv(frame_t *f) {
+  // TODO: divisor is 0
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
   jshort result = v1 / v2;
@@ -273,7 +274,7 @@ void ins_ifeq(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
   if (v == 0) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -281,7 +282,7 @@ void ins_ifne(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
   if (v != 0) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -289,7 +290,7 @@ void ins_iflt(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
   if (v < 0) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -297,7 +298,7 @@ void ins_ifge(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
   if (v >= 0) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -305,7 +306,7 @@ void ins_ifgt(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
   if (v > 0) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -313,7 +314,7 @@ void ins_ifle(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
   if (v <= 0) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -321,7 +322,7 @@ void ins_ifnull(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   u2 v = operand_stack_pop(&f->operand_stack);
   if (v == 0) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -329,43 +330,25 @@ void ins_ifnonnull(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   u2 v = (u2)operand_stack_pop(&f->operand_stack);
   if (v > 0) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
-void ins_if_acmpeq(frame_t *f) {
+void ins_if_ascmpeq(frame_t *f) {
   jbyte branch = bytecode_read_u1();
-  u2 v2 = (u2)operand_stack_pop(&f->operand_stack);
-  u2 v1 = (u2)operand_stack_pop(&f->operand_stack);
+  jshort v2 = (u2)operand_stack_pop(&f->operand_stack);
+  jshort v1 = (u2)operand_stack_pop(&f->operand_stack);
   if (v1 == v2) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
-void ins_if_acmpne(frame_t *f) {
+void ins_if_ascmpne(frame_t *f) {
   jbyte branch = bytecode_read_u1();
-  u2 v2 = (u2)operand_stack_pop(&f->operand_stack);
-  u2 v1 = (u2)operand_stack_pop(&f->operand_stack);
+  jshort v2 = (u2)operand_stack_pop(&f->operand_stack);
+  jshort v1 = (u2)operand_stack_pop(&f->operand_stack);
   if (v1 != v2) {
-    bytecode_jump_offset(branch);
-  }
-}
-
-void ins_if_scmpeq(frame_t *f) {
-  jbyte branch = bytecode_read_u1();
-  jshort v2 = operand_stack_pop(&f->operand_stack);
-  jshort v1 = operand_stack_pop(&f->operand_stack);
-  if (v1 == v2) {
-    bytecode_jump_offset(branch);
-  }
-}
-
-void ins_if_scmpne(frame_t *f) {
-  jbyte branch = bytecode_read_u1();
-  jshort v2 = operand_stack_pop(&f->operand_stack);
-  jshort v1 = operand_stack_pop(&f->operand_stack);
-  if (v1 != v2) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -374,7 +357,7 @@ void ins_if_scmplt(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 < v2) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -383,7 +366,7 @@ void ins_if_scmpge(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 >= v2) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -392,7 +375,7 @@ void ins_if_scmpgt(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 > v2) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
@@ -401,13 +384,13 @@ void ins_if_scmple(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
   if (v1 <= v2) {
-    bytecode_jump_offset(branch);
+    bytecode_jump_offset(branch - 1);
   }
 }
 
 void ins_goto(frame_t *f) {
   jbyte branch = bytecode_read_u1();
-  bytecode_jump_offset(branch);
+  bytecode_jump_offset(branch - 1);
 }
 
 void ins_jsr(frame_t *f) {
@@ -820,10 +803,10 @@ void (*opcodes[256])(frame_t *) = {
     ins_ifle,
     ins_ifnull,
     ins_ifnonnull,
-    ins_if_acmpeq,
-    ins_if_acmpne,
-    ins_if_scmpeq,
-    ins_if_scmpne,
+    ins_if_ascmpeq, // if_acmpeq
+    ins_if_ascmpne, // if_acmpne
+    ins_if_ascmpeq, // if_scmpeq
+    ins_if_ascmpne, // if_scmpne
     ins_if_scmplt,
     ins_if_scmpge,
     ins_if_scmpgt,
