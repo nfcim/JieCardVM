@@ -173,11 +173,29 @@ TEST_CASE("aaload", "[instructions]") {
 }
 
 TEST_CASE("baload", "[instructions]") {
-  // TODO
+  init();
+  context_create_cap(&current_package);
+  int ref = context_create_array(&current_package, ARRAY_T_BYTE, 0, 10);
+  context_write_array(&current_package, ref, ARRAY_T_BYTE, 3, 0x5A);
+  operand_stack_push(&frame.operand_stack, ref);
+  operand_stack_push(&frame.operand_stack, 3);
+  ins_baload(&frame);
+  REQUIRE(operand_stack_get(&frame.operand_stack) == 0x5A);
+  context_delete_cap(&current_package);
+  finalize();
 }
 
 TEST_CASE("saload", "[instructions]") {
-  // TODO
+  init();
+  context_create_cap(&current_package);
+  int ref = context_create_array(&current_package, ARRAY_T_SHORT, 0, 10);
+  context_write_array(&current_package, ref, ARRAY_T_SHORT, 5, 0x52A);
+  operand_stack_push(&frame.operand_stack, ref);
+  operand_stack_push(&frame.operand_stack, 5);
+  ins_saload(&frame);
+  REQUIRE(operand_stack_get(&frame.operand_stack) == 0x52A);
+  context_delete_cap(&current_package);
+  finalize();
 }
 
 TEST_CASE("asstore", "[instructions]") {
@@ -271,6 +289,39 @@ TEST_CASE("dup2", "[instructions]") {
   REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x5A5A);
   REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0xA55A);
   REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x5A5A);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("dup_x", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x1);
+  operand_stack_push(&frame.operand_stack, (jshort)0x2);
+  operand_stack_push(&frame.operand_stack, (jshort)0x3);
+  operand_stack_push(&frame.operand_stack, (jshort)0x4);
+  bytecodes[0] = 0x14;
+  ins_dup_x(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x4);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x3);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x2);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x1);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x4);
+  REQUIRE(frame.operand_stack.index == 0);
+  finalize();
+}
+
+TEST_CASE("swap_x", "[instructions]") {
+  init();
+  operand_stack_push(&frame.operand_stack, (jshort)0x1);
+  operand_stack_push(&frame.operand_stack, (jshort)0x2);
+  operand_stack_push(&frame.operand_stack, (jshort)0x3);
+  operand_stack_push(&frame.operand_stack, (jshort)0x4);
+  bytecodes[0] = 0x12;
+  ins_swap_x(&frame);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x3);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x2);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x4);
+  REQUIRE(operand_stack_pop(&frame.operand_stack) == (jshort)0x1);
   REQUIRE(frame.operand_stack.index == 0);
   finalize();
 }
