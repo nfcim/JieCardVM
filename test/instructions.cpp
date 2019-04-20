@@ -240,15 +240,48 @@ TEST_CASE("asstore_3", "[instructions]") {
 }
 
 TEST_CASE("aastore", "[instructions]") {
-  // TODO
+  init();
+  context_create_cap(&current_package);
+  int ref = context_create_array(&current_package, ARRAY_T_REFERENCE, 0, 10);
+  operand_stack_push(&frame.operand_stack, ref);
+  operand_stack_push(&frame.operand_stack, 5);
+  operand_stack_push(&frame.operand_stack, 0x52A);
+  ins_aastore(&frame);
+  jshort v;
+  context_read_array(&current_package, ref, ARRAY_T_REFERENCE, 5, (u1 *)&v);
+  REQUIRE(v == 0x52A);
+  context_delete_cap(&current_package);
+  finalize();
 }
 
 TEST_CASE("bastore", "[instructions]") {
-  // TODO
+  init();
+  context_create_cap(&current_package);
+  int ref = context_create_array(&current_package, ARRAY_T_BYTE, 0, 10);
+  operand_stack_push(&frame.operand_stack, ref);
+  operand_stack_push(&frame.operand_stack, 5);
+  operand_stack_push(&frame.operand_stack, 0x52);
+  ins_bastore(&frame);
+  jbyte v;
+  context_read_array(&current_package, ref, ARRAY_T_BYTE, 5, (u1 *)&v);
+  REQUIRE(v == 0x52);
+  context_delete_cap(&current_package);
+  finalize();
 }
 
 TEST_CASE("sastore", "[instructions]") {
-  // TODO
+  init();
+  context_create_cap(&current_package);
+  int ref = context_create_array(&current_package, ARRAY_T_SHORT, 0, 10);
+  operand_stack_push(&frame.operand_stack, ref);
+  operand_stack_push(&frame.operand_stack, 5);
+  operand_stack_push(&frame.operand_stack, 0x52A);
+  ins_sastore(&frame);
+  jshort v;
+  context_read_array(&current_package, ref, ARRAY_T_SHORT, 5, (u1 *)&v);
+  REQUIRE(v == 0x52A);
+  context_delete_cap(&current_package);
+  finalize();
 }
 
 TEST_CASE("pop", "[instructions]") {
