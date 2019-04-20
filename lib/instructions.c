@@ -411,7 +411,7 @@ void ins_stableswitch(frame_t *f) {
   } else {
     bytecode_jump_offset((index - low) * 2);
     u2 offset = bytecode_read_u2();
-    bytecode_jump_offset(offset - 6 - (index - low) * 2);
+    bytecode_jump_offset(offset - 8 - (index - low) * 2);
   }
 }
 
@@ -423,7 +423,7 @@ void ins_slookupswitch(frame_t *f) {
     jshort match = bytecode_read_u2();
     jshort offset = bytecode_read_u2();
     if (key == match) {
-      bytecode_jump_offset(offset - 4 - 4 * i);
+      bytecode_jump_offset(offset - 4 - 4 * (i + 1));
       return;
     }
   }

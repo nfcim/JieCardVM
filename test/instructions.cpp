@@ -776,3 +776,86 @@ TEST_CASE("jsr", "[instructions]") {
 TEST_CASE("ret", "[instructions]") {
   // TODO
 }
+
+TEST_CASE("stableswitch", "[instructions]") {
+  init();
+  bytecodes[0] = 0;
+  bytecodes[1] = 20;
+  bytecodes[2] = 0;
+  bytecodes[3] = 10;
+  bytecodes[4] = 0;
+  bytecodes[5] = 20;
+  bytecodes[6] = 0;
+  bytecodes[7] = 10;
+  operand_stack_push(&frame.operand_stack, (jshort)10);
+  ins_stableswitch(&frame);
+  REQUIRE(_bytecode_get_index() == 10);
+  finalize();
+  init();
+  bytecodes[0] = 0;
+  bytecodes[1] = 20;
+  bytecodes[2] = 0;
+  bytecodes[3] = 10;
+  bytecodes[4] = 0;
+  bytecodes[5] = 20;
+  bytecodes[6] = 0;
+  bytecodes[7] = 10;
+  operand_stack_push(&frame.operand_stack, (jshort)100);
+  ins_stableswitch(&frame);
+  REQUIRE(_bytecode_get_index() == 20);
+  finalize();
+}
+
+TEST_CASE("slookupswitch", "[instructions]") {
+  init();
+  bytecodes[0] = 0;
+  bytecodes[1] = 20;
+  bytecodes[2] = 0;
+  bytecodes[3] = 2;
+  bytecodes[4] = 1;
+  bytecodes[5] = 1;
+  bytecodes[6] = 0;
+  bytecodes[7] = 10;
+  bytecodes[8] = 0;
+  bytecodes[9] = 10;
+  bytecodes[10] = 0;
+  bytecodes[11] = 15;
+  operand_stack_push(&frame.operand_stack, (jshort)0x101);
+  ins_slookupswitch(&frame);
+  REQUIRE(_bytecode_get_index() == 10);
+  finalize();
+  init();
+  bytecodes[0] = 0;
+  bytecodes[1] = 20;
+  bytecodes[2] = 0;
+  bytecodes[3] = 2;
+  bytecodes[4] = 1;
+  bytecodes[5] = 1;
+  bytecodes[6] = 0;
+  bytecodes[7] = 10;
+  bytecodes[8] = 0;
+  bytecodes[9] = 10;
+  bytecodes[10] = 0;
+  bytecodes[11] = 15;
+  operand_stack_push(&frame.operand_stack, (jshort)10);
+  ins_slookupswitch(&frame);
+  REQUIRE(_bytecode_get_index() == 15);
+  finalize();
+  init();
+  bytecodes[0] = 0;
+  bytecodes[1] = 20;
+  bytecodes[2] = 0;
+  bytecodes[3] = 2;
+  bytecodes[4] = 1;
+  bytecodes[5] = 1;
+  bytecodes[6] = 0;
+  bytecodes[7] = 10;
+  bytecodes[8] = 0;
+  bytecodes[9] = 10;
+  bytecodes[10] = 0;
+  bytecodes[11] = 15;
+  operand_stack_push(&frame.operand_stack, (jshort)-5);
+  ins_slookupswitch(&frame);
+  REQUIRE(_bytecode_get_index() == 20);
+  finalize();
+}
