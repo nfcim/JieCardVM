@@ -167,6 +167,10 @@ int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val);
 
 int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata);
 
+int context_create_constant_pool(package_t *pkg, u1 *data, u2 length);
+
+int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info);
+
 #ifdef __cplusplus
 }
 #endif

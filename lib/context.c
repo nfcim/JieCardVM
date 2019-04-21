@@ -268,3 +268,58 @@ int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata) {
 
   return CONTEXT_ERR_OK;
 }
+
+int context_create_constant_pool(package_t *pkg, u1 *data, u2 length) {
+  // TODO: check if length is a multiple of 4
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  u2 count = length / 4;
+  err = lfs_setattr(&g_lfs, pkg->aid_hex, LFS_ATTR_METADATA, &count,
+                    sizeof(count));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_write(&g_lfs, &f, data, length);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return CONTEXT_ERR_OK;
+}
+
+// TODO: add cache
+int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info) {
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
+  // TODO: what if the file does not exist
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  u2 count;
+  err = lfs_getattr(&g_lfs, pkg->aid_hex, LFS_ATTR_METADATA, &count,
+                    sizeof(count));
+  if (err < 0 || index >= count)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_seek(&g_lfs, &f, index * 4, LFS_SEEK_CUR);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_read(&g_lfs, &f, info, sizeof(cp_info));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return CONTEXT_ERR_OK;
+}
