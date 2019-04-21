@@ -37,6 +37,72 @@ typedef struct {
   u2 length;    // length of array
 } array_metadata_t;
 
+typedef struct __attribute__((__packed__)) {
+  union {
+    u2 internal_ref;
+    struct __attribute__((__packed__)) {
+      u1 package_token;
+      u1 class_token;
+    } external_ref;
+  };
+} class_ref;
+
+typedef struct __attribute__((__packed__)) {
+  class_ref klass;
+  u1 token;
+} instance_field_ref;
+
+typedef instance_field_ref virtual_method_ref;
+
+typedef instance_field_ref super_method_ref;
+
+typedef struct __attribute__((__packed__)) {
+  union {
+    struct __attribute__((__packed__)) {
+      u1 padding;
+      u2 offset;
+    } internal_ref;
+    struct __attribute__((__packed__)) {
+      u1 package_token;
+      u1 class_token;
+      u1 token;
+    } external_ref;
+  };
+} static_field_ref;
+
+typedef struct {
+  union {
+    struct __attribute__((__packed__)) {
+      u1 method_info_block_index;
+      u2 offset;
+    } internal_ref;
+    struct __attribute__((__packed__)) {
+      u1 package_token;
+      u1 class_token;
+      u1 token;
+    } external_ref;
+  };
+} static_method_ref;
+
+#define CONSTANT_CLASS_REF 1
+#define CONSTANT_INSTANCE_FIELD_REF 2
+#define CONSTANT_VIRTUAL_METHOD_REF 3
+#define CONSTANT_SUPER_METHOD_REF 4
+#define CONSTANT_STATIC_FIELD_REF 5
+#define CONSTANT_STATIC_METHOD_REF 6
+
+typedef struct __attribute__((__packed__)) {
+  u1 tag;
+  union {
+    class_ref klass;
+    instance_field_ref instance_field;
+    virtual_method_ref virtual_method;
+    super_method_ref super_method;
+    static_field_ref static_field;
+    static_method_ref static_method;
+  };
+} cp_info;
+
 /**
  * Initialize the context
  *
@@ -62,8 +128,25 @@ int context_create_cap(package_t *pkg);
  */
 int context_delete_cap(package_t *pkg);
 
+/**
+ * Append bytecodes to a cap
+ *
+ * @param pkg Package info
+ * @param data Bytecodes
+ * @param length Length of bytecodes
+ * @return CONTEXT_ERR_OK
+ */
 int context_append_method(package_t *pkg, u1 *data, u2 length);
 
+/**
+ * Read bytecodes from a cap
+ *
+ * @param pkg Package info
+ * @param target Buffer to store bytecodes
+ * @param offset Offset of bytecodes to read
+ * @param length Length to read
+ * @return
+ */
 int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
 
 /**
