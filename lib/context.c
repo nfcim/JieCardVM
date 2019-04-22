@@ -1,3 +1,4 @@
+#include "context.h"
 #include <context.h>
 #include <globals.h>
 #include <lfs.h>
@@ -321,5 +322,21 @@ int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  return CONTEXT_ERR_OK;
+}
+
+int context_resolve_static_method(package_t *pkg, u2 index,
+                                  bytecode_t *bytecode) {
+  cp_info info;
+  int err = context_read_constant_pool(pkg, index, &info);
+  if (err < 0 || info.tag != CONSTANT_STATIC_METHOD_REF)
+    return CONTEXT_ERR_UNKNOWN;
+  if (info.static_method.external_ref.package_token > 0x7F) {
+    // TODO: external package
+  } else {
+    context_read_method(pkg, bytecode->base,
+                        info.static_method.internal_ref.offset,
+                        MAX_BYTECODE_INDEX);
+  }
   return CONTEXT_ERR_OK;
 }

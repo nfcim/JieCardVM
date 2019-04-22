@@ -1,8 +1,9 @@
 #ifndef JIECARDVM_CONTEXT_H
 #define JIECARDVM_CONTEXT_H
 
-#include "lfs.h"
-#include "types.h"
+#include <lfs.h>
+#include <rtda.h>
+#include <types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,7 +74,7 @@ typedef struct __attribute__((__packed__)) {
 typedef struct {
   union {
     struct __attribute__((__packed__)) {
-      u1 method_info_block_index;
+      u1 padding;
       u2 offset;
     } internal_ref;
     struct __attribute__((__packed__)) {
@@ -170,6 +171,9 @@ int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata);
 int context_create_constant_pool(package_t *pkg, u1 *data, u2 length);
 
 int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info);
+
+int context_resolve_static_method(package_t *pkg, u2 index,
+                                  bytecode_t *bytecode);
 
 #ifdef __cplusplus
 }
