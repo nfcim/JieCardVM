@@ -325,18 +325,100 @@ int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info) {
   return CONTEXT_ERR_OK;
 }
 
+int context_create_static_image(package_t *pkg, u1 *data, u2 length) {
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/s");
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_write(&g_lfs, &f, data, length);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return CONTEXT_ERR_OK;
+}
+
+int context_read_static_image(package_t *pkg, u2 offset, u1 size, u1 *val) {
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/s");
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  if (offset + size > lfs_file_size(&g_lfs, &f))
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_read(&g_lfs, &f, val, size);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return CONTEXT_ERR_OK;
+}
+
+int context_write_static_image(package_t *pkg, u2 offset, u1 size, u2 val) {
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/s");
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  if (offset + size > lfs_file_size(&g_lfs, &f))
+    return CONTEXT_ERR_UNKNOWN;
+
+  if (size == 1) {
+    u1 data = (u1)val;
+    err = lfs_file_write(&g_lfs, &f, &data, 1);
+  } else if (size == 2)
+    err = lfs_file_write(&g_lfs, &f, &val, 2);
+  else
+    return CONTEXT_ERR_UNKNOWN;
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return CONTEXT_ERR_OK;
+}
+
 int context_resolve_static_method(package_t *pkg, u2 index,
                                   bytecode_t *bytecode) {
   cp_info info;
   int err = context_read_constant_pool(pkg, index, &info);
   if (err < 0 || info.tag != CONSTANT_STATIC_METHOD_REF)
     return CONTEXT_ERR_UNKNOWN;
-  if (info.static_method.external_ref.package_token > 0x7F) {
+  if (info.static_elem.external_ref.package_token > 0x7F) {
     // TODO: external package
   } else {
     context_read_method(pkg, bytecode->base,
-                        info.static_method.internal_ref.offset,
+                        info.static_elem.internal_ref.offset,
                         MAX_BYTECODE_INDEX);
+  }
+  return CONTEXT_ERR_OK;
+}
+
+jshort context_resolve_static_field(package_t *pkg, u2 index, u1 size) {
+  cp_info info;
+  int err = context_read_constant_pool(pkg, index, &info);
+  if (err < 0 || info.tag != CONSTANT_STATIC_FIELD_REF)
+    return CONTEXT_ERR_UNKNOWN;
+  if (info.static_elem.external_ref.package_token > 0x7F) {
+    // TODO: external package
+  } else {
+    jshort val;
+    context_read_static_image(pkg, info.static_elem.internal_ref.offset,
+                                     size, (u1 *)&val);
+    return val;
   }
   return CONTEXT_ERR_OK;
 }

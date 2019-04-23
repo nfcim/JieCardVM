@@ -12,8 +12,12 @@ extern "C" {
 #define ARRAY_BUFFER_SIZE 256
 #define ARRAY_BUFFER_SIZE_UMASK 0xFFFFFF00u
 #define ARRAY_BUFFER_SIZE_MASK 0xFFu
-
 #define LFS_ATTR_METADATA 0
+
+enum data_size {
+  ELEM_SIZE_1 = 1,
+  ELEM_SIZE_2 = 2,
+};
 
 enum context_error {
   CONTEXT_ERR_OK = 0,         // No error
@@ -69,21 +73,7 @@ typedef struct __attribute__((__packed__)) {
       u1 token;
     } external_ref;
   };
-} static_field_ref;
-
-typedef struct {
-  union {
-    struct __attribute__((__packed__)) {
-      u1 padding;
-      u2 offset;
-    } internal_ref;
-    struct __attribute__((__packed__)) {
-      u1 package_token;
-      u1 class_token;
-      u1 token;
-    } external_ref;
-  };
-} static_method_ref;
+} static_ref;
 
 #define CONSTANT_CLASS_REF 1
 #define CONSTANT_INSTANCE_FIELD_REF 2
@@ -99,8 +89,7 @@ typedef struct __attribute__((__packed__)) {
     instance_field_ref instance_field;
     virtual_method_ref virtual_method;
     super_method_ref super_method;
-    static_field_ref static_field;
-    static_method_ref static_method;
+    static_ref static_elem;
   };
 } cp_info;
 
@@ -172,8 +161,16 @@ int context_create_constant_pool(package_t *pkg, u1 *data, u2 length);
 
 int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info);
 
+int context_create_static_image(package_t *pkg, u1 *data, u2 length);
+
+int context_read_static_image(package_t *pkg, u2 offset, u1 size, u1 *val);
+
+int context_write_static_image(package_t *pkg, u2 offset, u1 size, u2 val);
+
 int context_resolve_static_method(package_t *pkg, u2 index,
                                   bytecode_t *bytecode);
+
+jshort context_resolve_static_field(package_t *pkg, u2 index, u1 size);
 
 #ifdef __cplusplus
 }
