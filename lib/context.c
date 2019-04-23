@@ -391,26 +391,23 @@ int context_resolve_static_method(package_t *pkg, u2 index,
     return CONTEXT_ERR_UNKNOWN;
   if (info.static_elem.external_ref.package_token > 0x7F) {
     // TODO: external package
+    return CONTEXT_ERR_OK;
   } else {
-    context_read_method(pkg, bytecode->base,
-                        info.static_elem.internal_ref.offset,
-                        MAX_BYTECODE_INDEX);
+    return context_read_method(pkg, bytecode->base,
+                               info.static_elem.internal_ref.offset,
+                               MAX_BYTECODE_INDEX);
   }
-  return CONTEXT_ERR_OK;
 }
 
-jshort context_resolve_static_field(package_t *pkg, u2 index, u1 size) {
+int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val) {
   cp_info info;
   int err = context_read_constant_pool(pkg, index, &info);
   if (err < 0 || info.tag != CONSTANT_STATIC_FIELD_REF)
     return CONTEXT_ERR_UNKNOWN;
   if (info.static_elem.external_ref.package_token > 0x7F) {
-    // TODO: external package
+    return CONTEXT_ERR_OK;
   } else {
-    jshort val;
-    context_read_static_image(pkg, info.static_elem.internal_ref.offset, size,
-                              (u1 *)&val);
-    return val;
+    return context_read_static_image(pkg, info.static_elem.internal_ref.offset,
+                                     size, val);
   }
-  return CONTEXT_ERR_OK;
 }

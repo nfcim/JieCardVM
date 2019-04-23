@@ -167,7 +167,7 @@ int context_write_static_image(package_t *pkg, u2 offset, u1 size, u2 val);
 int context_resolve_static_method(package_t *pkg, u2 index,
                                   bytecode_t *bytecode);
 
-jshort context_resolve_static_field(package_t *pkg, u2 index, u1 size);
+int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val);
 
 #ifdef __cplusplus
 }
