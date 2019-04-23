@@ -9,9 +9,6 @@
 extern "C" {
 #endif
 
-#define ARRAY_BUFFER_SIZE 256
-#define ARRAY_BUFFER_SIZE_UMASK 0xFFFFFF00u
-#define ARRAY_BUFFER_SIZE_MASK 0xFFu
 #define LFS_ATTR_METADATA 0
 
 enum data_size {

@@ -6,9 +6,9 @@
 #include <string.h>
 #include <utils.h>
 
+#define ARRAY_BUFFER_SIZE 16
 static package_metadata_t package_metadata;
 static array_metadata_t array_metadata;
-static u1 array_buffer[ARRAY_BUFFER_SIZE];
 
 static int read_package_metadata(package_t *pkg) {
   pkg->aid_hex[pkg->aid_hex_length] = 0;
@@ -132,6 +132,7 @@ int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
 }
 
 int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length) {
+  u1 array_buffer[ARRAY_BUFFER_SIZE];
   int err = read_package_metadata(pkg);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
@@ -175,12 +176,10 @@ int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length) {
   return package_metadata.array_cnt;
 }
 
-// TODO: add cache
 int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
   sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u", ref);
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
-  // TODO: what if the file does not exist
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -188,7 +187,6 @@ int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
                     sizeof(array_metadata));
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
-  // TODO: new return value
   if ((type == ARRAY_T_BYTE && array_metadata.type != ARRAY_T_BYTE &&
        array_metadata.type != ARRAY_T_BOOLEAN) ||
       type != array_metadata.type)
@@ -199,19 +197,16 @@ int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
   u2 offset = index;
   if (type == ARRAY_T_SHORT || type == ARRAY_T_REFERENCE)
     offset *= 2;
-  err =
-      lfs_file_seek(&g_lfs, &f, offset & ARRAY_BUFFER_SIZE_UMASK, LFS_SEEK_CUR);
+  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_SET);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  err = lfs_file_read(&g_lfs, &f, array_buffer, ARRAY_BUFFER_SIZE);
-  offset &= ARRAY_BUFFER_SIZE_MASK;
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  *val = array_buffer[offset];
   if (type == ARRAY_T_SHORT || type == ARRAY_T_REFERENCE)
-    *(val + 1) = array_buffer[offset + 1];
+    err = lfs_file_read(&g_lfs, &f, val, ELEM_SIZE_2);
+  else
+    err = lfs_file_read(&g_lfs, &f, val, ELEM_SIZE_1);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
 
   err = lfs_file_close(&g_lfs, &f);
   if (err < 0)
@@ -220,7 +215,6 @@ int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val) {
   return CONTEXT_ERR_OK;
 }
 
-// TODO: add cache
 int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val) {
   sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u", ref);
   lfs_file_t f;
@@ -295,12 +289,10 @@ int context_create_constant_pool(package_t *pkg, u1 *data, u2 length) {
   return CONTEXT_ERR_OK;
 }
 
-// TODO: add cache
 int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info) {
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
-  // TODO: what if the file does not exist
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -416,8 +408,8 @@ jshort context_resolve_static_field(package_t *pkg, u2 index, u1 size) {
     // TODO: external package
   } else {
     jshort val;
-    context_read_static_image(pkg, info.static_elem.internal_ref.offset,
-                                     size, (u1 *)&val);
+    context_read_static_image(pkg, info.static_elem.internal_ref.offset, size,
+                              (u1 *)&val);
     return val;
   }
   return CONTEXT_ERR_OK;
