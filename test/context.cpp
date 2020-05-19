@@ -1,19 +1,19 @@
 #include "context.h"
-#include "emubd/lfs_emubd.h"
+#include "bd/lfs_filebd.h"
 #include "globals.h"
 #include "lfs.h"
 #include <catch.hpp>
 
 static struct lfs_config cfg;
-static lfs_emubd_t bd;
+static lfs_filebd_t bd;
 static package_t pkg;
 
 static void init() {
   cfg.context = &bd;
-  cfg.read = &lfs_emubd_read;
-  cfg.prog = &lfs_emubd_prog;
-  cfg.erase = &lfs_emubd_erase;
-  cfg.sync = &lfs_emubd_sync;
+  cfg.read = &lfs_filebd_read;
+  cfg.prog = &lfs_filebd_prog;
+  cfg.erase = &lfs_filebd_erase;
+  cfg.sync = &lfs_filebd_sync;
   cfg.read_size = 16;
   cfg.prog_size = 16;
   cfg.block_size = 512;
@@ -21,14 +21,14 @@ static void init() {
   cfg.block_cycles = 50000;
   cfg.cache_size = 128;
   cfg.lookahead_size = 16;
-  lfs_emubd_create(&cfg, "testctx");
+  lfs_filebd_create(&cfg, "testctx");
   context_init(&cfg);
 
   strcpy(pkg.aid_hex, "F00001");
   pkg.aid_hex_length = 6;
 }
 
-static void finalize() { lfs_emubd_destroy(&cfg); }
+static void finalize() { lfs_filebd_destroy(&cfg); }
 
 TEST_CASE("context_create_cap", "[context]") {
   init();

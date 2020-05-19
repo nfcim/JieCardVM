@@ -8,7 +8,7 @@ add_executable(${TEST_EXE}
         main.cpp
         instructions.cpp
         context.cpp
-        ../littlefs/emubd/lfs_emubd.c
+        ../littlefs/bd/lfs_filebd.c
 )
 
 target_link_libraries(${TEST_EXE} ${CMAKE_PROJECT_NAME})

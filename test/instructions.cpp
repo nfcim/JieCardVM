@@ -1,7 +1,7 @@
 #include <catch.hpp>
 #include <context.h>
 #include <cstring>
-#include <emubd/lfs_emubd.h>
+#include <bd/lfs_filebd.h>
 #include <globals.h>
 #include <instructions.h>
 #include <rtda.h>
@@ -12,7 +12,7 @@ static jshort vt[100];
 static u1 bytecodes[100];
 static frame_t frame;
 static struct lfs_config cfg;
-static lfs_emubd_t bd;
+static lfs_filebd_t bd;
 
 static void init() {
   frame.operand_stack.base = operands;
@@ -22,10 +22,10 @@ static void init() {
 
   memset(&cfg, 0, sizeof(cfg));
   cfg.context = &bd;
-  cfg.read = &lfs_emubd_read;
-  cfg.prog = &lfs_emubd_prog;
-  cfg.erase = &lfs_emubd_erase;
-  cfg.sync = &lfs_emubd_sync;
+  cfg.read = &lfs_filebd_read;
+  cfg.prog = &lfs_filebd_prog;
+  cfg.erase = &lfs_filebd_erase;
+  cfg.sync = &lfs_filebd_sync;
   cfg.read_size = 16;
   cfg.prog_size = 16;
   cfg.block_size = 512;
@@ -33,7 +33,7 @@ static void init() {
   cfg.block_cycles = 50000;
   cfg.cache_size = 128;
   cfg.lookahead_size = 16;
-  lfs_emubd_create(&cfg, "testins");
+  lfs_filebd_create(&cfg, "testins");
   context_init(&cfg);
 
   strcpy(current_package.aid_hex, "F00001");
@@ -42,7 +42,7 @@ static void init() {
 
 static void finalize() {
   lfs_unmount(&g_lfs);
-  lfs_emubd_destroy(&cfg);
+  lfs_filebd_destroy(&cfg);
 }
 
 TEST_CASE("aconst_null", "[instructions]") {
