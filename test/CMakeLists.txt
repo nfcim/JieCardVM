@@ -13,3 +13,5 @@ add_executable(${TEST_EXE}
 
 target_link_libraries(${TEST_EXE} ${CMAKE_PROJECT_NAME})
 target_include_directories(${TEST_EXE} PRIVATE "")
+
+add_executable(cap_print cap_print.cpp)
