@@ -66,6 +66,11 @@ TEST_CASE("context_read_method", "[context]") {
   REQUIRE(ret > 0);
   // access flags = ACC_PUBLIC
   REQUIRE(buffer[1] == 0x01);
+  // name is <init>
+  u2 name_index = ntohs(*(u2 *)(buffer + 2)) - 1;
+  ret = context_read_utf8_constant(&pkg, name_index, buffer, sizeof(buffer));
+  REQUIRE(ret > 0);
+  REQUIRE(memcmp(buffer, "<init>", 6) == 0);
   finalize();
 }
 

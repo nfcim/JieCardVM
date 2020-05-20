@@ -620,3 +620,17 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
   }
   return CONTEXT_ERR_OK;
 }
+
+int context_read_utf8_constant(package_t *pkg, u2 index, u1 *str, u2 length) {
+  // reuse buffer
+  int read = context_read_constant(pkg, index, str, length);
+  if (read < 0)
+    return read;
+  if (str[0] != CONSTANT_UTF8)
+    return CONTEXT_ERR_UNKNOWN;
+  u2 data_length = ntohs(*(u2 *)(str + 1));
+  u2 actual_length = data_length < length ? data_length : length;
+  // overlap
+  memmove(str, str + 3, actual_length);
+  return actual_length;
+}

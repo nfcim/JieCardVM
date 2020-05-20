@@ -171,6 +171,17 @@ int context_append_constant(package_t *pkg, u1 *data, u2 length);
 int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length);
 
 /**
+ * Read utf8 constant info from a cap
+ *
+ * @param pkg Package info
+ * @param target Buffer to store utf8
+ * @param index Index of constant
+ * @param length Length to read
+ * @return bytes read
+ */
+int context_read_utf8_constant(package_t *pkg, u2 index, u1 *str, u2 length);
+
+/**
  * Get current constant count of a cap
  *
  * @param pkg Package info
