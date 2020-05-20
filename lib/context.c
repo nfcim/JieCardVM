@@ -554,7 +554,7 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
       // one byte tag and two bytes index
       index = (u2 *)(p + 1);
       // relocate
-      *index = htons(ntohs(*index) + constant_offset);
+      *index = ntohs(*index) + constant_offset - 1;
       size = 1 + 2;
       break;
     case CONSTANT_FIELD_REF:
@@ -565,10 +565,10 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
       // one byte tag, two bytes class index, two bytes name and type index
       // relocate
       index = (u2 *)(p + 1);
-      *index = htons(ntohs(*index) + constant_offset);
+      *index = ntohs(*index) + constant_offset - 1;
       // relocate
       index = (u2 *)(p + 3);
-      *index = htons(ntohs(*index) + constant_offset);
+      *index = ntohs(*index) + constant_offset - 1;
       size = 1 + 2 + 2;
       break;
 
@@ -600,11 +600,13 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
     u1 *method = p;
     u2 access_flags = ntohs(*(u2 *)p);
     p += 2;
-    u2 name_index = ntohs(*(u2 *)p);
-    // TODO: relocate
+    u2 *name_index = (u2 *)p;
+    // relocate
+    *name_index = ntohs(*name_index) + constant_offset - 1;
     p += 2;
-    u2 descriptor_index = ntohs(*(u2 *)p);
-    // TODO: relocate
+    u2 *descriptor_index = (u2 *)p;
+    // relocate
+    *descriptor_index = ntohs(*descriptor_index) + constant_offset - 1;
     p += 2;
     u2 attributes_count = ntohs(*(u2 *)p);
     p += 2;
