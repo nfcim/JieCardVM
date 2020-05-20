@@ -394,6 +394,23 @@ int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length) {
   return read;
 }
 
+int context_count_constant(package_t *pkg) {
+  // open lookup file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/C");
+  lfs_file_t lookup_f;
+  int err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex, LFS_O_RDONLY);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+  int file_size = lfs_file_size(&g_lfs, &lookup_f);
+
+  err = lfs_file_close(&g_lfs, &lookup_f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return file_size / sizeof(u4);
+}
+
 int context_create_static_image(package_t *pkg, u1 *data, u2 length) {
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/s");
   lfs_file_t f;
@@ -489,4 +506,81 @@ int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val) {
     return context_read_static_image(pkg, info.static_elem.internal_ref.offset,
                                      size, val);
   }
+}
+
+// load .class file into current context
+int context_load_class(package_t *package, u1 *data, u4 length) {
+  u1 *p = data;
+  u4 magic = ntohl(*(u4 *)p);
+  if (magic != 0xCAFEBABE)
+    return CONTEXT_ERR_UNKNOWN;
+  p += 4;
+  // minor, major
+  p += 4;
+
+  // constants
+  u2 constant_offset = context_count_constant(package);
+  u2 constant_pool_count = ntohs(*(u2 *)p);
+  for (u2 i = 0; i < constant_pool_count; i++) {
+    u1 tag = *p;
+    // see how long it is and relocate offsets
+    u2 size = 0;
+    u2 inner_length = 0;
+    u2 *index = NULL;
+    switch (tag) {
+    case 1:
+      // UTF-8
+      inner_length = htons(*(u2 *)(p + 1));
+      size = 1 + 2 + inner_length;
+      break;
+    case 3:
+    case 4:
+      // Integer and float
+      size = 1 + 4;
+      break;
+    case 5:
+    case 6:
+      // Long and double
+      size = 1 + 8;
+      break;
+    case 7:
+    case 8:
+      // class/string
+      // one byte tag and two bytes index
+      index = (u2 *)(p + 1);
+      // relocate
+      *index = htons(ntohs(*index) + constant_offset);
+      size = 1 + 2;
+      break;
+    case 9:
+    case 10:
+    case 11:
+      // field ref, method ref or interface method ref
+      // one byte tag, two bytes class index, two bytes name and type index
+      // relocate
+      index = (u2 *)(p + 1);
+      *index = htons(ntohs(*index) + constant_offset);
+      // relocate
+      index = (u2 *)(p + 3);
+      *index = htons(ntohs(*index) + constant_offset);
+      size = 1 + 2 + 2;
+      break;
+
+    default:
+      return CONTEXT_ERR_UNKNOWN;
+      break;
+    }
+
+    context_append_constant(package, p, size);
+    // advance
+    p += size;
+  }
+
+  u2 access_flags = ntohs(*(u2 *)p);
+  p += 2;
+  u2 this_class = ntohs(*(u2 *)p);
+  p += 2;
+  u2 super_class = ntohs(*(u2 *)p);
+  p += 2;
+  return CONTEXT_ERR_OK;
 }

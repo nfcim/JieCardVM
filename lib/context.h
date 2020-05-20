@@ -137,24 +137,6 @@ int context_append_method(package_t *pkg, u1 *data, u2 length);
 int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length);
 
 /**
- * Create an array
- *
- * @param pkg Package info
- * @param type Array type
- * @param class_ref If the array is of type reference, the class_ref should be
- * provided
- * @param length Length of the array
- * @return Arrayref
- */
-int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length);
-
-int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val);
-
-int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val);
-
-int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata);
-
-/**
  * Append constant to a cap
  *
  * @param pkg Package info
@@ -174,6 +156,40 @@ int context_append_constant(package_t *pkg, u1 *data, u2 length);
  * @return bytes read
  */
 int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length);
+
+/**
+ * Get current constant count of a cap
+ *
+ * @param pkg Package info
+ * @return count of constants
+ */
+int context_count_constant(package_t *pkg);
+
+/**
+ * Load java .class file into cap
+ *
+ * @param pkg Package info
+ * @return result
+ */
+int context_load_class(package_t *package, u1 *data, u4 length);
+
+/**
+ * Create an array
+ *
+ * @param pkg Package info
+ * @param type Array type
+ * @param class_ref If the array is of type reference, the class_ref should be
+ * provided
+ * @param length Length of the array
+ * @return Arrayref
+ */
+int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length);
+
+int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val);
+
+int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val);
+
+int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata);
 
 int context_create_static_image(package_t *pkg, u1 *data, u2 length);
 
