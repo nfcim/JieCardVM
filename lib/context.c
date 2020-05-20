@@ -91,10 +91,28 @@ int context_delete_cap(package_t *pkg) {
 }
 
 int context_append_method(package_t *pkg, u1 *data, u2 length) {
+  // open method file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
                           LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  // open method lookup file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/M");
+  lfs_file_t lookup_f;
+  err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex,
+                      LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  // update lookup file
+  u4 offset = lfs_file_size(&g_lfs, &f);
+  u4 lookup_file_size = lfs_file_size(&g_lfs, &lookup_f);
+  err = lfs_file_write(&g_lfs, &lookup_f, &offset, sizeof(offset));
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -106,13 +124,36 @@ int context_append_method(package_t *pkg, u1 *data, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  return CONTEXT_ERR_OK;
+  err = lfs_file_close(&g_lfs, &lookup_f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return lookup_file_size / sizeof(u4);
 }
 
-int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
+int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length) {
+  // open lookup file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/M");
+  lfs_file_t lookup_f;
+  int err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex, LFS_O_RDONLY);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  // seek to index
+  lfs_file_seek(&g_lfs, &lookup_f, index * sizeof(u4), LFS_SEEK_SET);
+
+  // read offset
+  u4 offset = 0;
+  err = lfs_file_read(&g_lfs, &lookup_f, &offset, sizeof(offset));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  // open method file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
   lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
+  err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 

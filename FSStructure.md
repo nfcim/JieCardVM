@@ -51,7 +51,6 @@ Currently, we use linear search for lookup from method name to method info. The 
 
 ```
 method_lookup {
-    u4 method_count;
     u4 offsets[method_count];
 }
 ```
@@ -78,7 +77,6 @@ Currently, we use linear search for lookup from class name to class info. The of
 
 ```
 class_lookup {
-    u4 class_count;
     u4 offsets[class_count];
 }
 ```

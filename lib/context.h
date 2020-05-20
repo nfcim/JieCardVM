@@ -116,25 +116,25 @@ int context_create_cap(package_t *pkg);
 int context_delete_cap(package_t *pkg);
 
 /**
- * Append bytecodes to a cap
+ * Append method info to a cap
  *
  * @param pkg Package info
- * @param data Bytecodes
- * @param length Length of bytecodes
- * @return CONTEXT_ERR_OK
+ * @param data Method info
+ * @param length Length of method info
+ * @return method index on success
  */
 int context_append_method(package_t *pkg, u1 *data, u2 length);
 
 /**
- * Read bytecodes from a cap
+ * Read method info from a cap
  *
  * @param pkg Package info
- * @param target Buffer to store bytecodes
- * @param offset Offset of bytecodes to read
+ * @param target Buffer to store method info
+ * @param index Index of method
  * @param length Length to read
- * @return
+ * @return bytes read
  */
-int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
+int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length);
 
 /**
  * Create an array

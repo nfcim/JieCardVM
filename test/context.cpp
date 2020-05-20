@@ -41,21 +41,27 @@ TEST_CASE("context_append_method", "[context]") {
   init();
   u1 bytecodes[] = {0x7B, 0x30, 0x11, 0x01, 0xC8, 0x31, 0x1D, 0x1E,
                     0x41, 0x32, 0x1F, 0x1E, 0x43, 0x30, 0x1D, 0x78};
+  // first method
   int ret = context_append_method(&pkg, bytecodes, sizeof(bytecodes));
-  REQUIRE(ret == CONTEXT_ERR_OK);
-  context_append_method(&pkg, bytecodes, sizeof(bytecodes));
-  REQUIRE(ret == CONTEXT_ERR_OK);
+  REQUIRE(ret == 0);
+  // second method
+  ret = context_append_method(&pkg, bytecodes, sizeof(bytecodes));
+  REQUIRE(ret == 1);
   finalize();
 }
 
 TEST_CASE("context_read_method", "[context]") {
   init();
   u1 bytecodes[100];
+  // read first method
   int ret = context_read_method(&pkg, bytecodes, 0, 256);
   REQUIRE(ret == 32);
   REQUIRE(bytecodes[0] == 0x7B);
   REQUIRE(bytecodes[10] == 0x1F);
   REQUIRE(bytecodes[16] == 0x7B);
+  // read second method
+  ret = context_read_method(&pkg, bytecodes, 1, 256);
+  REQUIRE(ret == 16);
   finalize();
 }
 
