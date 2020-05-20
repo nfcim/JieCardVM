@@ -112,6 +112,63 @@ void parse_directory(const string &javacard_path) {
          comp->applet_count, comp->custom_count);
 }
 
+struct __attribute__((__packed__)) applet_component {
+  u1 tag;
+  u2 size;
+  u1 count;
+  struct {
+    u1 aid_length;
+    u1 aid[0];
+    u2 install_method_offset;
+  } applets[0];
+};
+
+void parse_applet(const string &javacard_path) {
+  auto header = read_file_binary(javacard_path + "/Applet.cap");
+  u1 *p = (u1 *)&header[0];
+  applet_component *comp = (applet_component *)p;
+  assert(comp->tag == 3);
+  printf("Found %d applets:\n", comp->count);
+  p += 4;
+  for (int j = 0; j < comp->count; j++) {
+    u1 length = *p;
+    printf("AID:");
+    for (u1 i = 0; i < length; i++) {
+      printf(" %02X", p[1 + i]);
+    }
+    printf("\n");
+    p += 1 + length;
+    u2 offset = ntohs(*(u2 *)p);
+    printf("Install method offset: %d\n", offset);
+    p += 2;
+  }
+}
+
+struct __attribute__((__packed__)) import_component {
+  u1 tag;
+  u2 size;
+  u1 count;
+  package_info packages[0];
+};
+
+void parse_import(const string &javacard_path) {
+  auto header = read_file_binary(javacard_path + "/Import.cap");
+  u1 *p = (u1 *)&header[0];
+  import_component *comp = (import_component *)p;
+  assert(comp->tag == 4);
+  printf("Found %d imports:\n", comp->count);
+  p += 4;
+  for (int j = 0; j < comp->count; j++) {
+    package_info *info = (package_info *)p;
+    printf("Package: version %d.%d, aid", info->major_version, info->minor_version);
+    for (u1 i = 0; i < info->aid_length;i++) {
+      printf(" %02X", info->aid[i]);
+    }
+    printf("\n");
+    p += sizeof(package_info) + info->aid_length;
+  }
+}
+
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     printf("Usage: %s path_to_decompressed_cap\n", argv[0]);
@@ -140,5 +197,7 @@ int main(int argc, char *argv[]) {
 
   parse_header(javacard_path);
   parse_directory(javacard_path);
+  parse_applet(javacard_path);
+  parse_import(javacard_path);
   return 0;
 }
