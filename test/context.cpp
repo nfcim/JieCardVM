@@ -3,6 +3,7 @@
 #include "globals.h"
 #include "lfs.h"
 #include <catch.hpp>
+#include "vm.h"
 
 static struct lfs_config cfg;
 static lfs_filebd_t bd;
@@ -74,22 +75,23 @@ TEST_CASE("context_read_method", "[context]") {
   finalize();
 }
 
-/*
-TEST_CASE("context_read_method", "[context]") {
+TEST_CASE("context_find_method", "[context]") {
   init();
-  u1 bytecodes[100];
-  // read first method
-  int ret = context_read_method(&pkg, bytecodes, 0, 256);
-  REQUIRE(ret == 32);
-  REQUIRE(bytecodes[0] == 0x7B);
-  REQUIRE(bytecodes[10] == 0x1F);
-  REQUIRE(bytecodes[16] == 0x7B);
-  // read second method
-  ret = context_read_method(&pkg, bytecodes, 1, 256);
-  REQUIRE(ret == 16);
+  u2 index;
+  // first method is <init>
+  int ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "<init>");
+  REQUIRE(ret == CONTEXT_ERR_OK);
+  REQUIRE(index == 0);
+  // second method is empty()
+  ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "empty");
+  REQUIRE(ret == CONTEXT_ERR_OK);
+  REQUIRE(index == 1);
+  // third method is returnByte()
+  ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "returnByte");
+  REQUIRE(ret == CONTEXT_ERR_OK);
+  REQUIRE(index == 2);
   finalize();
 }
-*/
 
 TEST_CASE("context_create_array", "[context]") {
   u1 buffer[512];
@@ -212,6 +214,13 @@ TEST_CASE("context_resolve_static_field", "[context]") {
   finalize();
 }
 */
+
+TEST_CASE("vm_execute_static_method", "[context]") {
+  init();
+  int ret = vm_execute_static_method(&pkg, "im/nfc/testapplet/Simple", "returnByte");
+  REQUIRE(ret == CONTEXT_ERR_OK);
+  finalize();
+}
 
 TEST_CASE("context_delete_cap", "[context]") {
   init();

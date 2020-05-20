@@ -150,6 +150,17 @@ int context_append_method(package_t *pkg, u1 *data, u2 length);
 int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length);
 
 /**
+ * Read method info from a cap
+ *
+ * @param pkg Package info
+ * @param target Buffer to store method index
+ * @param class_name Class name
+ * @param method_name Method name
+ * @return status
+ */
+int context_find_method(package_t *pkg, u2 *index, char *class_name, char *method_name);
+
+/**
  * Append constant to a cap
  *
  * @param pkg Package info

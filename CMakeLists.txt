@@ -5,6 +5,8 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -g")
+add_compile_options("-fsanitize=address")
+link_libraries("-fsanitize=address")
 
 # public headers
 include_directories("include" "littlefs" "lib")

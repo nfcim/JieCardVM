@@ -636,3 +636,25 @@ int context_read_utf8_constant(package_t *pkg, u2 index, u1 *str, u2 length) {
   memmove(str, str + 3, actual_length);
   return actual_length;
 }
+
+int context_find_method(package_t *pkg, u2 *index, char *class_name,
+                        char *method_name) {
+  u1 buffer[64];
+  u2 method_name_len = strlen(method_name);
+  for (u2 i = 0;; i++) {
+    int res = context_read_method(pkg, buffer, i, sizeof(buffer));
+    if (res < 0)
+      return res;
+    else if (res == 0)
+      return CONTEXT_ERR_NOENT;
+
+    // TODO: match class as well
+    u2 name_index = *(u2 *)(buffer + 2);
+    res = context_read_utf8_constant(pkg, name_index, buffer, sizeof(buffer));
+    if (res == method_name_len && strncmp((char *)buffer, method_name, res) == 0) {
+      // found
+      *index = i;
+      return CONTEXT_ERR_OK;
+    }
+  }
+}
