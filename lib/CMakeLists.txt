@@ -10,6 +10,7 @@ add_library(${CMAKE_PROJECT_NAME} STATIC
         context.h
         utils.h
         globals.h
+        class_loader.h
         vm.c
         rtda.c
         instructions.c
@@ -18,4 +19,5 @@ add_library(${CMAKE_PROJECT_NAME} STATIC
         context.c
         utils.c
         globals.c
+        class_loader.c
         )
