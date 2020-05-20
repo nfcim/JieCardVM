@@ -15,3 +15,9 @@ target_link_libraries(${TEST_EXE} ${CMAKE_PROJECT_NAME})
 target_include_directories(${TEST_EXE} PRIVATE "")
 
 add_executable(cap_print cap_print.cpp)
+
+add_custom_command(
+        TARGET ${TEST_EXE} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/test/Simple.class
+                ${CMAKE_CURRENT_BINARY_DIR}/Simple.class)

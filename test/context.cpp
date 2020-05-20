@@ -37,19 +37,26 @@ TEST_CASE("context_create_cap", "[context]") {
   finalize();
 }
 
-TEST_CASE("context_append_method", "[context]") {
+TEST_CASE("context_load_class", "[context]") {
   init();
-  u1 bytecodes[] = {0x7B, 0x30, 0x11, 0x01, 0xC8, 0x31, 0x1D, 0x1E,
-                    0x41, 0x32, 0x1F, 0x1E, 0x43, 0x30, 0x1D, 0x78};
-  // first method
-  int ret = context_append_method(&pkg, bytecodes, sizeof(bytecodes));
+  u1 buffer[1024];
+  FILE *fp = fopen("test/Simple.class", "rb");
+  u4 length = fread(buffer, sizeof(buffer), 1, fp);
+  int ret = context_load_class(&pkg, buffer, length);
   REQUIRE(ret == 0);
-  // second method
-  ret = context_append_method(&pkg, bytecodes, sizeof(bytecodes));
-  REQUIRE(ret == 1);
+}
+
+TEST_CASE("context_read_constant", "[context]") {
+  init();
+  u1 buffer[100];
+  // first constant is a method ref
+  int ret = context_read_constant(&pkg, 0, buffer, 100);
+  REQUIRE(ret > 0);
+  REQUIRE(buffer[0] == CONSTANT_METHOD_REF);
   finalize();
 }
 
+/*
 TEST_CASE("context_read_method", "[context]") {
   init();
   u1 bytecodes[100];
@@ -64,6 +71,7 @@ TEST_CASE("context_read_method", "[context]") {
   REQUIRE(ret == 16);
   finalize();
 }
+*/
 
 TEST_CASE("context_create_array", "[context]") {
   u1 buffer[512];
@@ -128,6 +136,7 @@ TEST_CASE("context_read_array", "[context]") {
   REQUIRE(ret == CONTEXT_ERR_NOENT);
 }
 
+/*
 TEST_CASE("context_create_constant_pool", "[context]") {
   init();
   u1 data[64] = {0x02, 0x00, 0x0E, 0x00, 0x02, 0x00, 0x0E, 0x01, 0x06, 0x00,
@@ -176,7 +185,6 @@ TEST_CASE("context_read_static_image", "[context]") {
   finalize();
 }
 
-/*
 TEST_CASE("context_resolve_static_field", "[context]") {
   init();
   jshort val;

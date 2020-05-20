@@ -314,7 +314,7 @@ int context_append_constant(package_t *pkg, u1 *data, u2 length) {
   pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
   lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT);
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -400,6 +400,8 @@ int context_count_constant(package_t *pkg) {
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/C");
   lfs_file_t lookup_f;
   int err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex, LFS_O_RDONLY);
+  if (err == LFS_ERR_NOENT)
+    return 0;
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
   int file_size = lfs_file_size(&g_lfs, &lookup_f);
@@ -521,30 +523,32 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
   // constants
   u2 constant_offset = context_count_constant(package);
   u2 constant_pool_count = ntohs(*(u2 *)p);
-  for (u2 i = 0; i < constant_pool_count; i++) {
+  p += 2;
+  // constant_pool[constant_pool_count-1]
+  for (u2 i = 0; i < constant_pool_count - 1; i++) {
     u1 tag = *p;
     // see how long it is and relocate offsets
     u2 size = 0;
     u2 inner_length = 0;
     u2 *index = NULL;
     switch (tag) {
-    case 1:
+    case CONSTANT_UTF8:
       // UTF-8
       inner_length = htons(*(u2 *)(p + 1));
       size = 1 + 2 + inner_length;
       break;
-    case 3:
-    case 4:
+    case CONSTANT_INTEGER:
+    case CONSTANT_FLOAT:
       // Integer and float
       size = 1 + 4;
       break;
-    case 5:
-    case 6:
+    case CONSTANT_LONG:
+    case CONSTANT_DOUBLE:
       // Long and double
       size = 1 + 8;
       break;
-    case 7:
-    case 8:
+    case CONSTANT_CLASS:
+    case CONSTANT_STRING:
       // class/string
       // one byte tag and two bytes index
       index = (u2 *)(p + 1);
@@ -552,10 +556,11 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
       *index = htons(ntohs(*index) + constant_offset);
       size = 1 + 2;
       break;
-    case 9:
-    case 10:
-    case 11:
-      // field ref, method ref or interface method ref
+    case CONSTANT_FIELD_REF:
+    case CONSTANT_METHOD_REF:
+    case CONSTANT_INTERFACE_METHOD_REF:
+    case CONSTANT_NAME_AND_TYPE:
+      // field ref, method ref, interface method ref or name and type
       // one byte tag, two bytes class index, two bytes name and type index
       // relocate
       index = (u2 *)(p + 1);

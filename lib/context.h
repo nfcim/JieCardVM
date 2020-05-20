@@ -79,6 +79,19 @@ typedef struct __attribute__((__packed__)) {
 #define CONSTANT_STATIC_FIELD_REF 5
 #define CONSTANT_STATIC_METHOD_REF 6
 
+// below are defined for .class constant pool
+#define CONSTANT_UTF8 1
+#define CONSTANT_INTEGER 3
+#define CONSTANT_FLOAT 4
+#define CONSTANT_LONG 5
+#define CONSTANT_DOUBLE 6
+#define CONSTANT_CLASS 7
+#define CONSTANT_STRING 8
+#define CONSTANT_FIELD_REF 9
+#define CONSTANT_METHOD_REF 10
+#define CONSTANT_INTERFACE_METHOD_REF 11
+#define CONSTANT_NAME_AND_TYPE 12
+
 typedef struct __attribute__((__packed__)) {
   u1 tag;
   union {
