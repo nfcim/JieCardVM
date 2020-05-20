@@ -44,6 +44,8 @@ TEST_CASE("context_load_class", "[context]") {
   u4 length = fread(buffer, sizeof(buffer), 1, fp);
   int ret = context_load_class(&pkg, buffer, length);
   REQUIRE(ret == 0);
+  REQUIRE(context_count_constant(&pkg) == 18);
+  finalize();
 }
 
 TEST_CASE("context_read_constant", "[context]") {
@@ -53,6 +55,17 @@ TEST_CASE("context_read_constant", "[context]") {
   int ret = context_read_constant(&pkg, 0, buffer, 100);
   REQUIRE(ret > 0);
   REQUIRE(buffer[0] == CONSTANT_METHOD_REF);
+  finalize();
+}
+
+TEST_CASE("context_read_method", "[context]") {
+  init();
+  u1 buffer[100];
+  // first method is <init>
+  int ret = context_read_method(&pkg, buffer, 0, 100);
+  REQUIRE(ret > 0);
+  // access flags = ACC_PUBLIC
+  REQUIRE(buffer[1] == 0x01);
   finalize();
 }
 

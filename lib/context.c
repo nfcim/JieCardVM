@@ -314,7 +314,8 @@ int context_append_constant(package_t *pkg, u1 *data, u2 length) {
   pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
   lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
+                          LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -587,5 +588,35 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
   p += 2;
   u2 super_class = ntohs(*(u2 *)p);
   p += 2;
+  u2 interface_count = ntohs(*(u2 *)p);
+  p += 2;
+  // TODO: interfaces
+  u2 fields_count = ntohs(*(u2 *)p);
+  p += 2;
+  // TODO: fields
+  u2 methods_count = ntohs(*(u2 *)p);
+  p += 2;
+  for (u2 i = 0; i < methods_count; i++) {
+    u1 *method = p;
+    u2 access_flags = ntohs(*(u2 *)p);
+    p += 2;
+    u2 name_index = ntohs(*(u2 *)p);
+    // TODO: relocate
+    p += 2;
+    u2 descriptor_index = ntohs(*(u2 *)p);
+    // TODO: relocate
+    p += 2;
+    u2 attributes_count = ntohs(*(u2 *)p);
+    p += 2;
+    for (u2 i = 0; i < attributes_count; i++) {
+      u2 attributes_name_index = ntohs(*(u2 *)p);
+      p += 2;
+      u4 attributes_length = ntohl(*(u4 *)p);
+      p += 4;
+      // skip attribute
+      p += attributes_length;
+    }
+    context_append_method(package, method, p - method);
+  }
   return CONTEXT_ERR_OK;
 }
