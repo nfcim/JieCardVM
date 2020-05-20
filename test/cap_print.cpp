@@ -160,12 +160,67 @@ void parse_import(const string &javacard_path) {
   p += 4;
   for (int j = 0; j < comp->count; j++) {
     package_info *info = (package_info *)p;
-    printf("Package: version %d.%d, aid", info->major_version, info->minor_version);
-    for (u1 i = 0; i < info->aid_length;i++) {
+    printf("Package: version %d.%d, aid", info->major_version,
+           info->minor_version);
+    for (u1 i = 0; i < info->aid_length; i++) {
       printf(" %02X", info->aid[i]);
     }
     printf("\n");
     p += sizeof(package_info) + info->aid_length;
+  }
+}
+
+struct __attribute__((__packed__)) cp_info {
+  u1 tag;
+  u1 info[3];
+};
+
+struct __attribute__((__packed__)) constant_pool_component {
+  u1 tag;
+  u2 size;
+  u2 count;
+  cp_info constant_pool[0];
+};
+
+void parse_constant_pool(const string &javacard_path) {
+  auto header = read_file_binary(javacard_path + "/ConstantPool.cap");
+  u1 *p = (u1 *)&header[0];
+  constant_pool_component *comp = (constant_pool_component *)p;
+  assert(comp->tag == 5);
+  u2 count = ntohs(comp->count);
+  printf("Found %d constants:\n", count);
+  for (u2 i = 0; i < count; i++) {
+    printf("Constant #%d: ", i);
+    switch (comp->constant_pool[i].tag) {
+    case 1:
+      // class ref
+      printf("class ref\n");
+      break;
+    case 2:
+      // instance field ref
+      printf("instance field ref\n");
+      break;
+    case 3:
+      // virtual method ref
+      printf("virtual method ref\n");
+      break;
+    case 4:
+      // super method ref
+      printf("super method ref\n");
+      break;
+    case 5:
+      // static field ref
+      printf("static field ref\n");
+      break;
+    case 6:
+      // static method ref
+      printf("static method ref\n");
+      break;
+
+    default:
+      assert(false);
+      break;
+    }
   }
 }
 
@@ -199,5 +254,6 @@ int main(int argc, char *argv[]) {
   parse_directory(javacard_path);
   parse_applet(javacard_path);
   parse_import(javacard_path);
+  parse_constant_pool(javacard_path);
   return 0;
 }
