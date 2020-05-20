@@ -169,6 +169,10 @@ int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  err = lfs_file_close(&g_lfs, &lookup_f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
   return read;
 }
 
@@ -305,17 +309,28 @@ int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata) {
   return CONTEXT_ERR_OK;
 }
 
-int context_create_constant_pool(package_t *pkg, u1 *data, u2 length) {
-  // TODO: check if length is a multiple of 4
+int context_append_constant(package_t *pkg, u1 *data, u2 length) {
+  // open constant file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  u2 count = length / 4;
-  err = lfs_setattr(&g_lfs, pkg->aid_hex, LFS_ATTR_METADATA, &count,
-                    sizeof(count));
+  // open constant lookup file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/C");
+  lfs_file_t lookup_f;
+  err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex,
+                      LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  // update lookup file
+  u4 offset = lfs_file_size(&g_lfs, &f);
+  u4 lookup_file_size = lfs_file_size(&g_lfs, &lookup_f);
+  err = lfs_file_write(&g_lfs, &lookup_f, &offset, sizeof(offset));
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -327,35 +342,56 @@ int context_create_constant_pool(package_t *pkg, u1 *data, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  return CONTEXT_ERR_OK;
+  err = lfs_file_close(&g_lfs, &lookup_f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return lookup_file_size / sizeof(u4);
 }
 
-int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info) {
+int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length) {
+  // open lookup file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/C");
+  lfs_file_t lookup_f;
+  int err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex, LFS_O_RDONLY);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  // seek to index
+  lfs_file_seek(&g_lfs, &lookup_f, index * sizeof(u4), LFS_SEEK_SET);
+
+  // read offset
+  u4 offset = 0;
+  err = lfs_file_read(&g_lfs, &lookup_f, &offset, sizeof(offset));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  // open constant file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
   lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
+  err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  u2 count;
-  err = lfs_getattr(&g_lfs, pkg->aid_hex, LFS_ATTR_METADATA, &count,
-                    sizeof(count));
-  if (err < 0 || index >= count)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_seek(&g_lfs, &f, index * 4, LFS_SEEK_CUR);
+  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_CUR);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  err = lfs_file_read(&g_lfs, &f, info, sizeof(cp_info));
-  if (err < 0)
+  int read = lfs_file_read(&g_lfs, &f, info, length);
+  if (read < 0)
     return CONTEXT_ERR_UNKNOWN;
 
   err = lfs_file_close(&g_lfs, &f);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  return CONTEXT_ERR_OK;
+  err = lfs_file_close(&g_lfs, &lookup_f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return read;
 }
 
 int context_create_static_image(package_t *pkg, u1 *data, u2 length) {
@@ -427,7 +463,8 @@ int context_write_static_image(package_t *pkg, u2 offset, u1 size, u2 val) {
 int context_resolve_static_method(package_t *pkg, u2 index,
                                   bytecode_t *bytecode) {
   cp_info info;
-  int err = context_read_constant_pool(pkg, index, &info);
+  // FIXME
+  int err = context_read_constant(pkg, index, (u1 *)&info, sizeof(cp_info));
   if (err < 0 || info.tag != CONSTANT_STATIC_METHOD_REF)
     return CONTEXT_ERR_UNKNOWN;
   if (info.static_elem.external_ref.package_token > 0x7F) {
@@ -442,7 +479,8 @@ int context_resolve_static_method(package_t *pkg, u2 index,
 
 int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val) {
   cp_info info;
-  int err = context_read_constant_pool(pkg, index, &info);
+  // FIXME
+  int err = context_read_constant(pkg, index, (u1 *)&info, sizeof(cp_info));
   if (err < 0 || info.tag != CONSTANT_STATIC_FIELD_REF)
     return CONTEXT_ERR_UNKNOWN;
   if (info.static_elem.external_ref.package_token > 0x7F) {

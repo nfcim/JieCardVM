@@ -16,9 +16,16 @@ Content:
 
 ```
 merged_constant_pool {
-    u4 constant_pool_size;
     u4 constant_pool_offset[constant_pool_size];
     cp_info consts[constant_pool_size];
+};
+```
+
+And another file `/AID/C`:
+
+```
+lookup_constant_pool {
+    u4 constant_pool_offset[constant_pool_size];
 };
 ```
 
@@ -27,7 +34,7 @@ Struct `cp_info` is defined in Java Class File definition.
 Each `u4` of `constant_pool_offset` saves the file offset of the corresponding `cp_info` struct. To lookup a `cp_info`, a two-step sequence can be:
 
 ```
-1. seek to (index + 1) * 4 and read offset
+1. seek to index * 4 and read offset
 2. seek to offset and read cp_info
 ```
 

@@ -4,7 +4,7 @@ project(jiecardvm LANGUAGES C CXX)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -g")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -g")
 
 # public headers
 include_directories("include" "littlefs" "lib")

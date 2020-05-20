@@ -154,9 +154,26 @@ int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val);
 
 int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata);
 
-int context_create_constant_pool(package_t *pkg, u1 *data, u2 length);
+/**
+ * Append constant to a cap
+ *
+ * @param pkg Package info
+ * @param data Constant info
+ * @param length Length of constant info
+ * @return constant index on success
+ */
+int context_append_constant(package_t *pkg, u1 *data, u2 length);
 
-int context_read_constant_pool(package_t *pkg, u2 index, cp_info *info);
+/**
+ * Read constant info from a cap
+ *
+ * @param pkg Package info
+ * @param target Buffer to store constant info
+ * @param index Index of constant
+ * @param length Length to read
+ * @return bytes read
+ */
+int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length);
 
 int context_create_static_image(package_t *pkg, u1 *data, u2 length);
 
