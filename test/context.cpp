@@ -70,6 +70,18 @@ TEST_CASE("vm_load_constant_pool", "[context]") {
   finalize();
 }
 
+TEST_CASE("vm_load_applet", "[context]") {
+  init();
+  u1 buffer[1024];
+  FILE *fp = fopen("test/Applet.cap", "rb");
+  REQUIRE(fp != NULL);
+  u4 length = fread(buffer, 1, sizeof(buffer), fp);
+  int ret = vm_load_applet(buffer, length);
+  REQUIRE(ret == 0);
+  fclose(fp);
+  finalize();
+}
+
 TEST_CASE("context_read_constant", "[context]") {
   init();
   u1 buffer[100];

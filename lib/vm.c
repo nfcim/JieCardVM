@@ -9,6 +9,12 @@
 
 package_t current_package;
 
+typedef struct __attribute__((__packed__)) {
+  u1 tag;
+  u2 size;
+  u1 count;
+} applet_component_compat_header;
+
 bool step(void) {
   u1 opcode = bytecode_read_u1();
   if (opcode == 0)
@@ -42,5 +48,15 @@ int vm_load_constant_pool(u1 *data, u4 length) {
   if (res < 0)
     return VM_ERR_UNKNOWN;
   DBG_MSG("Loaded %d constants\n", length / 4 - 1);
+  return VM_ERR_OK;
+}
+
+int vm_load_applet(u1 *data, u4 length) {
+  int res = context_write_applets(&current_package, data, length);
+  if (res < 0)
+    return VM_ERR_UNKNOWN;
+  applet_component_compat_header *header =
+      (applet_component_compat_header *)data;
+  DBG_MSG("Loaded %d applets\n", header->count);
   return VM_ERR_OK;
 }

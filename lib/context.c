@@ -89,10 +89,11 @@ int context_delete_cap(package_t *pkg) {
   return CONTEXT_ERR_OK;
 }
 
-int context_write_methods(package_t *pkg, u1 *data, u2 length) {
-  // open method file
+int context_write_general(package_t *pkg, u1 *data, u2 length,
+                          const char *postfix) {
+  // open file
   pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, postfix);
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT);
   if (err < 0)
@@ -107,6 +108,10 @@ int context_write_methods(package_t *pkg, u1 *data, u2 length) {
     return CONTEXT_ERR_UNKNOWN;
 
   return CONTEXT_ERR_OK;
+}
+
+int context_write_methods(package_t *pkg, u1 *data, u2 length) {
+  return context_write_general(pkg, data, length, "/m");
 }
 
 int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
@@ -267,23 +272,7 @@ int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata) {
 }
 
 int context_write_constants(package_t *pkg, u1 *data, u2 length) {
-  // open constant file
-  pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
-  lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_write(&g_lfs, &f, data, length);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_close(&g_lfs, &f);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  return CONTEXT_ERR_OK;
+  return context_write_general(pkg, data, length, "/c");
 }
 
 int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length) {
@@ -426,4 +415,8 @@ int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val) {
     return context_read_static_image(pkg, info.static_elem.internal_ref.offset,
                                      size, val);
   }
+}
+
+int context_write_applets(package_t *pkg, u1 *data, u2 length) {
+  return context_write_general(pkg, data, length, "/a");
 }

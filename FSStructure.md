@@ -17,4 +17,9 @@ Each CAP file corresponds to one context. And each CAP has its own AID, so all d
 
 ### Classes
 
-`Class.cap` is copied to a file called `/AID/c`.
+`Class.cap` is copied to a file called `/AID/C`.
+
+
+### Applets
+
+`Applet.cap` is copied to a file called `/AID/a`.

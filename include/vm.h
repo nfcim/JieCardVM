@@ -56,6 +56,15 @@ int vm_load_method(u1 *data, u4 length);
  */
 int vm_load_constant_pool(u1 *data, u4 length);
 
+/**
+ * Load Applet.cap
+ *
+ * @param data Content of Applet.cap
+ * @param length Length of data
+ * @return VM_ERR_OK on success
+ */
+int vm_load_applet(u1 *data, u4 length);
+
 #ifdef __cplusplus
 };
 #endif

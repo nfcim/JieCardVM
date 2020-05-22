@@ -176,6 +176,16 @@ int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length);
 int context_count_constant(package_t *pkg);
 
 /**
+ * Write Applet.cap into current package
+ *
+ * @param pkg Package info
+ * @param data Applet info
+ * @param length Length of applet info
+ * @return CONTEXT_ERR_OK on success
+ */
+int context_write_applets(package_t *pkg, u1 *data, u2 length);
+
+/**
  * Create an array
  *
  * @param pkg Package info
