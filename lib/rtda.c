@@ -1,11 +1,13 @@
 #include "rtda.h"
 #include "context.h"
-#include "vm.h"
 #include "instructions.h"
 #include "utils.h"
+#include "vm.h"
 
 static bytecode_t bytecode;
 static frame_t frames[TOTAL_FRAMES];
+int current_frame;
+int running;
 
 jshort operand_stack_pop(operand_stack_t *s) { return s->base[--s->index]; }
 
@@ -72,9 +74,27 @@ jshort object_data_get(jshort objRef, jshort index) { return 0; }
 void object_data_set(jshort objRef, jshort index, jshort value) {}
 
 void run() {
-  for (int i = 0;i < 1000;i++) {
+  current_frame = 0;
+  running = 1;
+  while (running) {
     u1 opcode = bytecode_read_u1();
     DBG_MSG("Opcode %02x\n", opcode);
-    opcodes[opcode](&frames[0]);
+    opcodes[opcode](&frames[current_frame]);
   }
+}
+
+int init_frame(u2 method_offset) {
+  current_frame = 0;
+  frames[0].method_offset = method_offset;
+
+  method_header_info header;
+  int res = context_read_method(&current_package, (u1 *)&header, method_offset,
+                                sizeof(header));
+  if (res != sizeof(header))
+    return res;
+  DBG_MSG("Method flags:%x max_stack:%d nargs:%d max_locals:%d\n", header.flags,
+          header.max_locals, header.nargs, header.max_locals);
+  // bytecode offset
+  bytecode_set_method(method_offset + 2);
+  return 0;
 }

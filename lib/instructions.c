@@ -440,6 +440,10 @@ void ins_sreturn(frame_t *f) {
 
 void ins_return(frame_t *f) {
   // TODO
+  // returning from root frame
+  if (current_frame == 0) {
+    running = 0;
+  }
 }
 
 void ins_getstatic_abs(frame_t *f) {

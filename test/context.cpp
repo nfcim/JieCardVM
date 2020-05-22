@@ -92,7 +92,8 @@ TEST_CASE("context_read_constant", "[context]") {
 
 TEST_CASE("vm_install_applet", "[context]") {
   init();
-  u1 aid[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+  // EmptyApplet
+  u1 aid[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x00, 0x00, 0x02};
   int res = vm_install_applet(aid, sizeof(aid));
   REQUIRE(res == 0);
   finalize();

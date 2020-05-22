@@ -88,15 +88,7 @@ int vm_install_applet(u1 *target_aid, u2 length) {
       install_method_offset += 3;
       DBG_MSG("Install method is at %d\n", install_method_offset);
 
-      method_header_info header;
-      res = context_read_method(&current_package, (u1 *)&header,
-                                install_method_offset, sizeof(header));
-      if (res != sizeof(header))
-        return VM_ERR_UNKNOWN;
-      DBG_MSG("Method flags:%x max_stack:%d nargs:%d max_locals:%d\n",
-              header.flags, header.max_locals, header.nargs, header.max_locals);
-      // bytecode offset
-      bytecode_set_method(install_method_offset + 2);
+      init_frame(install_method_offset);
       run();
       return VM_ERR_OK;
     } else {

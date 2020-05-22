@@ -46,6 +46,11 @@ typedef struct {
   u2 index;
 } bytecode_t;
 
+// index of current frame
+extern int current_frame;
+// whether vm is running
+extern int running;
+
 jshort operand_stack_pop(operand_stack_t *s);
 
 void operand_stack_push(operand_stack_t *s, jshort val);
@@ -64,13 +69,24 @@ void bytecode_jump_offset(int16_t offset);
 
 /**
  * Use bytecode from Method.cap
+ *
+ * @param method_offset Offset of bytecode in Method.cap
  */
 void bytecode_set_method(u2 method_offset);
 
 /**
  * Use bytecode from buffer
+ *
+ * @param bytecode Buffer of bytecode
  */
 void bytecode_set_buffer(u1 *bytecode);
+
+/**
+ * Init the first frame
+ *
+ * @param method_offset Method offset of root frame in Method.cap
+ */
+int init_frame(u2 method_offset);
 
 u2 _bytecode_get_index(void);
 
