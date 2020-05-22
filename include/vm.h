@@ -10,7 +10,8 @@ extern "C" {
 enum vm_error {
   VM_ERR_OK = 0,           // No error
   VM_ERR_INVALID_ARG = -1, // Invalid argument
-  VM_ERR_UNKNOWN = -2, // Unknown error
+  VM_ERR_UNKNOWN = -2,     // Unknown error
+  VM_ERR_NO_ENT = -3,      // No entry found
 };
 
 extern package_t current_package;
@@ -64,6 +65,15 @@ int vm_load_constant_pool(u1 *data, u4 length);
  * @return VM_ERR_OK on success
  */
 int vm_load_applet(u1 *data, u4 length);
+
+/**
+ * Run install(byte[],short,byte) method of the applet
+ *
+ * @param aid AID of applet in binary
+ * @param length Length of aid
+ * @return VM_ERR_OK on success
+ */
+int vm_install_applet(u1 *aid, u2 length);
 
 #ifdef __cplusplus
 };

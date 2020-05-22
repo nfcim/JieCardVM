@@ -94,11 +94,11 @@ typedef struct __attribute__((__packed__)) {
 } cp_info;
 
 typedef struct __attribute__((__packed__)) {
-  u1 flags : 4;
   u1 max_stack : 4;
-  u1 nargs : 4;
+  u1 flags : 4;
   u1 max_locals : 4;
-} method_info;
+  u1 nargs : 4;
+} method_header_info;
 
 /**
  * Initialize the context
@@ -184,6 +184,17 @@ int context_count_constant(package_t *pkg);
  * @return CONTEXT_ERR_OK on success
  */
 int context_write_applets(package_t *pkg, u1 *data, u2 length);
+
+/**
+ * Read applet info from current package
+ *
+ * @param pkg Applet info
+ * @param target Buffer to store applet info
+ * @param offset Offset into Applet.cap
+ * @param length Length to read
+ * @return bytes read
+ */
+int context_read_applet(package_t *pkg, u1 *target, u2 offset, u2 length);
 
 /**
  * Create an array

@@ -420,3 +420,27 @@ int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val) {
 int context_write_applets(package_t *pkg, u1 *data, u2 length) {
   return context_write_general(pkg, data, length, "/a");
 }
+
+int context_read_applet(package_t *pkg, u1 *target, u2 offset, u2 length) {
+  // open applet file
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/a");
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_SET);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  int read = lfs_file_read(&g_lfs, &f, target, length);
+  if (read < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return read;
+}
