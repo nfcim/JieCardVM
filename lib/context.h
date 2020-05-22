@@ -79,18 +79,8 @@ typedef struct __attribute__((__packed__)) {
 #define CONSTANT_STATIC_FIELD_REF 5
 #define CONSTANT_STATIC_METHOD_REF 6
 
-// below are defined for .class constant pool
-#define CONSTANT_UTF8 1
-#define CONSTANT_INTEGER 3
-#define CONSTANT_FLOAT 4
-#define CONSTANT_LONG 5
-#define CONSTANT_DOUBLE 6
-#define CONSTANT_CLASS 7
-#define CONSTANT_STRING 8
-#define CONSTANT_FIELD_REF 9
-#define CONSTANT_METHOD_REF 10
-#define CONSTANT_INTERFACE_METHOD_REF 11
-#define CONSTANT_NAME_AND_TYPE 12
+#define COMPONENT_ConstantPool 5
+#define COMPONENT_Method 7
 
 typedef struct __attribute__((__packed__)) {
   u1 tag;
@@ -102,6 +92,13 @@ typedef struct __attribute__((__packed__)) {
     static_ref static_elem;
   };
 } cp_info;
+
+typedef struct __attribute__((__packed__)) {
+  u1 flags : 4;
+  u1 max_stack : 4;
+  u1 nargs : 4;
+  u1 max_locals : 4;
+} method_info;
 
 /**
  * Initialize the context
@@ -129,47 +126,35 @@ int context_create_cap(package_t *pkg);
 int context_delete_cap(package_t *pkg);
 
 /**
- * Append method info to a cap
+ * Write Method.cap into current package
  *
  * @param pkg Package info
  * @param data Method info
  * @param length Length of method info
- * @return method index on success
+ * @return CONTEXT_ERR_OK on success
  */
-int context_append_method(package_t *pkg, u1 *data, u2 length);
+int context_write_methods(package_t *pkg, u1 *data, u2 length);
 
 /**
- * Read method info from a cap
+ * Read method info from current package
  *
  * @param pkg Package info
  * @param target Buffer to store method info
- * @param index Index of method
- * @param offset Offset into method
+ * @param offset Offset into Method.cap
  * @param length Length to read
  * @return bytes read
  */
-int context_read_method(package_t *pkg, u1 *target, u2 index, u4 offset, u4 length);
+int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length);
 
 /**
- * Read method info from a cap
+ * Write Constant.cp into current package
  *
  * @param pkg Package info
- * @param target Buffer to store method index
- * @param class_name Class name
- * @param method_name Method name
- * @return status
- */
-int context_find_method(package_t *pkg, u2 *index, const char *class_name, const char *method_name);
-
-/**
- * Append constant to a cap
- *
- * @param pkg Package info
- * @param data Constant info
+ * @param data One or more constant info
  * @param length Length of constant info
- * @return constant index on success
+ * @return CONTEXT_ERR_OK on success
  */
-int context_append_constant(package_t *pkg, u1 *data, u2 length);
+int context_write_constants(package_t *pkg, u1 *data, u2 length);
 
 /**
  * Read constant info from a cap
@@ -183,42 +168,12 @@ int context_append_constant(package_t *pkg, u1 *data, u2 length);
 int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length);
 
 /**
- * Read utf8 constant info from a cap
- *
- * @param pkg Package info
- * @param target Buffer to store utf8
- * @param index Index of constant
- * @param length Length to read
- * @return bytes read
- */
-int context_read_utf8_constant(package_t *pkg, u2 index, u1 *str, u2 length);
-
-/**
  * Get current constant count of a cap
  *
  * @param pkg Package info
  * @return count of constants
  */
 int context_count_constant(package_t *pkg);
-
-/**
- * Load java .class file into cap
- *
- * @param pkg Package info
- * @return result
- */
-int context_load_class(package_t *package, u1 *data, u4 length);
-
-/**
- * Read byte code of a method
- *
- * @param pkg Package info
- * @param index Method index
- * @param data Bytecode buffer
- * @param len Buffer length
- * @return result
- */
-int context_read_method_bytecode(package_t *package, u2 index, u1 *data, u4 length);
 
 /**
  * Create an array

@@ -45,15 +45,27 @@ TEST_CASE("context_create_cap", "[context]") {
   finalize();
 }
 
-TEST_CASE("context_load_class", "[context]") {
+TEST_CASE("vm_load_method", "[context]") {
   init();
   u1 buffer[1024];
-  FILE *fp = fopen("test/Simple.class", "rb");
+  FILE *fp = fopen("test/Method.cap", "rb");
   REQUIRE(fp != NULL);
-  u4 length = fread(buffer, sizeof(buffer), 1, fp);
-  int ret = context_load_class(&pkg, buffer, length);
+  u4 length = fread(buffer, 1, sizeof(buffer), fp);
+  int ret = vm_load_method(buffer, length);
   REQUIRE(ret == 0);
-  REQUIRE(context_count_constant(&pkg) == 18);
+  fclose(fp);
+  finalize();
+}
+
+TEST_CASE("vm_load_constant_pool", "[context]") {
+  init();
+  u1 buffer[1024];
+  FILE *fp = fopen("test/ConstantPool.cap", "rb");
+  REQUIRE(fp != NULL);
+  u4 length = fread(buffer, 1, sizeof(buffer), fp);
+  int ret = vm_load_constant_pool(buffer, length);
+  REQUIRE(ret == 0);
+  REQUIRE(context_count_constant(&current_package) == 9);
   fclose(fp);
   finalize();
 }
@@ -61,59 +73,8 @@ TEST_CASE("context_load_class", "[context]") {
 TEST_CASE("context_read_constant", "[context]") {
   init();
   u1 buffer[100];
-  // first constant is a method ref
   int ret = context_read_constant(&pkg, 0, buffer, 100);
   REQUIRE(ret > 0);
-  REQUIRE(buffer[0] == CONSTANT_METHOD_REF);
-  finalize();
-}
-
-TEST_CASE("context_read_method", "[context]") {
-  init();
-  u1 buffer[100];
-  // first method is <init>
-  int ret = context_read_method(&pkg, buffer, 0, 0, 100);
-  REQUIRE(ret > 0);
-  // access flags = ACC_PUBLIC
-  REQUIRE(buffer[1] == 0x01);
-  // name is <init>
-  u2 name_index = *(u2 *)(buffer + 2);
-  ret = context_read_utf8_constant(&pkg, name_index, buffer, sizeof(buffer));
-  REQUIRE(ret > 0);
-  REQUIRE(memcmp(buffer, "<init>", 6) == 0);
-  finalize();
-}
-
-TEST_CASE("context_find_method", "[context]") {
-  init();
-  u2 index;
-  // first method is <init>
-  int ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "<init>");
-  REQUIRE(ret == CONTEXT_ERR_OK);
-  REQUIRE(index == 0);
-  // second method is empty()
-  ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "empty");
-  REQUIRE(ret == CONTEXT_ERR_OK);
-  REQUIRE(index == 1);
-  // third method is returnByte()
-  ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "returnByte");
-  REQUIRE(ret == CONTEXT_ERR_OK);
-  REQUIRE(index == 2);
-  // not found
-  ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "nada");
-  REQUIRE(ret == CONTEXT_ERR_NOENT);
-  finalize();
-}
-
-TEST_CASE("context_read_method_bytecode", "[context]") {
-  init();
-  u1 buffer[64];
-  // first method is <init>
-  int ret = context_read_method_bytecode(&pkg, 0, buffer, sizeof(buffer));
-  // 5 bytes
-  REQUIRE(ret == 5);
-  // aload_0
-  REQUIRE(buffer[0] == 0x18);
   finalize();
 }
 
@@ -241,7 +202,7 @@ TEST_CASE("context_resolve_static_field", "[context]") {
 
 TEST_CASE("vm_execute_static_method", "[context]") {
   init();
-  int ret = vm_execute_static_method(&pkg, "im/nfc/testapplet/Simple", "returnByte");
+  int ret = vm_execute_static_method(0);
   REQUIRE(ret == CONTEXT_ERR_OK);
   finalize();
 }

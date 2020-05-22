@@ -1,4 +1,3 @@
-#include "context.h"
 #include <context.h>
 #include <globals.h>
 #include <lfs.h>
@@ -90,29 +89,12 @@ int context_delete_cap(package_t *pkg) {
   return CONTEXT_ERR_OK;
 }
 
-int context_append_method(package_t *pkg, u1 *data, u2 length) {
+int context_write_methods(package_t *pkg, u1 *data, u2 length) {
   // open method file
   pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
   lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
-                          LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  // open method lookup file
-  pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/M");
-  lfs_file_t lookup_f;
-  err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex,
-                      LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  // update lookup file
-  u4 offset = lfs_file_size(&g_lfs, &f);
-  u4 lookup_file_size = lfs_file_size(&g_lfs, &lookup_f);
-  err = lfs_file_write(&g_lfs, &lookup_f, &offset, sizeof(offset));
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -124,44 +106,19 @@ int context_append_method(package_t *pkg, u1 *data, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  err = lfs_file_close(&g_lfs, &lookup_f);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  return lookup_file_size / sizeof(u4);
+  return CONTEXT_ERR_OK;
 }
 
-int context_read_method(package_t *pkg, u1 *target, u2 index, u4 off,
-                        u4 length) {
-  // open lookup file
-  pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/M");
-  lfs_file_t lookup_f;
-  int err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex, LFS_O_RDONLY);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  u4 size = lfs_file_size(&g_lfs, &lookup_f);
-  if (index * sizeof(u4) >= size)
-    return CONTEXT_ERR_NOENT;
-  // seek to index
-  lfs_file_seek(&g_lfs, &lookup_f, index * sizeof(u4), LFS_SEEK_SET);
-
-  // read offset
-  u4 offset = 0;
-  err = lfs_file_read(&g_lfs, &lookup_f, &offset, sizeof(offset));
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
+int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
   // open method file
   pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
   lfs_file_t f;
-  err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  err = lfs_file_seek(&g_lfs, &f, offset + off, LFS_SEEK_SET);
+  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_SET);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -170,10 +127,6 @@ int context_read_method(package_t *pkg, u1 *target, u2 index, u4 off,
     return CONTEXT_ERR_UNKNOWN;
 
   err = lfs_file_close(&g_lfs, &f);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_close(&g_lfs, &lookup_f);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -313,29 +266,12 @@ int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata) {
   return CONTEXT_ERR_OK;
 }
 
-int context_append_constant(package_t *pkg, u1 *data, u2 length) {
+int context_write_constants(package_t *pkg, u1 *data, u2 length) {
   // open constant file
   pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
   lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
-                          LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  // open constant lookup file
-  pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/C");
-  lfs_file_t lookup_f;
-  err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex,
-                      LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  // update lookup file
-  u4 offset = lfs_file_size(&g_lfs, &f);
-  u4 lookup_file_size = lfs_file_size(&g_lfs, &lookup_f);
-  err = lfs_file_write(&g_lfs, &lookup_f, &offset, sizeof(offset));
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_WRONLY | LFS_O_CREAT);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -347,44 +283,23 @@ int context_append_constant(package_t *pkg, u1 *data, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  err = lfs_file_close(&g_lfs, &lookup_f);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  return lookup_file_size / sizeof(u4);
+  return CONTEXT_ERR_OK;
 }
 
 int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length) {
-  // open lookup file
   pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/C");
-  lfs_file_t lookup_f;
-  int err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex, LFS_O_RDONLY);
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  u4 file_size = lfs_file_size(&g_lfs, &lookup_f);
+  u4 file_size = lfs_file_size(&g_lfs, &f);
   if (index * sizeof(u4) >= file_size)
     return CONTEXT_ERR_NOENT;
 
   // seek to index
-  lfs_file_seek(&g_lfs, &lookup_f, index * sizeof(u4), LFS_SEEK_SET);
-
-  // read offset
-  u4 offset = 0;
-  err = lfs_file_read(&g_lfs, &lookup_f, &offset, sizeof(offset));
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  // open constant file
-  pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
-  lfs_file_t f;
-  err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_CUR);
+  err = lfs_file_seek(&g_lfs, &f, index * sizeof(cp_info), LFS_SEEK_CUR);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -396,30 +311,26 @@ int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  err = lfs_file_close(&g_lfs, &lookup_f);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
   return read;
 }
 
 int context_count_constant(package_t *pkg) {
-  // open lookup file
   pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/C");
-  lfs_file_t lookup_f;
-  int err = lfs_file_open(&g_lfs, &lookup_f, pkg->aid_hex, LFS_O_RDONLY);
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/c");
+  lfs_file_t f;
+  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
   if (err == LFS_ERR_NOENT)
     return 0;
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
-  int file_size = lfs_file_size(&g_lfs, &lookup_f);
+  int file_size = lfs_file_size(&g_lfs, &f);
 
-  err = lfs_file_close(&g_lfs, &lookup_f);
+  err = lfs_file_close(&g_lfs, &f);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  return file_size / sizeof(u4);
+  // skip 4-byte header
+  return file_size / sizeof(cp_info) - 1;
 }
 
 int context_create_static_image(package_t *pkg, u1 *data, u2 length) {
@@ -499,9 +410,7 @@ int context_resolve_static_method(package_t *pkg, u2 index,
     // TODO: external package
     return CONTEXT_ERR_OK;
   } else {
-    return context_read_method(pkg, bytecode->base,
-                               info.static_elem.internal_ref.offset, 0,
-                               MAX_BYTECODE_INDEX);
+    return context_read_method(pkg, bytecode->base, 0, MAX_BYTECODE_INDEX);
   }
 }
 
@@ -517,202 +426,4 @@ int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val) {
     return context_read_static_image(pkg, info.static_elem.internal_ref.offset,
                                      size, val);
   }
-}
-
-// load .class file into current context
-int context_load_class(package_t *package, u1 *data, u4 length) {
-  u1 *p = data;
-  u4 magic = htobe32(*(u4 *)p);
-  if (magic != 0xCAFEBABE)
-    return CONTEXT_ERR_UNKNOWN;
-  p += 4;
-  // minor, major
-  p += 4;
-  DBG_MSG("loading class\n");
-
-  // constants
-  u2 constant_offset = context_count_constant(package);
-  u2 constant_pool_count = htobe16(*(u2 *)p);
-  p += 2;
-  // constant_pool[constant_pool_count-1]
-  for (u2 i = 0; i < constant_pool_count - 1; i++) {
-    u1 tag = *p;
-    // see how long it is and relocate offsets
-    u2 size = 0;
-    u2 inner_length = 0;
-    u2 *index = NULL;
-    switch (tag) {
-    case CONSTANT_UTF8:
-      // UTF-8
-      inner_length = htobe16(*(u2 *)(p + 1));
-      size = 1 + 2 + inner_length;
-      break;
-    case CONSTANT_INTEGER:
-    case CONSTANT_FLOAT:
-      // Integer and float
-      size = 1 + 4;
-      break;
-    case CONSTANT_LONG:
-    case CONSTANT_DOUBLE:
-      // Long and double
-      size = 1 + 8;
-      break;
-    case CONSTANT_CLASS:
-    case CONSTANT_STRING:
-      // class/string
-      // one byte tag and two bytes index
-      index = (u2 *)(p + 1);
-      // relocate
-      *index = htobe16(*index) + constant_offset - 1;
-      size = 1 + 2;
-      break;
-    case CONSTANT_FIELD_REF:
-    case CONSTANT_METHOD_REF:
-    case CONSTANT_INTERFACE_METHOD_REF:
-    case CONSTANT_NAME_AND_TYPE:
-      // field ref, method ref, interface method ref or name and type
-      // one byte tag, two bytes class index, two bytes name and type index
-      // relocate
-      index = (u2 *)(p + 1);
-      *index = htobe16(*index) + constant_offset - 1;
-      // relocate
-      index = (u2 *)(p + 3);
-      *index = htobe16(*index) + constant_offset - 1;
-      size = 1 + 2 + 2;
-      break;
-
-    default:
-      return CONTEXT_ERR_UNKNOWN;
-      break;
-    }
-
-    context_append_constant(package, p, size);
-    // advance
-    p += size;
-  }
-  DBG_MSG("loaded %d constants\n", constant_pool_count - 1);
-
-  u2 access_flags = htobe16(*(u2 *)p);
-  p += 2;
-  u2 this_class = htobe16(*(u2 *)p);
-  p += 2;
-  u2 super_class = htobe16(*(u2 *)p);
-  p += 2;
-  u2 interface_count = htobe16(*(u2 *)p);
-  p += 2;
-  // TODO: interfaces
-  u2 fields_count = htobe16(*(u2 *)p);
-  p += 2;
-  // TODO: fields
-  u2 methods_count = htobe16(*(u2 *)p);
-  p += 2;
-  for (u2 i = 0; i < methods_count; i++) {
-    u1 *method = p;
-    u2 access_flags = htobe16(*(u2 *)p);
-    p += 2;
-    u2 *name_index = (u2 *)p;
-    // relocate
-    *name_index = htobe16(*name_index) + constant_offset - 1;
-    p += 2;
-    u2 *descriptor_index = (u2 *)p;
-    // relocate
-    *descriptor_index = htobe16(*descriptor_index) + constant_offset - 1;
-    p += 2;
-    u2 attributes_count = htobe16(*(u2 *)p);
-    *(u2 *)p = attributes_count;
-    p += 2;
-    for (u2 i = 0; i < attributes_count; i++) {
-      // relocate
-      u2 attributes_name_index = htobe16(*(u2 *)p) + constant_offset - 1;
-      *(u2 *)p = attributes_name_index;
-      p += 2;
-      char name_buffer[16] = {0};
-      context_read_utf8_constant(package, attributes_name_index,
-                                 (u1 *)name_buffer, sizeof(name_buffer));
-      DBG_MSG("found attribute type %s\n", name_buffer);
-      u4 attributes_length = htobe32(*(u4 *)p);
-      *(u4 *)p = attributes_length;
-      p += 4;
-      // skip attribute
-      p += attributes_length;
-    }
-    context_append_method(package, method, p - method);
-  }
-  DBG_MSG("loaded %d methods\n", methods_count);
-  return CONTEXT_ERR_OK;
-}
-
-int context_read_utf8_constant(package_t *pkg, u2 index, u1 *str, u2 length) {
-  if (length < 4)
-    return CONTEXT_ERR_UNKNOWN;
-  // reuse buffer
-  int read = context_read_constant(pkg, index, str, length);
-  if (read < 0)
-    return read;
-  if (str[0] != CONSTANT_UTF8)
-    return CONTEXT_ERR_UNKNOWN;
-  u2 data_length = htobe16(*(u2 *)(str + 1));
-  u2 actual_length = data_length < (length - 4) ? data_length : (length - 4);
-  // overlap
-  memmove(str, str + 3, actual_length);
-  str[actual_length] = 0;
-  return actual_length;
-}
-
-int context_find_method(package_t *pkg, u2 *index, const char *class_name,
-                        const char *method_name) {
-  u1 buffer[64];
-  u2 method_name_len = strlen(method_name);
-  for (u2 i = 0;; i++) {
-    int res = context_read_method(pkg, buffer, i, 0, sizeof(buffer));
-    if (res < 0)
-      return res;
-
-    // TODO: match class as well
-    u2 name_index = *(u2 *)(buffer + 2);
-    res = context_read_utf8_constant(pkg, name_index, buffer, sizeof(buffer));
-    if (res == method_name_len &&
-        strncmp((char *)buffer, method_name, res) == 0) {
-      // found
-      *index = i;
-      return CONTEXT_ERR_OK;
-    }
-  }
-}
-
-int context_read_method_bytecode(package_t *package, u2 index, u1 *data, u4 length) {
-  u2 method_header[4];
-  int ret = context_read_method(package, (u1 *)method_header, index, 0,
-                                sizeof(method_header));
-  if (ret < 0)
-    return ret;
-  u4 offset = 8;
-  u2 attributes_count = method_header[3];
-  for (u2 i = 0; i < attributes_count; i++) {
-    u1 attribute_info[6];
-    ret = context_read_method(package, attribute_info, index, offset,
-                              sizeof(attribute_info));
-    if (ret < 0)
-      return ret;
-    u2 name_index = *(u2 *)attribute_info;
-    u4 attribute_length = *(u4 *)(attribute_info + 2);
-    char name[16];
-    ret = context_read_utf8_constant(package, name_index, &name, sizeof(name));
-    if (ret < 0)
-      return ret;
-    // TODO: optimize this
-    if (strcmp(name, "Code") == 0) {
-      u1 code_header[8];
-      ret = context_read_method(package, &code_header, index, offset + 6,
-                                sizeof(code_header));
-      if (ret < 0)
-        return ret;
-      u4 code_length = htobe32(*(u4 *)(code_header + 4));
-      u4 actual_length = code_length < length ? code_length : length;
-      return context_read_method(package, data, index, offset + 6 + 8, actual_length);
-    }
-
-    offset += 2 + 4 + attribute_length;
-  }
-  return CONTEXT_ERR_OK;
 }

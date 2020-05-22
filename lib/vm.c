@@ -1,8 +1,10 @@
 #include "instructions.h"
 #include "rtda.h"
 #include "types.h"
+#include "utils.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include <vm.h>
 
 package_t current_package;
@@ -14,14 +16,31 @@ bool step(void) {
   return true;
 }
 
-int vm_execute_static_method(package_t *package, const char *class_name,
-                             const char *method_name) {
-  u2 index;
-  int ret = context_find_method(package, &index, class_name, method_name);
-  if (ret < 0)
-    return ret;
-  // TODO: check static
-  return 0;
+int vm_set_current_package(char *aid) {
+  size_t len = strlen(aid);
+  if (aid + 1 >= sizeof(current_package.aid_hex)) {
+    return VM_ERR_INVALID_ARG;
+  }
+  strcpy(current_package.aid_hex, aid);
+  current_package.aid_hex_length = len;
+  return VM_ERR_OK;
 }
 
+int vm_execute_static_method(int index) { return 0; }
+
 int vm_init(void) { return 0; }
+
+int vm_load_method(u1 *data, u4 length) {
+  int res = context_write_methods(&current_package, data, length);
+  if (res < 0)
+    return VM_ERR_UNKNOWN;
+  return VM_ERR_OK;
+}
+
+int vm_load_constant_pool(u1 *data, u4 length) {
+  int res = context_write_constants(&current_package, data, length);
+  if (res < 0)
+    return VM_ERR_UNKNOWN;
+  DBG_MSG("Loaded %d constants\n", length / 4 - 1);
+  return VM_ERR_OK;
+}

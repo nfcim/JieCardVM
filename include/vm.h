@@ -7,10 +7,54 @@
 extern "C" {
 #endif
 
+enum vm_error {
+  VM_ERR_OK = 0,           // No error
+  VM_ERR_INVALID_ARG = -1, // Invalid argument
+  VM_ERR_UNKNOWN = -2, // Unknown error
+};
+
 extern package_t current_package;
 
+/**
+ * Initialize JieCardVM
+ *
+ * @return VM_ERR_OK on success
+ */
 int vm_init(void);
-int vm_execute_static_method(package_t *package, const char *class_name, const char *method_name);
+
+/**
+ * Switch current package
+ *
+ * @param aid AID of the CAP package in hex string without spaces
+ * @return VM_ERR_OK on success
+ */
+int vm_set_current_package(char *aid);
+
+/**
+ * Execute a static method
+ *
+ * @param index Method index
+ * @return VM_ERR_OK on success
+ */
+int vm_execute_static_method(int index);
+
+/**
+ * Load Method.cap
+ *
+ * @param data Content of Method.cap
+ * @param length Length of data
+ * @return VM_ERR_OK on success
+ */
+int vm_load_method(u1 *data, u4 length);
+
+/**
+ * Load ConstantPool.cap
+ *
+ * @param data Content of ConstantPool.cap
+ * @param length Length of data
+ * @return VM_ERR_OK on success
+ */
+int vm_load_constant_pool(u1 *data, u4 length);
 
 #ifdef __cplusplus
 };
