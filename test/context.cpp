@@ -3,13 +3,20 @@
 #include "globals.h"
 #include "lfs.h"
 #include <catch.hpp>
+#include <unistd.h>
 #include "vm.h"
 
 static struct lfs_config cfg;
 static lfs_filebd_t bd;
 static package_t pkg;
+static bool first = true;
 
 static void init() {
+  if (first) {
+    unlink("testctx");
+    first = false;
+  }
+
   cfg.context = &bd;
   cfg.read = &lfs_filebd_read;
   cfg.prog = &lfs_filebd_prog;
@@ -42,10 +49,12 @@ TEST_CASE("context_load_class", "[context]") {
   init();
   u1 buffer[1024];
   FILE *fp = fopen("test/Simple.class", "rb");
+  REQUIRE(fp != NULL);
   u4 length = fread(buffer, sizeof(buffer), 1, fp);
   int ret = context_load_class(&pkg, buffer, length);
   REQUIRE(ret == 0);
   REQUIRE(context_count_constant(&pkg) == 18);
+  fclose(fp);
   finalize();
 }
 
@@ -63,7 +72,7 @@ TEST_CASE("context_read_method", "[context]") {
   init();
   u1 buffer[100];
   // first method is <init>
-  int ret = context_read_method(&pkg, buffer, 0, 100);
+  int ret = context_read_method(&pkg, buffer, 0, 0, 100);
   REQUIRE(ret > 0);
   // access flags = ACC_PUBLIC
   REQUIRE(buffer[1] == 0x01);
@@ -93,6 +102,18 @@ TEST_CASE("context_find_method", "[context]") {
   // not found
   ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "nada");
   REQUIRE(ret == CONTEXT_ERR_NOENT);
+  finalize();
+}
+
+TEST_CASE("context_read_method_bytecode", "[context]") {
+  init();
+  u1 buffer[64];
+  // first method is <init>
+  int ret = context_read_method_bytecode(&pkg, 0, buffer, sizeof(buffer));
+  // 5 bytes
+  REQUIRE(ret == 5);
+  // aload_0
+  REQUIRE(buffer[0] == 0x18);
   finalize();
 }
 

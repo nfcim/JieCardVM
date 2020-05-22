@@ -10,9 +10,9 @@ extern "C" {
 #ifdef DEBUG_OUTPUT
 #include <stdio.h>
 #define DBG_MSG(format, ...)                                                   \
-  printf("[DBG] %s(%d): " format, __func__, __LINE__, ##__VA_ARGS__)
+  printf("[DBG] %s(%dL): " format, __func__, __LINE__, ##__VA_ARGS__)
 #define ERR_MSG(format, ...)                                                   \
-  printf("[ERR] %s(%d): " format, __func__, __LINE__, ##__VA_ARGS__)
+  printf("[ERR] %s(%dL): " format, __func__, __LINE__, ##__VA_ARGS__)
 #define PRINT_HEX(...) print_hex(__VA_ARGS__)
 #else
 #define DBG_MSG(...)

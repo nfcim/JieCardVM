@@ -8,53 +8,61 @@ Each CAP file corresponds to one context. And each CAP has its own AID, so all d
 
 ### Constant pool
 
-Here constant pool refers to the variable length one in .class file.
-
-Each java class has its own constant pool, and constant pools are merged under a single file called `/AID/c`. The merged pool can have at most 65536 entries.
+CAP file has only one constant pool after constant pools of java classes are merged under a single file in ConstantPool.cap. It is saved to a file called `/AID/c`. The pool can have at most 65536 entries.
 
 Content:
 
 ```
-merged_constant_pool {
-    u4 constant_pool_offset[constant_pool_size];
-    cp_info consts[constant_pool_size];
+constant_pool_component {
+    u1 tag; // 5
+    u2 size;
+    u2 count;
+    cp_info constant_pool[count];
 };
-```
 
-And another file `/AID/C`:
-
-```
-lookup_constant_pool {
-    u4 constant_pool_offset[constant_pool_size];
-};
-```
-
-Struct `cp_info` is defined in Java Class File definition.
-
-Each `u4` of `constant_pool_offset` saves the file offset of the corresponding `cp_info` struct. To lookup a `cp_info`, a two-step sequence can be:
-
-```
-1. seek to index * 4 and read offset
-2. seek to offset and read cp_info
-```
-
-Thus, indexes in .class files need to be relocated by an offset.
-
-### Methods
-
-All methods are merged into one file as well. The file is called `/AID/m` and it consists of several `method_info` structs:
-
-```
-method_info {
-    u2 access_flags;
-    u2 name_index;
-    u2 descriptor_index;
-    u2 attributes_count;
-    attribute_info attributes[attributes_info];
+cp_info {
+    u1 tag;
+    u1 info[3];
 }
 ```
 
-Currently, we use linear search for lookup from method name to method info. The offsets are stored in a file called `/AID/M`. Its content:
+It's easy to access cp_info by its index.
+
+### Methods
+
+All methods are merged into `Method.cap` as well. The file is saved to `/AID/m` and its structure:
+
+```
+method_component_compat {
+    u1 tag; // 7
+    u2 size;
+    u1 handler_count;
+    exception_handler_info exception_handlers[handler_count];
+    method_info methods[];
+}
+
+exception_handler_info {
+    u2 start_offset;
+    u2 stop_bit: 1;
+    u2 active_length: 15;
+    u2 handler_offset;
+    u2 catch_type_index;
+}
+
+method_info {
+    method_header method_header;
+    u1 bytecodes[];
+}
+
+method_header_info {
+    u1 flags: 4;
+    u1 max_stack: 4;
+    u1 nargs: 4;
+    u1 max_locals: 4;
+}
+```
+
+Because each method info has variable length, to speedup lookup, we store the offsets into a file called `/AID/M`. Its content:
 
 ```
 method_lookup {
@@ -62,30 +70,15 @@ method_lookup {
 }
 ```
 
-In the future, we can use cuckoo hashing to speed it up.
-
 ### Classes
 
-All classes are merged into one file as well. The file is called `/AID/c` and it consists of several `class_info` structs:
+As with others, `Class.cap` is saved to `/AID/c` and it has the following structure:
 
 ```
-class_info {
-    u2 access_flags;
-    u2 this_class;
-    u2 super_class;
-    u2 interfaces_count;
-    u2 interfaces[interfaces_count];
-    u2 fields_count;
-    field_info fields[fields_count];
+class_component_compat {
+    u1 tag; // 6
+    u2 size;
+    interface_info interfaces[];
+    class_info_compat classes[];
 }
 ```
-
-Currently, we use linear search for lookup from class name to class info. The offsets are stored in a file called `/AID/C`. Its content:
-
-```
-class_lookup {
-    u4 offsets[class_count];
-}
-```
-
-In the future, we can use cuckoo hashing to speed it up.

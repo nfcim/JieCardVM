@@ -144,10 +144,11 @@ int context_append_method(package_t *pkg, u1 *data, u2 length);
  * @param pkg Package info
  * @param target Buffer to store method info
  * @param index Index of method
+ * @param offset Offset into method
  * @param length Length to read
  * @return bytes read
  */
-int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length);
+int context_read_method(package_t *pkg, u1 *target, u2 index, u4 offset, u4 length);
 
 /**
  * Read method info from a cap
@@ -207,6 +208,17 @@ int context_count_constant(package_t *pkg);
  * @return result
  */
 int context_load_class(package_t *package, u1 *data, u4 length);
+
+/**
+ * Read byte code of a method
+ *
+ * @param pkg Package info
+ * @param index Method index
+ * @param data Bytecode buffer
+ * @param len Buffer length
+ * @return result
+ */
+int context_read_method_bytecode(package_t *package, u2 index, u1 *data, u4 length);
 
 /**
  * Create an array

@@ -131,7 +131,8 @@ int context_append_method(package_t *pkg, u1 *data, u2 length) {
   return lookup_file_size / sizeof(u4);
 }
 
-int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length) {
+int context_read_method(package_t *pkg, u1 *target, u2 index, u4 off,
+                        u4 length) {
   // open lookup file
   pkg->aid_hex[pkg->aid_hex_length] = 0;
   strcpy(pkg->aid_hex + pkg->aid_hex_length, "/M");
@@ -160,7 +161,7 @@ int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_SET);
+  err = lfs_file_seek(&g_lfs, &f, offset + off, LFS_SEEK_SET);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -362,6 +363,10 @@ int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  u4 file_size = lfs_file_size(&g_lfs, &lookup_f);
+  if (index * sizeof(u4) >= file_size)
+    return CONTEXT_ERR_NOENT;
+
   // seek to index
   lfs_file_seek(&g_lfs, &lookup_f, index * sizeof(u4), LFS_SEEK_SET);
 
@@ -495,7 +500,7 @@ int context_resolve_static_method(package_t *pkg, u2 index,
     return CONTEXT_ERR_OK;
   } else {
     return context_read_method(pkg, bytecode->base,
-                               info.static_elem.internal_ref.offset,
+                               info.static_elem.internal_ref.offset, 0,
                                MAX_BYTECODE_INDEX);
   }
 }
@@ -523,6 +528,7 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
   p += 4;
   // minor, major
   p += 4;
+  DBG_MSG("loading class\n");
 
   // constants
   u2 constant_offset = context_count_constant(package);
@@ -584,6 +590,7 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
     // advance
     p += size;
   }
+  DBG_MSG("loaded %d constants\n", constant_pool_count - 1);
 
   u2 access_flags = htobe16(*(u2 *)p);
   p += 2;
@@ -612,21 +619,32 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
     *descriptor_index = htobe16(*descriptor_index) + constant_offset - 1;
     p += 2;
     u2 attributes_count = htobe16(*(u2 *)p);
+    *(u2 *)p = attributes_count;
     p += 2;
     for (u2 i = 0; i < attributes_count; i++) {
-      u2 attributes_name_index = htobe16(*(u2 *)p);
+      // relocate
+      u2 attributes_name_index = htobe16(*(u2 *)p) + constant_offset - 1;
+      *(u2 *)p = attributes_name_index;
       p += 2;
-      u4 attributes_length = ntohl(*(u4 *)p);
+      char name_buffer[16] = {0};
+      context_read_utf8_constant(package, attributes_name_index,
+                                 (u1 *)name_buffer, sizeof(name_buffer));
+      DBG_MSG("found attribute type %s\n", name_buffer);
+      u4 attributes_length = htobe32(*(u4 *)p);
+      *(u4 *)p = attributes_length;
       p += 4;
       // skip attribute
       p += attributes_length;
     }
     context_append_method(package, method, p - method);
   }
+  DBG_MSG("loaded %d methods\n", methods_count);
   return CONTEXT_ERR_OK;
 }
 
 int context_read_utf8_constant(package_t *pkg, u2 index, u1 *str, u2 length) {
+  if (length < 4)
+    return CONTEXT_ERR_UNKNOWN;
   // reuse buffer
   int read = context_read_constant(pkg, index, str, length);
   if (read < 0)
@@ -634,9 +652,10 @@ int context_read_utf8_constant(package_t *pkg, u2 index, u1 *str, u2 length) {
   if (str[0] != CONSTANT_UTF8)
     return CONTEXT_ERR_UNKNOWN;
   u2 data_length = htobe16(*(u2 *)(str + 1));
-  u2 actual_length = data_length < length ? data_length : length;
+  u2 actual_length = data_length < (length - 4) ? data_length : (length - 4);
   // overlap
   memmove(str, str + 3, actual_length);
+  str[actual_length] = 0;
   return actual_length;
 }
 
@@ -645,7 +664,7 @@ int context_find_method(package_t *pkg, u2 *index, const char *class_name,
   u1 buffer[64];
   u2 method_name_len = strlen(method_name);
   for (u2 i = 0;; i++) {
-    int res = context_read_method(pkg, buffer, i, sizeof(buffer));
+    int res = context_read_method(pkg, buffer, i, 0, sizeof(buffer));
     if (res < 0)
       return res;
 
@@ -659,4 +678,41 @@ int context_find_method(package_t *pkg, u2 *index, const char *class_name,
       return CONTEXT_ERR_OK;
     }
   }
+}
+
+int context_read_method_bytecode(package_t *package, u2 index, u1 *data, u4 length) {
+  u2 method_header[4];
+  int ret = context_read_method(package, (u1 *)method_header, index, 0,
+                                sizeof(method_header));
+  if (ret < 0)
+    return ret;
+  u4 offset = 8;
+  u2 attributes_count = method_header[3];
+  for (u2 i = 0; i < attributes_count; i++) {
+    u1 attribute_info[6];
+    ret = context_read_method(package, attribute_info, index, offset,
+                              sizeof(attribute_info));
+    if (ret < 0)
+      return ret;
+    u2 name_index = *(u2 *)attribute_info;
+    u4 attribute_length = *(u4 *)(attribute_info + 2);
+    char name[16];
+    ret = context_read_utf8_constant(package, name_index, &name, sizeof(name));
+    if (ret < 0)
+      return ret;
+    // TODO: optimize this
+    if (strcmp(name, "Code") == 0) {
+      u1 code_header[8];
+      ret = context_read_method(package, &code_header, index, offset + 6,
+                                sizeof(code_header));
+      if (ret < 0)
+        return ret;
+      u4 code_length = htobe32(*(u4 *)(code_header + 4));
+      u4 actual_length = code_length < length ? code_length : length;
+      return context_read_method(package, data, index, offset + 6 + 8, actual_length);
+    }
+
+    offset += 2 + 4 + attribute_length;
+  }
+  return CONTEXT_ERR_OK;
 }
