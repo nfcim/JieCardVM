@@ -158,7 +158,7 @@ int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length);
  * @param method_name Method name
  * @return status
  */
-int context_find_method(package_t *pkg, u2 *index, char *class_name, char *method_name);
+int context_find_method(package_t *pkg, u2 *index, const char *class_name, const char *method_name);
 
 /**
  * Append constant to a cap

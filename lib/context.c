@@ -140,6 +140,9 @@ int context_read_method(package_t *pkg, u1 *target, u2 index, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  u4 size = lfs_file_size(&g_lfs, &lookup_f);
+  if (index * sizeof(u4) >= size)
+    return CONTEXT_ERR_NOENT;
   // seek to index
   lfs_file_seek(&g_lfs, &lookup_f, index * sizeof(u4), LFS_SEEK_SET);
 
@@ -514,7 +517,7 @@ int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val) {
 // load .class file into current context
 int context_load_class(package_t *package, u1 *data, u4 length) {
   u1 *p = data;
-  u4 magic = ntohl(*(u4 *)p);
+  u4 magic = htobe32(*(u4 *)p);
   if (magic != 0xCAFEBABE)
     return CONTEXT_ERR_UNKNOWN;
   p += 4;
@@ -523,7 +526,7 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
 
   // constants
   u2 constant_offset = context_count_constant(package);
-  u2 constant_pool_count = ntohs(*(u2 *)p);
+  u2 constant_pool_count = htobe16(*(u2 *)p);
   p += 2;
   // constant_pool[constant_pool_count-1]
   for (u2 i = 0; i < constant_pool_count - 1; i++) {
@@ -535,7 +538,7 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
     switch (tag) {
     case CONSTANT_UTF8:
       // UTF-8
-      inner_length = htons(*(u2 *)(p + 1));
+      inner_length = htobe16(*(u2 *)(p + 1));
       size = 1 + 2 + inner_length;
       break;
     case CONSTANT_INTEGER:
@@ -554,7 +557,7 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
       // one byte tag and two bytes index
       index = (u2 *)(p + 1);
       // relocate
-      *index = ntohs(*index) + constant_offset - 1;
+      *index = htobe16(*index) + constant_offset - 1;
       size = 1 + 2;
       break;
     case CONSTANT_FIELD_REF:
@@ -565,10 +568,10 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
       // one byte tag, two bytes class index, two bytes name and type index
       // relocate
       index = (u2 *)(p + 1);
-      *index = ntohs(*index) + constant_offset - 1;
+      *index = htobe16(*index) + constant_offset - 1;
       // relocate
       index = (u2 *)(p + 3);
-      *index = ntohs(*index) + constant_offset - 1;
+      *index = htobe16(*index) + constant_offset - 1;
       size = 1 + 2 + 2;
       break;
 
@@ -582,36 +585,36 @@ int context_load_class(package_t *package, u1 *data, u4 length) {
     p += size;
   }
 
-  u2 access_flags = ntohs(*(u2 *)p);
+  u2 access_flags = htobe16(*(u2 *)p);
   p += 2;
-  u2 this_class = ntohs(*(u2 *)p);
+  u2 this_class = htobe16(*(u2 *)p);
   p += 2;
-  u2 super_class = ntohs(*(u2 *)p);
+  u2 super_class = htobe16(*(u2 *)p);
   p += 2;
-  u2 interface_count = ntohs(*(u2 *)p);
+  u2 interface_count = htobe16(*(u2 *)p);
   p += 2;
   // TODO: interfaces
-  u2 fields_count = ntohs(*(u2 *)p);
+  u2 fields_count = htobe16(*(u2 *)p);
   p += 2;
   // TODO: fields
-  u2 methods_count = ntohs(*(u2 *)p);
+  u2 methods_count = htobe16(*(u2 *)p);
   p += 2;
   for (u2 i = 0; i < methods_count; i++) {
     u1 *method = p;
-    u2 access_flags = ntohs(*(u2 *)p);
+    u2 access_flags = htobe16(*(u2 *)p);
     p += 2;
     u2 *name_index = (u2 *)p;
     // relocate
-    *name_index = ntohs(*name_index) + constant_offset - 1;
+    *name_index = htobe16(*name_index) + constant_offset - 1;
     p += 2;
     u2 *descriptor_index = (u2 *)p;
     // relocate
-    *descriptor_index = ntohs(*descriptor_index) + constant_offset - 1;
+    *descriptor_index = htobe16(*descriptor_index) + constant_offset - 1;
     p += 2;
-    u2 attributes_count = ntohs(*(u2 *)p);
+    u2 attributes_count = htobe16(*(u2 *)p);
     p += 2;
     for (u2 i = 0; i < attributes_count; i++) {
-      u2 attributes_name_index = ntohs(*(u2 *)p);
+      u2 attributes_name_index = htobe16(*(u2 *)p);
       p += 2;
       u4 attributes_length = ntohl(*(u4 *)p);
       p += 4;
@@ -630,28 +633,27 @@ int context_read_utf8_constant(package_t *pkg, u2 index, u1 *str, u2 length) {
     return read;
   if (str[0] != CONSTANT_UTF8)
     return CONTEXT_ERR_UNKNOWN;
-  u2 data_length = ntohs(*(u2 *)(str + 1));
+  u2 data_length = htobe16(*(u2 *)(str + 1));
   u2 actual_length = data_length < length ? data_length : length;
   // overlap
   memmove(str, str + 3, actual_length);
   return actual_length;
 }
 
-int context_find_method(package_t *pkg, u2 *index, char *class_name,
-                        char *method_name) {
+int context_find_method(package_t *pkg, u2 *index, const char *class_name,
+                        const char *method_name) {
   u1 buffer[64];
   u2 method_name_len = strlen(method_name);
   for (u2 i = 0;; i++) {
     int res = context_read_method(pkg, buffer, i, sizeof(buffer));
     if (res < 0)
       return res;
-    else if (res == 0)
-      return CONTEXT_ERR_NOENT;
 
     // TODO: match class as well
     u2 name_index = *(u2 *)(buffer + 2);
     res = context_read_utf8_constant(pkg, name_index, buffer, sizeof(buffer));
-    if (res == method_name_len && strncmp((char *)buffer, method_name, res) == 0) {
+    if (res == method_name_len &&
+        strncmp((char *)buffer, method_name, res) == 0) {
       // found
       *index = i;
       return CONTEXT_ERR_OK;

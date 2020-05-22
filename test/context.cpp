@@ -90,6 +90,9 @@ TEST_CASE("context_find_method", "[context]") {
   ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "returnByte");
   REQUIRE(ret == CONTEXT_ERR_OK);
   REQUIRE(index == 2);
+  // not found
+  ret = context_find_method(&pkg, &index, "im/nfc/testapplet/Simple", "nada");
+  REQUIRE(ret == CONTEXT_ERR_NOENT);
   finalize();
 }
 

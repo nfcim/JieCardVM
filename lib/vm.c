@@ -14,7 +14,13 @@ bool step(void) {
   return true;
 }
 
-int vm_execute_static_method(package_t *package, char *class_name, char *method_name) {
+int vm_execute_static_method(package_t *package, const char *class_name,
+                             const char *method_name) {
+  u2 index;
+  int ret = context_find_method(package, &index, class_name, method_name);
+  if (ret < 0)
+    return ret;
+  // TODO: check static
   return 0;
 }
 
