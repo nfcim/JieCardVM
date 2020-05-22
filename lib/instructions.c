@@ -975,6 +975,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_ifle_w,
     ins_ifnull_w,
     ins_ifnonnull_w,
+    // 0xa0
     ins_if_ascmpeq_w, // ins_if_acmpeq_w
     ins_if_ascmpne_w, // ins_if_acmpne_w
     ins_if_ascmpeq_w, // ins_if_scmpeq_w
@@ -991,6 +992,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_getfield_abs_this, // getfield_a_this
     ins_getfield_abs_this, // getfield_b_this
     ins_getfield_abs_this, // getfield_s_this
+    // 0xb0
     ins_invalid,
     ins_putfield_abs_w, // putfield_a_w
     ins_putfield_abs_w, // putfield_b_w
@@ -1069,6 +1071,6 @@ void (*opcodes[256])(frame_t *) = {
     ins_invalid,
     ins_invalid,
     ins_invalid,
-    ins_invalid,
-    ins_invalid,
+    ins_invalid, // impdep
+    ins_invalid, // impdep2
 };
