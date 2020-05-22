@@ -9,18 +9,13 @@
 
 package_t current_package;
 
+u1 bytecode_buffer[TOTAL_FRAMES][16];
+
 typedef struct __attribute__((__packed__)) {
   u1 tag;
   u2 size;
   u1 count;
 } applet_component_compat_header;
-
-bool step(void) {
-  u1 opcode = bytecode_read_u1();
-  if (opcode == 0)
-    return false;
-  return true;
-}
 
 int vm_set_current_package(char *aid) {
   size_t len = strlen(aid);
@@ -100,6 +95,9 @@ int vm_install_applet(u1 *target_aid, u2 length) {
         return VM_ERR_UNKNOWN;
       DBG_MSG("Method flags:%x max_stack:%d nargs:%d max_locals:%d\n",
               header.flags, header.max_locals, header.nargs, header.max_locals);
+      // bytecode offset
+      bytecode_set_method(install_method_offset + 2);
+      run();
       return VM_ERR_OK;
     } else {
       // skip

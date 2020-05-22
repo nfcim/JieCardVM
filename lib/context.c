@@ -399,7 +399,7 @@ int context_resolve_static_method(package_t *pkg, u2 index,
     // TODO: external package
     return CONTEXT_ERR_OK;
   } else {
-    return context_read_method(pkg, bytecode->base, 0, MAX_BYTECODE_INDEX);
+    return context_read_method(pkg, bytecode->method.buffer, 0, BYTECODE_WINDOW_SIZE);
   }
 }
 

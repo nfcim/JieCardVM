@@ -18,7 +18,7 @@ static void init() {
   frame.operand_stack.base = operands;
   frame.operand_stack.index = 0;
   frame.variable_table.base = vt;
-  bytecode_set(bytecodes);
+  bytecode_set_buffer(bytecodes);
 
   memset(&cfg, 0, sizeof(cfg));
   cfg.context = &bd;

@@ -474,6 +474,7 @@ void ins_invokevirtual(frame_t *f) {
 
 void ins_invokespecial(frame_t *f) {
   // TODO
+  u2 index = bytecode_read_u2();
 }
 
 void ins_invokestatic(frame_t *f) {
@@ -486,6 +487,7 @@ void ins_invokeinterface(frame_t *f) {
 
 void ins_new(frame_t *f) {
   // TODO
+  u2 index = bytecode_read_u2();
 }
 
 void ins_newarray(frame_t *f) {
@@ -681,6 +683,7 @@ void ins_putfield_abs_this(frame_t *f) {
 }
 
 void (*opcodes[256])(frame_t *) = {
+    // 0x00
     ins_nop,
     ins_aconst_null,
     ins_sconst_m1,
@@ -697,6 +700,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_invalid,
     ins_invalid,
     ins_invalid,
+    // 0x10
     ins_bspush,
     ins_sspush,
     ins_invalid,
@@ -713,6 +717,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_asload_1, // sload_1
     ins_asload_2, // sload_2
     ins_asload_3, // sload_3
+    // 0x20
     ins_invalid,
     ins_invalid,
     ins_invalid,
@@ -728,6 +733,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_asstore_1, // astore_1
     ins_asstore_2, // astore_2
     ins_asstore_3, // astore_3
+    // 0x30
     ins_asstore_0, // sstore_0
     ins_asstore_1, // sstore_1
     ins_asstore_2, // sstore_2
@@ -745,6 +751,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_dup,
     ins_dup2,
     ins_dup_x,
+    // 0x40
     ins_swap_x,
     ins_sadd,
     ins_invalid,
@@ -761,6 +768,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_sshl,
     ins_invalid,
     ins_sshr,
+    // 0x50
     ins_invalid,
     ins_sushr,
     ins_invalid,
@@ -777,6 +785,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_invalid,
     ins_invalid,
     ins_invalid,
+    // 0x60
     ins_ifeq,
     ins_ifne,
     ins_iflt,
@@ -793,6 +802,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_if_scmpge,
     ins_if_scmpgt,
     ins_if_scmple,
+    // 0x70
     ins_goto,
     ins_jsr,
     ins_ret,
@@ -809,6 +819,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_getstatic_abs, // getstatic_s
     ins_invalid,
     ins_putstatic_abs, // putstatic_a
+    // 0x80
     ins_putstatic_abs, // putstatic_b
     ins_putstatic_abs, // putstatic_s
     ins_invalid,
@@ -825,6 +836,7 @@ void (*opcodes[256])(frame_t *) = {
     ins_invokestatic,
     ins_invokeinterface,
     ins_new,
+    // 0x90
     ins_newarray,
     ins_anewarray,
     ins_arraylength,

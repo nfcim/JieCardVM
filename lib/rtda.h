@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#define MAX_BYTECODE_INDEX 512
+#define BYTECODE_WINDOW_SIZE 16
 #define TOTAL_FRAMES 100
 
 typedef struct {
@@ -30,7 +30,19 @@ typedef struct {
 } frame_t;
 
 typedef struct {
-  u1 *base;
+  u1 is_external;
+  union {
+    // read bytecode from Method.cap
+    // a sliding window of Method.cap
+    struct {
+      u1 buffer[BYTECODE_WINDOW_SIZE];
+      u2 method_offset; // offset of buffer in Method.cap
+    } method;
+    // read bytecode from external buffer
+    struct {
+      u1 *buffer;
+    } external;
+  };
   u2 index;
 } bytecode_t;
 
@@ -50,7 +62,15 @@ u2 bytecode_read_u2(void);
 
 void bytecode_jump_offset(int16_t offset);
 
-void bytecode_set(u1 *base);
+/**
+ * Use bytecode from Method.cap
+ */
+void bytecode_set_method(u2 method_offset);
+
+/**
+ * Use bytecode from buffer
+ */
+void bytecode_set_buffer(u1 *bytecode);
 
 u2 _bytecode_get_index(void);
 
@@ -61,6 +81,8 @@ void constant_pool_set(u2 index, u2 val);
 jshort object_data_get(jshort objRef, jshort index);
 
 void object_data_set(jshort objRef, jshort index, jshort value);
+
+void run();
 
 #ifdef __cplusplus
 };
