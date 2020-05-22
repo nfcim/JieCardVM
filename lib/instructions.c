@@ -5,64 +5,85 @@
 #include "instructions.h"
 #include "rtda.h"
 
-void ins_invalid(frame_t *f) {}
+void ins_invalid(frame_t *f) { assert(false); }
 
 void ins_nop(frame_t *f) {}
 
+// 0x01
 void ins_aconst_null(frame_t *f) {
   operand_stack_push(&f->operand_stack, JNULL);
 }
 
+// 0x02
 void ins_sconst_m1(frame_t *f) { operand_stack_push(&f->operand_stack, -1); }
 
+// 0x03
 void ins_sconst_0(frame_t *f) { operand_stack_push(&f->operand_stack, 0); }
 
+// 0x04
 void ins_sconst_1(frame_t *f) { operand_stack_push(&f->operand_stack, 1); }
 
+// 0x05
 void ins_sconst_2(frame_t *f) { operand_stack_push(&f->operand_stack, 2); }
 
+// 0x06
 void ins_sconst_3(frame_t *f) { operand_stack_push(&f->operand_stack, 3); }
 
+// 0x07
 void ins_sconst_4(frame_t *f) { operand_stack_push(&f->operand_stack, 4); }
 
+// 0x08
 void ins_sconst_5(frame_t *f) { operand_stack_push(&f->operand_stack, 5); }
 
+// 0x10 push byte
 void ins_bspush(frame_t *f) {
   jbyte v = bytecode_read_u1();
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x11 push short
 void ins_sspush(frame_t *f) {
   jshort v = bytecode_read_u2();
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x15 Load reference from local variable
+// 0x16 Load short from local variable
 void ins_asload(frame_t *f) {
   u1 index = bytecode_read_u1();
   jshort v = variable_table_get(&f->variable_table, index);
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x18 Load reference from local variable
+// 0x1c Load short from local variable
 void ins_asload_0(frame_t *f) {
   jshort v = variable_table_get(&f->variable_table, 0);
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x19 Load reference from local variable
+// 0x1d Load short from local variable
 void ins_asload_1(frame_t *f) {
   jshort v = variable_table_get(&f->variable_table, 1);
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x1a Load reference from local variable
+// 0x1e Load short from local variable
 void ins_asload_2(frame_t *f) {
   jshort v = variable_table_get(&f->variable_table, 2);
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x1b Load reference from local variable
+// 0x1f Load short from local variable
 void ins_asload_3(frame_t *f) {
   jshort v = variable_table_get(&f->variable_table, 3);
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x24 Load reference from array
 void ins_aaload(frame_t *f) {
   jshort index = operand_stack_pop(&f->operand_stack);
   jshort ref = operand_stack_pop(&f->operand_stack);
@@ -71,6 +92,7 @@ void ins_aaload(frame_t *f) {
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x25 Load byte or boolean from array
 void ins_baload(frame_t *f) {
   jshort index = operand_stack_pop(&f->operand_stack);
   jshort ref = operand_stack_pop(&f->operand_stack);
@@ -79,6 +101,7 @@ void ins_baload(frame_t *f) {
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x26 Load short from array
 void ins_saload(frame_t *f) {
   jshort index = operand_stack_pop(&f->operand_stack);
   jshort ref = operand_stack_pop(&f->operand_stack);
@@ -87,32 +110,43 @@ void ins_saload(frame_t *f) {
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x28 Store reference into local variable
+// 0x29 Store short into local variable
 void ins_asstore(frame_t *f) {
   u1 index = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
   variable_table_set(&f->variable_table, index, v);
 }
 
+// 0x2b Store reference into local variable
+// 0x2f Store short into local variable
 void ins_asstore_0(frame_t *f) {
   jshort v = operand_stack_pop(&f->operand_stack);
   variable_table_set(&f->variable_table, 0, v);
 }
 
+// 0x2c Store reference into local variable
+// 0x30 Store short into local variable
 void ins_asstore_1(frame_t *f) {
   jshort v = operand_stack_pop(&f->operand_stack);
   variable_table_set(&f->variable_table, 1, v);
 }
 
+// 0x2d Store reference into local variable
+// 0x31 Store short into local variable
 void ins_asstore_2(frame_t *f) {
   jshort v = operand_stack_pop(&f->operand_stack);
   variable_table_set(&f->variable_table, 2, v);
 }
 
+// 0x2e Store reference into local variable
+// 0x32 Store short into local variable
 void ins_asstore_3(frame_t *f) {
   jshort v = operand_stack_pop(&f->operand_stack);
   variable_table_set(&f->variable_table, 3, v);
 }
 
+// 0x37 Store into reference array or reference array view
 void ins_aastore(frame_t *f) {
   jshort v = operand_stack_pop(&f->operand_stack);
   jshort index = operand_stack_pop(&f->operand_stack);
@@ -120,6 +154,7 @@ void ins_aastore(frame_t *f) {
   context_write_array(&current_package, ref, ARRAY_T_REFERENCE, index, v);
 }
 
+// 0x38 Store into byte or boolean array
 void ins_bastore(frame_t *f) {
   jbyte v = operand_stack_pop(&f->operand_stack);
   jshort index = operand_stack_pop(&f->operand_stack);
@@ -127,6 +162,7 @@ void ins_bastore(frame_t *f) {
   context_write_array(&current_package, ref, ARRAY_T_BYTE, index, v);
 }
 
+// 0x39 Store into short array
 void ins_sastore(frame_t *f) {
   jshort v = operand_stack_pop(&f->operand_stack);
   jshort index = operand_stack_pop(&f->operand_stack);
@@ -134,18 +170,22 @@ void ins_sastore(frame_t *f) {
   context_write_array(&current_package, ref, ARRAY_T_SHORT, index, v);
 }
 
+// 0x3b Pop top operand stack word
 void ins_pop(frame_t *f) { operand_stack_pop(&f->operand_stack); }
 
+// 0x3c Pop top two operand stack words
 void ins_pop2(frame_t *f) {
   operand_stack_pop(&f->operand_stack);
   operand_stack_pop(&f->operand_stack);
 }
 
+// 0x3d Duplicate top operand stack word
 void ins_dup(frame_t *f) {
   jshort v = operand_stack_get(&f->operand_stack);
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x3e Duplicate top two operand stack words
 void ins_dup2(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_get(&f->operand_stack);
@@ -154,6 +194,7 @@ void ins_dup2(frame_t *f) {
   operand_stack_push(&f->operand_stack, v2);
 }
 
+// 0x3f Duplicate top operand stack words and insert below
 void ins_dup_x(frame_t *f) {
   // TODO: check m & n
   u1 mn = bytecode_read_u1();
@@ -166,6 +207,7 @@ void ins_dup_x(frame_t *f) {
   f->operand_stack.index += m;
 }
 
+// 0x40 Swap top two operand stack words
 void ins_swap_x(frame_t *f) {
   // TODO: check m & n
   u1 buf[2];
@@ -178,6 +220,7 @@ void ins_swap_x(frame_t *f) {
   memcpy(f->operand_stack.base + f->operand_stack.index - n - m, buf, m * 2);
 }
 
+// 0x41 Add short
 void ins_sadd(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
@@ -185,6 +228,7 @@ void ins_sadd(frame_t *f) {
   operand_stack_push(&f->operand_stack, result);
 }
 
+// 0x43 Subtract short
 void ins_ssub(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
@@ -192,6 +236,7 @@ void ins_ssub(frame_t *f) {
   operand_stack_push(&f->operand_stack, result);
 }
 
+// 0x45 Multiply short
 void ins_smul(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
@@ -199,6 +244,7 @@ void ins_smul(frame_t *f) {
   operand_stack_push(&f->operand_stack, result);
 }
 
+// 0x47 Divide short
 void ins_sdiv(frame_t *f) {
   // TODO: divisor is 0
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -207,6 +253,7 @@ void ins_sdiv(frame_t *f) {
   operand_stack_push(&f->operand_stack, result);
 }
 
+// 0x49 Remainder short
 void ins_srem(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
@@ -214,11 +261,13 @@ void ins_srem(frame_t *f) {
   operand_stack_push(&f->operand_stack, result);
 }
 
+// 0x4b Negative short
 void ins_sneg(frame_t *f) {
   jshort v = operand_stack_pop(&f->operand_stack);
   operand_stack_push(&f->operand_stack, -v);
 }
 
+// 0x4d Shift left short
 void ins_sshl(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
@@ -226,6 +275,7 @@ void ins_sshl(frame_t *f) {
   operand_stack_push(&f->operand_stack, v1 << v2);
 }
 
+// 0x4f Arithmetic shift right short
 void ins_sshr(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
@@ -233,6 +283,7 @@ void ins_sshr(frame_t *f) {
   operand_stack_push(&f->operand_stack, v1 >> v2);
 }
 
+// 0x51 Logical shift right short
 void ins_sushr(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
@@ -240,24 +291,28 @@ void ins_sushr(frame_t *f) {
   operand_stack_push(&f->operand_stack, (u2)v1 >> v2);
 }
 
+// 0x53 Boolean AND short
 void ins_sand(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
   operand_stack_push(&f->operand_stack, v1 & v2);
 }
 
+// 0x55 Boolean OR short
 void ins_sor(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
   operand_stack_push(&f->operand_stack, v1 | v2);
 }
 
+// 0x57 Boolean XOR short
 void ins_sxor(frame_t *f) {
   jshort v2 = operand_stack_pop(&f->operand_stack);
   jshort v1 = operand_stack_pop(&f->operand_stack);
   operand_stack_push(&f->operand_stack, v1 ^ v2);
 }
 
+// 0x59 Increment local short variable by constant
 void ins_sinc(frame_t *f) {
   u1 index = bytecode_read_u1();
   jbyte v = bytecode_read_u1();
@@ -265,11 +320,13 @@ void ins_sinc(frame_t *f) {
   variable_table_set(&f->variable_table, index, var + v);
 }
 
+// 0x5b Convert short to byte
 void ins_s2b(frame_t *f) {
   jshort v = operand_stack_pop(&f->operand_stack);
   operand_stack_push(&f->operand_stack, (jbyte)v);
 }
 
+// 0x60 Branch if short comparison with zero succeeds
 void ins_ifeq(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -278,6 +335,7 @@ void ins_ifeq(frame_t *f) {
   }
 }
 
+// 0x61 Branch if short comparison with zero succeeds
 void ins_ifne(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -286,6 +344,7 @@ void ins_ifne(frame_t *f) {
   }
 }
 
+// 0x62 Branch if short comparison with zero succeeds
 void ins_iflt(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -294,6 +353,7 @@ void ins_iflt(frame_t *f) {
   }
 }
 
+// 0x63 Branch if short comparison with zero succeeds
 void ins_ifge(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -302,6 +362,7 @@ void ins_ifge(frame_t *f) {
   }
 }
 
+// 0x64 Branch if short comparison with zero succeeds
 void ins_ifgt(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -310,6 +371,7 @@ void ins_ifgt(frame_t *f) {
   }
 }
 
+// 0x65 Branch if short comparison with zero succeeds
 void ins_ifle(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -318,6 +380,7 @@ void ins_ifle(frame_t *f) {
   }
 }
 
+// 0x64 Branch if short comparison with zero succeeds
 void ins_ifnull(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   u2 v = operand_stack_pop(&f->operand_stack);
@@ -326,6 +389,7 @@ void ins_ifnull(frame_t *f) {
   }
 }
 
+// 0x66 Branch if reference is null
 void ins_ifnonnull(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   u2 v = (u2)operand_stack_pop(&f->operand_stack);
@@ -334,6 +398,8 @@ void ins_ifnonnull(frame_t *f) {
   }
 }
 
+// 0x68 Branch if reference comparison succeeds
+// 0x6a Branch if short comparison succeeds
 void ins_if_ascmpeq(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v2 = (u2)operand_stack_pop(&f->operand_stack);
@@ -343,6 +409,8 @@ void ins_if_ascmpeq(frame_t *f) {
   }
 }
 
+// 0x69 Branch if reference comparison succeeds
+// 0x6b Branch if short comparison succeeds
 void ins_if_ascmpne(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v2 = (u2)operand_stack_pop(&f->operand_stack);
@@ -352,6 +420,7 @@ void ins_if_ascmpne(frame_t *f) {
   }
 }
 
+// 0x6c Branch if short comparison succeeds
 void ins_if_scmplt(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -361,6 +430,7 @@ void ins_if_scmplt(frame_t *f) {
   }
 }
 
+// 0x6d Branch if short comparison succeeds
 void ins_if_scmpge(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -370,6 +440,7 @@ void ins_if_scmpge(frame_t *f) {
   }
 }
 
+// 0x6e Branch if short comparison succeeds
 void ins_if_scmpgt(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -379,6 +450,7 @@ void ins_if_scmpgt(frame_t *f) {
   }
 }
 
+// 0x6f Branch if short comparison succeeds
 void ins_if_scmple(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -388,19 +460,23 @@ void ins_if_scmple(frame_t *f) {
   }
 }
 
+// 0x70 Branch always
 void ins_goto(frame_t *f) {
   jbyte branch = bytecode_read_u1();
   bytecode_jump_offset(branch - 1);
 }
 
+// 0x71 Jump subroutine
 void ins_jsr(frame_t *f) {
   // TODO
 }
 
+// 0x72 Return from subroutine
 void ins_ret(frame_t *f) {
   // TODO
 }
 
+// 0x73 Access jump table by short index and jump
 void ins_stableswitch(frame_t *f) {
   jshort index = operand_stack_pop(&f->operand_stack);
   jshort defaultVal = bytecode_read_u2();
@@ -415,6 +491,7 @@ void ins_stableswitch(frame_t *f) {
   }
 }
 
+// 0x75 Access jump table by key match and jump
 void ins_slookupswitch(frame_t *f) {
   jshort key = operand_stack_pop(&f->operand_stack);
   jshort defaultVal = bytecode_read_u2();
@@ -430,14 +507,17 @@ void ins_slookupswitch(frame_t *f) {
   bytecode_jump_offset(defaultVal - 4 - 4 * nPairs);
 }
 
+// 0x77 Return reference from method
 void ins_areturn(frame_t *f) {
   // TODO
 }
 
+// 0x78 Return short from method
 void ins_sreturn(frame_t *f) {
   // TODO
 }
 
+// 0x77 Return void from method
 void ins_return(frame_t *f) {
   // TODO
   // returning from root frame
@@ -446,18 +526,21 @@ void ins_return(frame_t *f) {
   }
 }
 
+// 0x7b/0x7c/0x7d Get static field from class
 void ins_getstatic_abs(frame_t *f) {
   u2 index = bytecode_read_u2();
   jshort v = constant_pool_get(index);
   operand_stack_push(&f->operand_stack, v);
 }
 
+// 0x7f/0x80/0x81 Set static field from class
 void ins_putstatic_abs(frame_t *f) {
   u2 index = bytecode_read_u2();
   jshort v = operand_stack_pop(&f->operand_stack);
   constant_pool_set(index, v);
 }
 
+// 0x83/0x84/0x85 Fetch field from object
 void ins_getfield_abs(frame_t *f) {
   u1 index = bytecode_read_u1();
   jshort objRef = operand_stack_pop(&f->operand_stack);
@@ -465,6 +548,7 @@ void ins_getfield_abs(frame_t *f) {
   operand_stack_push(&f->operand_stack, value);
 }
 
+// 0x87/0x88/0x89 Set field in object
 void ins_putfield_abs(frame_t *f) {
   u1 index = bytecode_read_u1();
   jshort value = operand_stack_pop(&f->operand_stack);
@@ -472,28 +556,35 @@ void ins_putfield_abs(frame_t *f) {
   object_data_set(objRef, index, value);
 }
 
+// 0x8b Invoke instance method, dispatch based on class
 void ins_invokevirtual(frame_t *f) {
   // TODO
 }
 
+// 0x8c Invoke instance method; special handling for superclass, private and
+// instance initialization method invocations
 void ins_invokespecial(frame_t *f) {
   // TODO
   u2 index = bytecode_read_u2();
 }
 
+// 0x8d Invoke a class (static) method
 void ins_invokestatic(frame_t *f) {
   // TODO
 }
 
+// 0x8e Invoke interface method
 void ins_invokeinterface(frame_t *f) {
   // TODO
 }
 
+// 0x8f Create new object
 void ins_new(frame_t *f) {
   // TODO
   u2 index = bytecode_read_u2();
 }
 
+// 0x90 Create new array
 void ins_newarray(frame_t *f) {
   u1 atype = bytecode_read_u1();
   jshort count = operand_stack_pop(&f->operand_stack);
@@ -505,10 +596,12 @@ void ins_newarray(frame_t *f) {
   }
 }
 
+// 0x91 Create new array of reference
 void ins_anewarray(frame_t *f) {
   // TODO
 }
 
+// 0x92 Get length of array
 void ins_arraylength(frame_t *f) {
   jshort ref = operand_stack_pop(&f->operand_stack);
   array_metadata_t metadata;
@@ -516,18 +609,22 @@ void ins_arraylength(frame_t *f) {
   operand_stack_push(&f->operand_stack, metadata.length);
 }
 
+// 0x93 Throw exception or error
 void ins_athrow(frame_t *f) {
   // TODO
 }
 
+// 0x94 Check whether objects is of given type
 void ins_checkcast(frame_t *f) {
   // TODO
 }
 
+// 0x95 Determine if object is of given type
 void ins_instanceof(frame_t *f) {
   // TODO
 }
 
+// 0x96 Increment local short variable by constant
 void ins_sinc_w(frame_t *f) {
   u1 index = bytecode_read_u1();
   jshort v = bytecode_read_u2();
@@ -535,6 +632,7 @@ void ins_sinc_w(frame_t *f) {
   variable_table_set(&f->variable_table, index, var + v);
 }
 
+// 0x98 Branch if short comparison with zero succeeds (wide index)
 void ins_ifeq_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -543,6 +641,7 @@ void ins_ifeq_w(frame_t *f) {
   }
 }
 
+// 0x99 Branch if short comparison with zero succeeds (wide index)
 void ins_ifne_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -551,6 +650,7 @@ void ins_ifne_w(frame_t *f) {
   }
 }
 
+// 0x9a Branch if short comparison with zero succeeds (wide index)
 void ins_iflt_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -559,6 +659,7 @@ void ins_iflt_w(frame_t *f) {
   }
 }
 
+// 0x9b Branch if short comparison with zero succeeds (wide index)
 void ins_ifge_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -567,6 +668,7 @@ void ins_ifge_w(frame_t *f) {
   }
 }
 
+// 0x9c Branch if short comparison with zero succeeds (wide index)
 void ins_ifgt_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -575,6 +677,7 @@ void ins_ifgt_w(frame_t *f) {
   }
 }
 
+// 0x9d Branch if short comparison with zero succeeds (wide index)
 void ins_ifle_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v = operand_stack_pop(&f->operand_stack);
@@ -583,6 +686,7 @@ void ins_ifle_w(frame_t *f) {
   }
 }
 
+// 0x9e Branch if reference is null (wide index)
 void ins_ifnull_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   u2 v = operand_stack_pop(&f->operand_stack);
@@ -591,6 +695,7 @@ void ins_ifnull_w(frame_t *f) {
   }
 }
 
+// 0x9f Branch if reference is null (wide index)
 void ins_ifnonnull_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   u2 v = (u2)operand_stack_pop(&f->operand_stack);
@@ -599,6 +704,8 @@ void ins_ifnonnull_w(frame_t *f) {
   }
 }
 
+// 0xa0 Branch if reference comparison succeeds (wide index)
+// 0xa2 Branch if short comparison succeeds (wide index)
 void ins_if_ascmpeq_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v2 = (u2)operand_stack_pop(&f->operand_stack);
@@ -608,6 +715,8 @@ void ins_if_ascmpeq_w(frame_t *f) {
   }
 }
 
+// 0xa1 Branch if reference comparison succeeds (wide index)
+// 0xa3 Branch if short comparison succeeds (wide index)
 void ins_if_ascmpne_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v2 = (u2)operand_stack_pop(&f->operand_stack);
@@ -617,6 +726,7 @@ void ins_if_ascmpne_w(frame_t *f) {
   }
 }
 
+// 0xa4 Branch if short comparison succeeds (wide index)
 void ins_if_scmplt_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -626,6 +736,7 @@ void ins_if_scmplt_w(frame_t *f) {
   }
 }
 
+// 0xa5 Branch if short comparison succeeds (wide index)
 void ins_if_scmpge_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -635,6 +746,7 @@ void ins_if_scmpge_w(frame_t *f) {
   }
 }
 
+// 0xa6 Branch if short comparison succeeds (wide index)
 void ins_if_scmpgt_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -644,6 +756,7 @@ void ins_if_scmpgt_w(frame_t *f) {
   }
 }
 
+// 0xa7 Branch if short comparison succeeds (wide index)
 void ins_if_scmple_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   jshort v2 = operand_stack_pop(&f->operand_stack);
@@ -653,11 +766,13 @@ void ins_if_scmple_w(frame_t *f) {
   }
 }
 
+// 0xa8 Branch always (wide index)
 void ins_goto_w(frame_t *f) {
   jshort branch = bytecode_read_u2();
   bytecode_jump_offset(branch - 2);
 }
 
+// 0xa9/0xaa/0xab Fetch field from object (wide index)
 void ins_getfield_abs_w(frame_t *f) {
   u2 index = bytecode_read_u2();
   jshort objRef = operand_stack_pop(&f->operand_stack);
@@ -665,6 +780,7 @@ void ins_getfield_abs_w(frame_t *f) {
   operand_stack_push(&f->operand_stack, value);
 }
 
+// 0xad/0xae/0xaf Fetch field from current object
 void ins_getfield_abs_this(frame_t *f) {
   u1 index = bytecode_read_u1();
   jshort objRef = variable_table_get(&f->variable_table, 0);
@@ -672,6 +788,7 @@ void ins_getfield_abs_this(frame_t *f) {
   operand_stack_push(&f->operand_stack, value);
 }
 
+// 0xb1/0xb2/0xb3 Set field in object (wide index)
 void ins_putfield_abs_w(frame_t *f) {
   u2 index = bytecode_read_u2();
   jshort value = operand_stack_pop(&f->operand_stack);
@@ -679,6 +796,7 @@ void ins_putfield_abs_w(frame_t *f) {
   object_data_set(objRef, index, value);
 }
 
+// 0xb5/0xb6/0xb7 Set field in current object
 void ins_putfield_abs_this(frame_t *f) {
   u1 index = bytecode_read_u1();
   jshort value = operand_stack_pop(&f->operand_stack);

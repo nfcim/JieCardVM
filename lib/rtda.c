@@ -6,6 +6,8 @@
 
 static bytecode_t bytecode;
 static frame_t frames[TOTAL_FRAMES];
+static u2 stack_buffer[128];
+static jshort variable_buffer[128];
 int current_frame;
 int running;
 
@@ -78,7 +80,7 @@ void run() {
   running = 1;
   while (running) {
     u1 opcode = bytecode_read_u1();
-    DBG_MSG("Opcode %02x\n", opcode);
+    DBG_MSG("Frame %d Opcode %02x\n", current_frame, opcode);
     opcodes[opcode](&frames[current_frame]);
   }
 }
@@ -94,7 +96,15 @@ int init_frame(u2 method_offset) {
     return res;
   DBG_MSG("Method flags:%x max_stack:%d nargs:%d max_locals:%d\n", header.flags,
           header.max_locals, header.nargs, header.max_locals);
+
   // bytecode offset
   bytecode_set_method(method_offset + 2);
+
+  // set frame info
+  frames[0].operand_stack.max_stack = header.max_stack;
+  frames[0].operand_stack.base = stack_buffer;
+  frames[0].operand_stack.index = 0;
+  frames[0].variable_table.max_locals = header.max_locals;
+  frames[0].variable_table.base = variable_buffer;
   return 0;
 }
