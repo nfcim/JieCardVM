@@ -89,6 +89,7 @@ typedef struct __attribute__((__packed__)) {
     instance_field_ref instance_field;
     virtual_method_ref virtual_method;
     super_method_ref super_method;
+    // both static field and static method
     static_ref static_elem;
   };
 } cp_info;

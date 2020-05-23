@@ -284,11 +284,13 @@ int context_read_constant(package_t *pkg, u2 index, u1 *info, u2 length) {
     return CONTEXT_ERR_UNKNOWN;
 
   u4 file_size = lfs_file_size(&g_lfs, &f);
-  if (index * sizeof(u4) >= file_size)
+  u4 header_length = 5;
+  if (index * sizeof(cp_info) + header_length >= file_size)
     return CONTEXT_ERR_NOENT;
 
   // seek to index
-  err = lfs_file_seek(&g_lfs, &f, index * sizeof(cp_info), LFS_SEEK_CUR);
+  err = lfs_file_seek(&g_lfs, &f, index * sizeof(cp_info) + header_length,
+                      LFS_SEEK_CUR);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
@@ -399,7 +401,8 @@ int context_resolve_static_method(package_t *pkg, u2 index,
     // TODO: external package
     return CONTEXT_ERR_OK;
   } else {
-    return context_read_method(pkg, bytecode->method.buffer, 0, BYTECODE_WINDOW_SIZE);
+    return context_read_method(pkg, bytecode->method.buffer, 0,
+                               BYTECODE_WINDOW_SIZE);
   }
 }
 

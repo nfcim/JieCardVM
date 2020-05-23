@@ -26,7 +26,8 @@ typedef struct {
 typedef struct {
   operand_stack_t operand_stack;
   variable_table_t variable_table;
-  u2 method_offset;
+  u2 method_offset;   // method offset in Method.cap
+  u2 bytecode_offset; // bytecode offset in Method.cap
 } frame_t;
 
 typedef struct {
@@ -36,7 +37,7 @@ typedef struct {
     // a sliding window of Method.cap
     struct {
       u1 buffer[BYTECODE_WINDOW_SIZE];
-      u2 method_offset; // offset of buffer in Method.cap
+      u2 method_offset;   // offset of bytecode in Method.cap
     } method;
     // read bytecode from external buffer
     struct {
@@ -87,6 +88,13 @@ void bytecode_set_buffer(u1 *bytecode);
  * @param method_offset Method offset of root frame in Method.cap
  */
 int init_frame(u2 method_offset);
+
+/**
+ * Init a new frame on top
+ *
+ * @param method_offset Method offset of new frame in Method.cap
+ */
+int push_frame(u2 method_offset);
 
 u2 _bytecode_get_index(void);
 

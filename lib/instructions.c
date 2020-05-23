@@ -1,38 +1,41 @@
+#include <assert.h>
 #include <string.h>
 #include <vm.h>
 
 #include "context.h"
 #include "instructions.h"
 #include "rtda.h"
+#include "utils.h"
 
 void ins_invalid(frame_t *f) { assert(false); }
 
+// 0x00 Do nothing
 void ins_nop(frame_t *f) {}
 
-// 0x01
+// 0x01 Push null
 void ins_aconst_null(frame_t *f) {
   operand_stack_push(&f->operand_stack, JNULL);
 }
 
-// 0x02
+// 0x02 Push short constant
 void ins_sconst_m1(frame_t *f) { operand_stack_push(&f->operand_stack, -1); }
 
-// 0x03
+// 0x03 Push short constant
 void ins_sconst_0(frame_t *f) { operand_stack_push(&f->operand_stack, 0); }
 
-// 0x04
+// 0x04 Push short constant
 void ins_sconst_1(frame_t *f) { operand_stack_push(&f->operand_stack, 1); }
 
-// 0x05
+// 0x05 Push short constant
 void ins_sconst_2(frame_t *f) { operand_stack_push(&f->operand_stack, 2); }
 
-// 0x06
+// 0x06 Push short constant
 void ins_sconst_3(frame_t *f) { operand_stack_push(&f->operand_stack, 3); }
 
-// 0x07
+// 0x07 Push short constant
 void ins_sconst_4(frame_t *f) { operand_stack_push(&f->operand_stack, 4); }
 
-// 0x08
+// 0x08 Push short constant
 void ins_sconst_5(frame_t *f) { operand_stack_push(&f->operand_stack, 5); }
 
 // 0x10 push byte
@@ -523,6 +526,8 @@ void ins_return(frame_t *f) {
   // returning from root frame
   if (current_frame == 0) {
     running = 0;
+  } else {
+    pop_frame();
   }
 }
 
@@ -571,6 +576,16 @@ void ins_invokespecial(frame_t *f) {
 // 0x8d Invoke a class (static) method
 void ins_invokestatic(frame_t *f) {
   // TODO
+  u2 index = bytecode_read_u2();
+  DBG_MSG("Invoke static at %d\n", index);
+  cp_info cp;
+  context_read_constant(&current_package, index, (u1 *)&cp, sizeof(cp));
+  DBG_MSG("Constant type %d\n", cp.tag);
+  if (cp.tag == CONSTANT_STATIC_METHOD_REF) {
+    u2 offset = htobe16(cp.static_elem.internal_ref.offset);
+    DBG_MSG("Method offset %d\n", offset);
+    push_frame(offset);
+  }
 }
 
 // 0x8e Invoke interface method
@@ -806,28 +821,12 @@ void ins_putfield_abs_this(frame_t *f) {
 
 void (*opcodes[256])(frame_t *) = {
     // 0x00
-    ins_nop,
-    ins_aconst_null,
-    ins_sconst_m1,
-    ins_sconst_0,
-    ins_sconst_1,
-    ins_sconst_2,
-    ins_sconst_3,
-    ins_sconst_4,
-    ins_sconst_5,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
+    ins_nop, ins_aconst_null, ins_sconst_m1, ins_sconst_0, ins_sconst_1,
+    ins_sconst_2, ins_sconst_3, ins_sconst_4, ins_sconst_5, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
     ins_invalid,
     // 0x10
-    ins_bspush,
-    ins_sspush,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
+    ins_bspush, ins_sspush, ins_invalid, ins_invalid, ins_invalid,
     ins_asload, // aload
     ins_asload, // sload
     ins_invalid,
@@ -840,14 +839,8 @@ void (*opcodes[256])(frame_t *) = {
     ins_asload_2, // sload_2
     ins_asload_3, // sload_3
     // 0x20
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_aaload,
-    ins_baload,
-    ins_saload,
-    ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_aaload, ins_baload,
+    ins_saload, ins_invalid,
     ins_asstore, // astore
     ins_asstore, // sstore
     ins_invalid,
@@ -860,81 +853,28 @@ void (*opcodes[256])(frame_t *) = {
     ins_asstore_1, // sstore_1
     ins_asstore_2, // sstore_2
     ins_asstore_3, // sstore_3
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_aastore,
-    ins_bastore,
-    ins_sastore,
-    ins_invalid,
-    ins_pop,
-    ins_pop2,
-    ins_dup,
-    ins_dup2,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_aastore,
+    ins_bastore, ins_sastore, ins_invalid, ins_pop, ins_pop2, ins_dup, ins_dup2,
     ins_dup_x,
     // 0x40
-    ins_swap_x,
-    ins_sadd,
-    ins_invalid,
-    ins_ssub,
-    ins_invalid,
-    ins_smul,
-    ins_invalid,
-    ins_sdiv,
-    ins_invalid,
-    ins_srem,
-    ins_invalid,
-    ins_sneg,
-    ins_invalid,
-    ins_sshl,
-    ins_invalid,
-    ins_sshr,
+    ins_swap_x, ins_sadd, ins_invalid, ins_ssub, ins_invalid, ins_smul,
+    ins_invalid, ins_sdiv, ins_invalid, ins_srem, ins_invalid, ins_sneg,
+    ins_invalid, ins_sshl, ins_invalid, ins_sshr,
     // 0x50
-    ins_invalid,
-    ins_sushr,
-    ins_invalid,
-    ins_sand,
-    ins_invalid,
-    ins_sor,
-    ins_invalid,
-    ins_sxor,
-    ins_invalid,
-    ins_sinc,
-    ins_invalid,
-    ins_s2b,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
+    ins_invalid, ins_sushr, ins_invalid, ins_sand, ins_invalid, ins_sor,
+    ins_invalid, ins_sxor, ins_invalid, ins_sinc, ins_invalid, ins_s2b,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid,
     // 0x60
-    ins_ifeq,
-    ins_ifne,
-    ins_iflt,
-    ins_ifge,
-    ins_ifgt,
-    ins_ifle,
-    ins_ifnull,
+    ins_ifeq, ins_ifne, ins_iflt, ins_ifge, ins_ifgt, ins_ifle, ins_ifnull,
     ins_ifnonnull,
     ins_if_ascmpeq, // if_acmpeq
     ins_if_ascmpne, // if_acmpne
     ins_if_ascmpeq, // if_scmpeq
     ins_if_ascmpne, // if_scmpne
-    ins_if_scmplt,
-    ins_if_scmpge,
-    ins_if_scmpgt,
-    ins_if_scmple,
+    ins_if_scmplt, ins_if_scmpge, ins_if_scmpgt, ins_if_scmple,
     // 0x70
-    ins_goto,
-    ins_jsr,
-    ins_ret,
-    ins_stableswitch,
-    ins_invalid,
-    ins_slookupswitch,
-    ins_invalid,
-    ins_areturn,
-    ins_sreturn,
-    ins_invalid,
+    ins_goto, ins_jsr, ins_ret, ins_stableswitch, ins_invalid,
+    ins_slookupswitch, ins_invalid, ins_areturn, ins_sreturn, ins_invalid,
     ins_return,
     ins_getstatic_abs, // getstatic_a
     ins_getstatic_abs, // getstatic_b
@@ -952,38 +892,18 @@ void (*opcodes[256])(frame_t *) = {
     ins_putfield_abs, // putfield_a
     ins_putfield_abs, // putfield_b
     ins_putfield_abs, // putfield_s
-    ins_invalid,
-    ins_invokevirtual,
-    ins_invokespecial,
-    ins_invokestatic,
-    ins_invokeinterface,
-    ins_new,
+    ins_invalid, ins_invokevirtual, ins_invokespecial, ins_invokestatic,
+    ins_invokeinterface, ins_new,
     // 0x90
-    ins_newarray,
-    ins_anewarray,
-    ins_arraylength,
-    ins_athrow,
-    ins_checkcast,
-    ins_instanceof,
-    ins_sinc_w,
-    ins_invalid,
-    ins_ifeq_w,
-    ins_ifne_w,
-    ins_iflt_w,
-    ins_ifge_w,
-    ins_ifgt_w,
-    ins_ifle_w,
-    ins_ifnull_w,
-    ins_ifnonnull_w,
+    ins_newarray, ins_anewarray, ins_arraylength, ins_athrow, ins_checkcast,
+    ins_instanceof, ins_sinc_w, ins_invalid, ins_ifeq_w, ins_ifne_w, ins_iflt_w,
+    ins_ifge_w, ins_ifgt_w, ins_ifle_w, ins_ifnull_w, ins_ifnonnull_w,
     // 0xa0
     ins_if_ascmpeq_w, // ins_if_acmpeq_w
     ins_if_ascmpne_w, // ins_if_acmpne_w
     ins_if_ascmpeq_w, // ins_if_scmpeq_w
     ins_if_ascmpne_w, // ins_if_scmpne_w
-    ins_if_scmplt_w,
-    ins_if_scmpge_w,
-    ins_if_scmpgt_w,
-    ins_if_scmple_w,
+    ins_if_scmplt_w, ins_if_scmpge_w, ins_if_scmpgt_w, ins_if_scmple_w,
     ins_goto_w,
     ins_getfield_abs_w, // getfield_a_w
     ins_getfield_abs_w, // getfield_b_w
@@ -1001,76 +921,20 @@ void (*opcodes[256])(frame_t *) = {
     ins_putfield_abs_this, // putfield_a_this
     ins_putfield_abs_this, // putfield_b_this
     ins_putfield_abs_this, // putfield_s_this
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
-    ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
+    ins_invalid, ins_invalid, ins_invalid, ins_invalid, ins_invalid,
     ins_invalid, // impdep
     ins_invalid, // impdep2
 };

@@ -3,6 +3,7 @@
 #include "instructions.h"
 #include "utils.h"
 #include "vm.h"
+#include <assert.h>
 
 static bytecode_t bytecode;
 static frame_t frames[TOTAL_FRAMES];
@@ -79,15 +80,23 @@ void run() {
   current_frame = 0;
   running = 1;
   while (running) {
+    u2 pc = bytecode.method.method_offset + bytecode.index -
+            frames[current_frame].method_offset - 2;
     u1 opcode = bytecode_read_u1();
-    DBG_MSG("Frame %d Opcode %02x\n", current_frame, opcode);
+    DBG_MSG("Frame %d Opcode %02x pc %d\n", current_frame, opcode, pc);
     opcodes[opcode](&frames[current_frame]);
   }
 }
 
-int init_frame(u2 method_offset) {
-  current_frame = 0;
-  frames[0].method_offset = method_offset;
+int push_frame(u2 method_offset) {
+  if (current_frame >= 0) {
+    // save return address
+    frames[current_frame].bytecode_offset =
+        bytecode.method.method_offset + bytecode.index;
+  }
+
+  current_frame++;
+  frames[current_frame].method_offset = method_offset;
 
   method_header_info header;
   int res = context_read_method(&current_package, (u1 *)&header, method_offset,
@@ -101,10 +110,27 @@ int init_frame(u2 method_offset) {
   bytecode_set_method(method_offset + 2);
 
   // set frame info
-  frames[0].operand_stack.max_stack = header.max_stack;
-  frames[0].operand_stack.base = stack_buffer;
-  frames[0].operand_stack.index = 0;
-  frames[0].variable_table.max_locals = header.max_locals;
-  frames[0].variable_table.base = variable_buffer;
+  frames[current_frame].operand_stack.max_stack = header.max_stack;
+  frames[current_frame].operand_stack.base = stack_buffer;
+  frames[current_frame].operand_stack.index = 0;
+  frames[current_frame].variable_table.max_locals = header.max_locals;
+  frames[current_frame].variable_table.base = variable_buffer;
+  return 0;
+}
+
+int init_frame(u2 method_offset) {
+  current_frame = -1;
+  return push_frame(method_offset);
+}
+
+int pop_frame() {
+  assert(current_frame > 0);
+
+  current_frame--;
+
+  DBG_MSG("Return to frame %d\n", current_frame);
+
+  // bytecode offset
+  bytecode_set_method(frames[current_frame].bytecode_offset);
   return 0;
 }
