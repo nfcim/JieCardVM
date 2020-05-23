@@ -123,6 +123,8 @@ int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  // skip u1 tag, u2 size
+  offset += 3;
   err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_SET);
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;

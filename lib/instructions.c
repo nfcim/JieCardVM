@@ -517,12 +517,18 @@ void ins_areturn(frame_t *f) {
 
 // 0x78 Return short from method
 void ins_sreturn(frame_t *f) {
-  // TODO
+  // returning from root frame
+  if (current_frame == 0) {
+    running = 0;
+  } else {
+    u2 ret = operand_stack_pop(&f->operand_stack);
+    pop_frame();
+    operand_stack_push(&f->operand_stack, ret);
+  }
 }
 
 // 0x77 Return void from method
 void ins_return(frame_t *f) {
-  // TODO
   // returning from root frame
   if (current_frame == 0) {
     running = 0;

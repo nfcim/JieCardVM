@@ -85,7 +85,7 @@ int vm_install_applet(u1 *target_aid, u2 length) {
         return VM_ERR_UNKNOWN;
       install_method_offset = htobe16(install_method_offset);
       // u1 tag, u2 size
-      install_method_offset += 3;
+      install_method_offset;
       DBG_MSG("Install method is at %d\n", install_method_offset);
 
       init_frame(install_method_offset);
