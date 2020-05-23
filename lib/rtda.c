@@ -83,7 +83,8 @@ void run() {
     u2 pc = bytecode.method.method_offset + bytecode.index -
             frames[current_frame].method_offset - 2;
     u1 opcode = bytecode_read_u1();
-    DBG_MSG("Frame %d Opcode %02x pc %d\n", current_frame, opcode, pc);
+    DBG_MSG("Frame %d Opcode %02x pc %d stack %d\n", current_frame, opcode, pc,
+            frames[current_frame].operand_stack.index);
     opcodes[opcode](&frames[current_frame]);
   }
 }
@@ -123,7 +124,7 @@ int init_frame(u2 method_offset) {
   return push_frame(method_offset);
 }
 
-int pop_frame() {
+frame_t *pop_frame() {
   assert(current_frame > 0);
 
   current_frame--;
@@ -132,5 +133,5 @@ int pop_frame() {
 
   // bytecode offset
   bytecode_set_method(frames[current_frame].bytecode_offset);
-  return 0;
+  return &frames[current_frame];
 }

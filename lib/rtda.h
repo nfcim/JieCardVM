@@ -96,6 +96,13 @@ int init_frame(u2 method_offset);
  */
 int push_frame(u2 method_offset);
 
+/**
+ * Pop current frame
+ *
+ * @return Pointer to new frame
+ */
+frame_t *pop_frame();
+
 u2 _bytecode_get_index(void);
 
 u2 constant_pool_get(u2 index);

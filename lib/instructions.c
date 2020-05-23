@@ -162,6 +162,7 @@ void ins_bastore(frame_t *f) {
   jbyte v = operand_stack_pop(&f->operand_stack);
   jshort index = operand_stack_pop(&f->operand_stack);
   jshort ref = operand_stack_pop(&f->operand_stack);
+  DBG_MSG("Store byte array %d[%d] = %d\n", ref, index, v);
   context_write_array(&current_package, ref, ARRAY_T_BYTE, index, v);
 }
 
@@ -522,7 +523,7 @@ void ins_sreturn(frame_t *f) {
     running = 0;
   } else {
     u2 ret = operand_stack_pop(&f->operand_stack);
-    pop_frame();
+    f = pop_frame();
     operand_stack_push(&f->operand_stack, ret);
   }
 }
