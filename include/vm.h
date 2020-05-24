@@ -32,14 +32,6 @@ int vm_init(void);
 int vm_set_current_package(char *aid);
 
 /**
- * Execute a static method
- *
- * @param index Method index
- * @return VM_ERR_OK on success
- */
-int vm_execute_static_method(int index);
-
-/**
  * Load Method.cap
  *
  * @param data Content of Method.cap

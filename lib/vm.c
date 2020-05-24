@@ -27,8 +27,6 @@ int vm_set_current_package(char *aid) {
   return VM_ERR_OK;
 }
 
-int vm_execute_static_method(int index) { return 0; }
-
 int vm_init(void) { return 0; }
 
 int vm_load_method(u1 *data, u4 length) {

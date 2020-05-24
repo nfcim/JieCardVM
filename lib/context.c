@@ -395,36 +395,6 @@ int context_write_static_image(package_t *pkg, u2 offset, u1 size, u2 val) {
   return CONTEXT_ERR_OK;
 }
 
-int context_resolve_static_method(package_t *pkg, u2 index,
-                                  bytecode_t *bytecode) {
-  cp_info info;
-  // FIXME
-  int err = context_read_constant(pkg, index, (u1 *)&info, sizeof(cp_info));
-  if (err < 0 || info.tag != CONSTANT_STATIC_METHOD_REF)
-    return CONTEXT_ERR_UNKNOWN;
-  if (info.static_elem.external_ref.package_token > 0x7F) {
-    // TODO: external package
-    return CONTEXT_ERR_OK;
-  } else {
-    return context_read_method(pkg, bytecode->method.buffer, 0,
-                               BYTECODE_WINDOW_SIZE);
-  }
-}
-
-int context_resolve_static_field(package_t *pkg, u2 index, u1 size, u1 *val) {
-  cp_info info;
-  // FIXME
-  int err = context_read_constant(pkg, index, (u1 *)&info, sizeof(cp_info));
-  if (err < 0 || info.tag != CONSTANT_STATIC_FIELD_REF)
-    return CONTEXT_ERR_UNKNOWN;
-  if (info.static_elem.external_ref.package_token > 0x7F) {
-    return CONTEXT_ERR_OK;
-  } else {
-    return context_read_static_image(pkg, info.static_elem.internal_ref.offset,
-                                     size, val);
-  }
-}
-
 int context_write_applets(package_t *pkg, u1 *data, u2 length) {
   return context_write_general(pkg, data, length, "/a");
 }
