@@ -8,23 +8,23 @@
 static bytecode_t bytecode;
 static frame_t frames[TOTAL_FRAMES];
 static u2 stack_buffer[128];
-static jshort variable_buffer[128];
+static i2 variable_buffer[128];
 int current_frame;
 int running;
 
-jshort operand_stack_pop(operand_stack_t *s) { return s->base[--s->index]; }
+i2 operand_stack_pop(operand_stack_t *s) { return s->base[--s->index]; }
 
-void operand_stack_push(operand_stack_t *s, jshort val) {
+void operand_stack_push(operand_stack_t *s, i2 val) {
   s->base[s->index++] = val;
 }
 
-jshort operand_stack_get(operand_stack_t *s) { return s->base[s->index - 1]; }
+i2 operand_stack_get(operand_stack_t *s) { return s->base[s->index - 1]; }
 
-jshort variable_table_get(variable_table_t *t, u1 index) {
+i2 variable_table_get(variable_table_t *t, u1 index) {
   return t->base[index];
 }
 
-void variable_table_set(variable_table_t *t, u1 index, jshort val) {
+void variable_table_set(variable_table_t *t, u1 index, i2 val) {
   t->base[index] = val;
 }
 
@@ -72,9 +72,9 @@ u2 constant_pool_get(u2 index) { return 0; }
 
 void constant_pool_set(u2 index, u2 val) {}
 
-jshort object_data_get(jshort objRef, jshort index) { return 0; }
+i2 object_data_get(i2 objRef, i2 index) { return 0; }
 
-void object_data_set(jshort objRef, jshort index, jshort value) {}
+void object_data_set(i2 objRef, i2 index, i2 value) {}
 
 void run() {
   current_frame = 0;

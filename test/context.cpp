@@ -155,8 +155,8 @@ TEST_CASE("context_write_array", "[context]") {
 
 TEST_CASE("context_read_array", "[context]") {
   init();
-  jbyte b;
-  jshort s;
+  i1 b;
+  i2 s;
   int ret = context_read_array(&pkg, 1, ARRAY_T_BYTE, 1, (u1 *)&b);
   REQUIRE(ret == CONTEXT_ERR_OK);
   REQUIRE(b == 6);

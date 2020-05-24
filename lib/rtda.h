@@ -19,7 +19,7 @@ typedef struct {
 } operand_stack_t;
 
 typedef struct {
-  jshort *base; // base memory
+  i2 *base; // base memory
   u1 max_locals;
 } variable_table_t;
 
@@ -52,15 +52,15 @@ extern int current_frame;
 // whether vm is running
 extern int running;
 
-jshort operand_stack_pop(operand_stack_t *s);
+i2 operand_stack_pop(operand_stack_t *s);
 
-void operand_stack_push(operand_stack_t *s, jshort val);
+void operand_stack_push(operand_stack_t *s, i2 val);
 
-jshort operand_stack_get(operand_stack_t *s);
+i2 operand_stack_get(operand_stack_t *s);
 
-jshort variable_table_get(variable_table_t *t, u1 index);
+i2 variable_table_get(variable_table_t *t, u1 index);
 
-void variable_table_set(variable_table_t *t, u1 index, jshort val);
+void variable_table_set(variable_table_t *t, u1 index, i2 val);
 
 u1 bytecode_read_u1(void);
 
@@ -109,9 +109,9 @@ u2 constant_pool_get(u2 index);
 
 void constant_pool_set(u2 index, u2 val);
 
-jshort object_data_get(jshort objRef, jshort index);
+i2 object_data_get(i2 objRef, i2 index);
 
-void object_data_set(jshort objRef, jshort index, jshort value);
+void object_data_set(i2 objRef, i2 index, i2 value);
 
 void run();
 
