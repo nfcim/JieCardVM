@@ -141,6 +141,7 @@ int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
 }
 
 int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length) {
+  // get allocated array count
   u1 array_buffer[ARRAY_BUFFER_SIZE];
   int err = read_package_metadata(pkg);
   if (err < 0)
@@ -154,6 +155,7 @@ int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  // save array metadata
   array_metadata.type = type;
   array_metadata.class_ref = class_ref;
   array_metadata.length = length;
@@ -162,6 +164,7 @@ int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
+  // fill array content with zeros
   if (type == ARRAY_T_SHORT || type == ARRAY_T_REFERENCE)
     length *= 2;
   memset(array_buffer, 0, sizeof(array_buffer));

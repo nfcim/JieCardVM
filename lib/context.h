@@ -205,14 +205,42 @@ int context_read_applet(package_t *pkg, u1 *target, u2 offset, u2 length);
  * @param class_ref If the array is of type reference, the class_ref should be
  * provided
  * @param length Length of the array
- * @return Arrayref
+ * @return Array ref
  */
 int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length);
 
+/** 
+ * Read an element of array
+ * 
+ * @param pkg Package info
+ * @param ref Array ref
+ * @param type Element type
+ * @param index Index of element in array
+ * @param val Output buffer
+ * @return CONTEXT_ERR_OK on success
+*/
 int context_read_array(package_t *pkg, u2 ref, u1 type, u2 index, u1 *val);
 
+/** 
+ * Write an element of array
+ * 
+ * @param pkg Package info
+ * @param ref Array ref
+ * @param type Element type
+ * @param index Index of element in array
+ * @param val Element data
+ * @return CONTEXT_ERR_OK on success
+*/
 int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val);
 
+/** 
+ * Get the metadata of an array
+ * 
+ * @param pkg Package info
+ * @param ref Array ref
+ * @param metadata Metadata
+ * @return CONTEXT_ERR_OK on success
+*/
 int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata);
 
 int context_create_static_image(package_t *pkg, u1 *data, u2 length);
