@@ -27,3 +27,7 @@ Each CAP file corresponds to one context. And each CAP has its own AID, so all d
 ### Arrays
 
 Arrays are saved in files called `/AID/a%u`. Metadata is saved in file's attr.
+
+### Class objects
+
+Arrays are saved in files called `/AID/c%u`. Metadata is saved in file's attr.

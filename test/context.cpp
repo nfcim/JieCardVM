@@ -82,6 +82,18 @@ TEST_CASE("vm_load_applet", "[context]") {
   finalize();
 }
 
+TEST_CASE("vm_load_classes", "[context]") {
+  init();
+  u1 buffer[1024];
+  FILE *fp = fopen("test/Class.cap", "rb");
+  REQUIRE(fp != NULL);
+  u4 length = fread(buffer, 1, sizeof(buffer), fp);
+  int ret = vm_load_class(buffer, length);
+  REQUIRE(ret == 0);
+  fclose(fp);
+  finalize();
+}
+
 TEST_CASE("context_read_constant", "[context]") {
   init();
   u1 buffer[100];

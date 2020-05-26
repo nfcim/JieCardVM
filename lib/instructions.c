@@ -571,6 +571,8 @@ void ins_putfield_abs(frame_t *f) {
 // 0x8b Invoke instance method, dispatch based on class
 void ins_invokevirtual(frame_t *f) {
   // TODO
+  u2 index = bytecode_read_u2();
+  DBG_MSG("invokevirtual %d\n", index);
 }
 
 // 0x8c Invoke instance method; special handling for superclass, private and
@@ -578,6 +580,7 @@ void ins_invokevirtual(frame_t *f) {
 void ins_invokespecial(frame_t *f) {
   // TODO
   u2 index = bytecode_read_u2();
+  DBG_MSG("invokespecial %d\n", index);
 }
 
 // 0x8d Invoke a class (static) method
@@ -605,8 +608,10 @@ void ins_new(frame_t *f) {
   // TODO
   u2 index = bytecode_read_u2();
   cp_info info;
-  context_read_constant(&current_package, index, &info, sizeof(info));
-  DBG_MSG("info tag %d ref %d\n", info.tag, info.klass.internal_ref);
+  context_read_constant(&current_package, index, (u1 *)&info, sizeof(info));
+  u2 ref = htobe16(info.klass.internal_ref);
+  u2 res = context_create_object(&current_package, ref);
+  operand_stack_push(&f->operand_stack, res);
 }
 
 // 0x90 Create new array

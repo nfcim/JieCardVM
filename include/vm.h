@@ -59,6 +59,15 @@ int vm_load_constant_pool(u1 *data, u4 length);
 int vm_load_applet(u1 *data, u4 length);
 
 /**
+ * Load Class.cap
+ *
+ * @param data Content of Class.cap
+ * @param length Length of data
+ * @return VM_ERR_OK on success
+ */
+int vm_load_class(u1 *data, u4 length);
+
+/**
  * Run install(byte[],short,byte) method of the applet
  *
  * @param aid AID of applet in binary

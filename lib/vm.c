@@ -54,6 +54,13 @@ int vm_load_applet(u1 *data, u4 length) {
   return VM_ERR_OK;
 }
 
+int vm_load_class(u1 *data, u4 length) {
+  int res = context_write_classes(&current_package, data, length);
+  if (res < 0)
+    return VM_ERR_UNKNOWN;
+  return VM_ERR_OK;
+}
+
 int vm_install_applet(u1 *target_aid, u2 length) {
   u1 count;
   int res = context_read_applet(&current_package, &count, 0, sizeof(count));
@@ -83,7 +90,6 @@ int vm_install_applet(u1 *target_aid, u2 length) {
         return VM_ERR_UNKNOWN;
       install_method_offset = htobe16(install_method_offset);
       // u1 tag, u2 size
-      install_method_offset;
       DBG_MSG("Install method is at %d\n", install_method_offset);
 
       init_frame(install_method_offset);

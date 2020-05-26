@@ -72,6 +72,19 @@ typedef struct __attribute__((__packed__)) {
   };
 } static_ref;
 
+typedef struct __attribute__((__packed__)) {
+  u1 flags : 4;
+  u1 interface_count : 4;
+  class_ref super_class_ref;
+  u1 declared_instance_size;
+  u1 first_reference_token;
+  u1 reference_count;
+  u1 public_method_table_base;
+  u1 public_method_table_count;
+  u1 package_method_table_base;
+  u1 package_method_table_count;
+} class_info;
+
 #define CONSTANT_CLASS_REF 1
 #define CONSTANT_INSTANCE_FIELD_REF 2
 #define CONSTANT_VIRTUAL_METHOD_REF 3
@@ -242,6 +255,36 @@ int context_write_array(package_t *pkg, u2 ref, u1 type, u2 index, u2 val);
  * @return CONTEXT_ERR_OK on success
 */
 int context_array_meta(package_t *pkg, u2 ref, array_metadata_t *metadata);
+
+/**
+ * Write Class.cap into current package
+ *
+ * @param pkg Package info
+ * @param data Class info
+ * @param length Length of class info
+ * @return CONTEXT_ERR_OK on success
+ */
+int context_write_classes(package_t *pkg, u1 *data, u2 length);
+
+/**
+ * Read class info from current package
+ *
+ * @param pkg Applet info
+ * @param target Buffer to store class info
+ * @param offset Offset into Class.cap
+ * @param length Length to read
+ * @return bytes read
+ */
+int context_read_class(package_t *pkg, u1 *target, u2 offset, u2 length);
+
+/**
+ * Create an class object
+ *
+ * @param pkg Package info
+ * @param class_ref Class index in Class.cap
+ * @return Object ref
+ */
+int context_create_object(package_t *pkg, u2 class_index);
 
 int context_create_static_image(package_t *pkg, u1 *data, u2 length);
 

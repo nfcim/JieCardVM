@@ -407,3 +407,38 @@ int context_write_applets(package_t *pkg, u1 *data, u2 length) {
 int context_read_applet(package_t *pkg, u1 *target, u2 offset, u2 length) {
   return context_read_general(pkg, target, offset, length, "/a");
 }
+
+int context_write_classes(package_t *pkg, u1 *data, u2 length) {
+  return context_write_general(pkg, data, length, "/C");
+}
+
+int context_read_class(package_t *pkg, u1 *target, u2 offset, u2 length) {
+  return context_read_general(pkg, target, offset, length, "/C");
+}
+
+int context_create_object(package_t *pkg, u2 class_index) {
+  // get allocated object count
+  int err = read_package_metadata(pkg);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u",
+          ++package_metadata.object_cnt);
+  lfs_file_t f;
+  err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
+                      LFS_O_WRONLY | LFS_O_CREAT | LFS_O_EXCL);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  // TODO: object metadata
+
+  err = lfs_file_close(&g_lfs, &f);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  err = write_package_metadata(pkg);
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+
+  return package_metadata.object_cnt;
+}
