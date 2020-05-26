@@ -110,14 +110,11 @@ int context_write_general(package_t *pkg, u1 *data, u2 length,
   return CONTEXT_ERR_OK;
 }
 
-int context_write_methods(package_t *pkg, u1 *data, u2 length) {
-  return context_write_general(pkg, data, length, "/m");
-}
-
-int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
-  // open method file
+int context_read_general(package_t *pkg, u1 *target, u2 offset, u2 length,
+                         const char *postfix) {
+  // open file
   pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/m");
+  strcpy(pkg->aid_hex + pkg->aid_hex_length, postfix);
   lfs_file_t f;
   int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
   if (err < 0)
@@ -138,6 +135,14 @@ int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
     return CONTEXT_ERR_UNKNOWN;
 
   return read;
+}
+
+int context_write_methods(package_t *pkg, u1 *data, u2 length) {
+  return context_write_general(pkg, data, length, "/m");
+}
+
+int context_read_method(package_t *pkg, u1 *target, u2 offset, u2 length) {
+  return context_read_general(pkg, target, offset, length, "/m");
 }
 
 int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length) {
@@ -400,25 +405,5 @@ int context_write_applets(package_t *pkg, u1 *data, u2 length) {
 }
 
 int context_read_applet(package_t *pkg, u1 *target, u2 offset, u2 length) {
-  // open applet file
-  pkg->aid_hex[pkg->aid_hex_length] = 0;
-  strcpy(pkg->aid_hex + pkg->aid_hex_length, "/a");
-  lfs_file_t f;
-  int err = lfs_file_open(&g_lfs, &f, pkg->aid_hex, LFS_O_RDONLY);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_seek(&g_lfs, &f, offset, LFS_SEEK_SET);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  int read = lfs_file_read(&g_lfs, &f, target, length);
-  if (read < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  err = lfs_file_close(&g_lfs, &f);
-  if (err < 0)
-    return CONTEXT_ERR_UNKNOWN;
-
-  return read;
+  return context_read_general(pkg, target, offset, length, "/a");
 }

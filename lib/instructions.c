@@ -604,6 +604,9 @@ void ins_invokeinterface(frame_t *f) {
 void ins_new(frame_t *f) {
   // TODO
   u2 index = bytecode_read_u2();
+  cp_info info;
+  context_read_constant(&current_package, index, &info, sizeof(info));
+  DBG_MSG("info tag %d ref %d\n", info.tag, info.klass.internal_ref);
 }
 
 // 0x90 Create new array

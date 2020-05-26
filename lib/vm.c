@@ -56,10 +56,10 @@ int vm_load_applet(u1 *data, u4 length) {
 
 int vm_install_applet(u1 *target_aid, u2 length) {
   u1 count;
-  int res = context_read_applet(&current_package, &count, 3, sizeof(count));
+  int res = context_read_applet(&current_package, &count, 0, sizeof(count));
   if (res != 1)
     return VM_ERR_UNKNOWN;
-  u2 offset = 4;
+  u2 offset = 1;
   for (u1 i = 0; i < count; i++) {
     u1 aid_length;
     res = context_read_applet(&current_package, &aid_length, offset,
