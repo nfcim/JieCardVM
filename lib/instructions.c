@@ -600,6 +600,14 @@ void ins_invokespecial(frame_t *f) {
       DBG_MSG("Method offset %d\n", offset);
       push_frame(offset);
     }
+    // copy args from previous frame
+    for (int i = 0; i < frames[current_frame].info.nargs - 1; i++) {
+      u2 data = operand_stack_pop(&frames[current_frame - 1].operand_stack);
+      variable_table_set(&frames[current_frame].variable_table, i, data);
+    }
+    // set this pointer
+    u2 ref = operand_stack_pop(&frames[current_frame - 1].operand_stack);
+    frames[current_frame].this_ref = ref;
   }
 }
 

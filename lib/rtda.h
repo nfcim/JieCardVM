@@ -1,6 +1,8 @@
 #ifndef JIECARDVM_RTDA_H
 #define JIECARDVM_RTDA_H
 
+#include "common.h"
+#include "context.h"
 #include "lfs.h"
 #include "types.h"
 #include <stdint.h>
@@ -9,48 +11,12 @@
 extern "C" {
 #endif
 
-#define BYTECODE_WINDOW_SIZE 16
-#define TOTAL_FRAMES 100
-
-typedef struct {
-  u2 *base; // base memory
-  u1 index;
-  u1 max_stack;
-} operand_stack_t;
-
-typedef struct {
-  i2 *base; // base memory
-  u1 max_locals;
-} variable_table_t;
-
-typedef struct {
-  operand_stack_t operand_stack;
-  variable_table_t variable_table;
-  u2 method_offset;   // method offset in Method.cap
-  u2 bytecode_offset; // bytecode offset in Method.cap
-} frame_t;
-
-typedef struct {
-  u1 is_external;
-  union {
-    // read bytecode from Method.cap
-    // a sliding window of Method.cap
-    struct {
-      u1 buffer[BYTECODE_WINDOW_SIZE];
-      u2 method_offset;   // offset of bytecode in Method.cap
-    } method;
-    // read bytecode from external buffer
-    struct {
-      u1 *buffer;
-    } external;
-  };
-  u2 index;
-} bytecode_t;
-
 // index of current frame
 extern int current_frame;
 // whether vm is running
 extern int running;
+// frames
+extern frame_t frames[TOTAL_FRAMES];
 
 i2 operand_stack_pop(operand_stack_t *s);
 

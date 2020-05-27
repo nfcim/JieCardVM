@@ -1,14 +1,15 @@
 #include "rtda.h"
 #include "context.h"
 #include "instructions.h"
+#include "common.h"
 #include "utils.h"
 #include "vm.h"
 #include <assert.h>
 
 static bytecode_t bytecode;
-static frame_t frames[TOTAL_FRAMES];
 static u2 stack_buffer[128];
 static i2 variable_buffer[128];
+frame_t frames[TOTAL_FRAMES];
 int current_frame;
 int running;
 
@@ -116,6 +117,7 @@ int push_frame(u2 method_offset) {
   frames[current_frame].operand_stack.index = 0;
   frames[current_frame].variable_table.max_locals = header.max_locals;
   frames[current_frame].variable_table.base = variable_buffer;
+  frames[current_frame].info = header;
   return 0;
 }
 
