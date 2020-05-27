@@ -20,10 +20,16 @@ struct library_function {
 };
 
 void javacard_framework_applet_init();
+void javacard_framework_applet_register();
 
 const struct library_function LIBRARY_FUNCTIONS[] = {
+    // javacard/framework/Applet."<init>"
     {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID, 3, 0,
-     javacard_framework_applet_init}};
+     javacard_framework_applet_init},
+    // javacard/framework/Applet."register"
+    {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID, 3, 1,
+     javacard_framework_applet_register},
+     };
 
 const int LIBRARY_FUNCTION_COUNT =
     sizeof(LIBRARY_FUNCTIONS) / sizeof(struct library_function);

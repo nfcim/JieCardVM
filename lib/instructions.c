@@ -576,6 +576,41 @@ void ins_invokevirtual(frame_t *f) {
   context_read_constant(&current_package, index, (u1 *)&cp, sizeof(cp));
   DBG_MSG("Constant type %d\n", cp.tag);
   if (cp.tag == CONSTANT_VIRTUAL_METHOD_REF) {
+    if (cp.virtual_method.klass.external_ref.package_token & 0x80) {
+      // external
+      u1 package = cp.virtual_method.klass.external_ref.package_token & 0x7F;
+      DBG_MSG("External virtual method: package %d class %d token %d\n",
+              package, cp.virtual_method.klass.external_ref.class_token,
+              cp.virtual_method.token);
+      package_info info;
+      context_read_import(&current_package, (u1 *)&info, package,
+                          sizeof(package_info));
+      u1 aid_buffer[64];
+      context_read_import(&current_package, (u1 *)aid_buffer, package + 3,
+                          sizeof(aid_buffer));
+      DBG_MSG("Imported from AID");
+      for (u1 i = 0; i < info.aid_length; i++) {
+        DBG_PRINT(" %02X", aid_buffer[i]);
+      }
+      DBG_PRINT(", version %d.%d\n", info.major_version, info.minor_version);
+      for (u1 i = 0; i < LIBRARY_FUNCTION_COUNT; i++) {
+        if (info.aid_length == LIBRARY_FUNCTIONS[i].aid_length &&
+            cp.virtual_method.klass.external_ref.class_token ==
+                LIBRARY_FUNCTIONS[i].class_token &&
+            cp.virtual_method.token ==
+                LIBRARY_FUNCTIONS[i].token &&
+            memcmp(aid_buffer, LIBRARY_FUNCTIONS[i].aid,
+                   LIBRARY_FUNCTIONS[i].aid_length) == 0) {
+          DBG_MSG("Found handler\n");
+          LIBRARY_FUNCTIONS[i].handler();
+          break;
+        }
+      }
+    } else {
+      u2 offset = htobe16(cp.virtual_method.klass.internal_ref);
+      DBG_MSG("Internal virtual method: Class offset %d token %d\n", offset,
+              cp.virtual_method.token);
+    }
   }
 }
 
@@ -607,6 +642,9 @@ void ins_invokespecial(frame_t *f) {
       DBG_PRINT(", version %d.%d\n", info.major_version, info.minor_version);
       for (u1 i = 0; i < LIBRARY_FUNCTION_COUNT; i++) {
         if (info.aid_length == LIBRARY_FUNCTIONS[i].aid_length &&
+            cp.static_elem.external_ref.class_token ==
+                LIBRARY_FUNCTIONS[i].class_token &&
+            cp.static_elem.external_ref.token == LIBRARY_FUNCTIONS[i].token &&
             memcmp(aid_buffer, LIBRARY_FUNCTIONS[i].aid,
                    LIBRARY_FUNCTIONS[i].aid_length) == 0) {
           DBG_MSG("Found handler\n");
