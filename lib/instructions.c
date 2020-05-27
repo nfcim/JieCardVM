@@ -592,22 +592,33 @@ void ins_invokespecial(frame_t *f) {
     if (cp.static_elem.external_ref.package_token & 0x80) {
       // external
       u1 package = cp.static_elem.external_ref.package_token & 0x7F;
-      DBG_MSG("Package token %d\n", package);
-      DBG_MSG("Class token %d\n", cp.static_elem.external_ref.class_token);
-      DBG_MSG("Token %d\n", cp.static_elem.external_ref.token);
+      DBG_MSG("External static method: package %d class %d token %d\n", package,
+              cp.static_elem.external_ref.class_token,
+              cp.static_elem.external_ref.token);
+      package_info info;
+      context_read_import(&current_package, (u1 *)&info, package,
+                          sizeof(package_info));
+      u1 aid_buffer[64];
+      context_read_import(&current_package, (u1 *)aid_buffer, package + 3,
+                          sizeof(aid_buffer));
+      DBG_MSG("Imported from AID");
+      for (u1 i = 0; i < info.aid_length;i++) {
+        DBG_PRINT(" %02X", aid_buffer[i]);
+      }
+      DBG_PRINT(", version %d.%d\n", info.major_version, info.minor_version);
     } else {
       u2 offset = htobe16(cp.static_elem.internal_ref.offset);
-      DBG_MSG("Method offset %d\n", offset);
+      DBG_MSG("Internal static method: Method offset %d\n", offset);
       push_frame(offset);
+      // copy args from previous frame
+      for (int i = 0; i < frames[current_frame].info.nargs - 1; i++) {
+        u2 data = operand_stack_pop(&frames[current_frame - 1].operand_stack);
+        variable_table_set(&frames[current_frame].variable_table, i, data);
+      }
+      // set this pointer
+      u2 ref = operand_stack_pop(&frames[current_frame - 1].operand_stack);
+      frames[current_frame].this_ref = ref;
     }
-    // copy args from previous frame
-    for (int i = 0; i < frames[current_frame].info.nargs - 1; i++) {
-      u2 data = operand_stack_pop(&frames[current_frame - 1].operand_stack);
-      variable_table_set(&frames[current_frame].variable_table, i, data);
-    }
-    // set this pointer
-    u2 ref = operand_stack_pop(&frames[current_frame - 1].operand_stack);
-    frames[current_frame].this_ref = ref;
   }
 }
 

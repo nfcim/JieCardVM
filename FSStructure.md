@@ -14,15 +14,17 @@ Each CAP file corresponds to one context. And each CAP has its own AID, so all d
 
 `Method.cap` is copied to a file called `/AID/m`.
 
-
 ### Classes
 
 `Class.cap` is copied to a file called `/AID/C`.
 
-
 ### Applets
 
 `Applet.cap` is copied to a file called `/AID/a`.
+
+### Imports
+
+`Import.cap` is copied to a file called `/AID/i`.
 
 ### Arrays
 

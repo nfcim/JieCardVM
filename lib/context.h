@@ -195,6 +195,27 @@ int context_read_class(package_t *pkg, u1 *target, u2 offset, u2 length);
  */
 int context_create_object(package_t *pkg, u2 class_index);
 
+/**
+ * Write Import.cap into current package
+ *
+ * @param pkg Package info
+ * @param data Import info
+ * @param length Length of import info
+ * @return CONTEXT_ERR_OK on success
+ */
+int context_write_imports(package_t *pkg, u1 *data, u2 length);
+
+/**
+ * Read import info from current package
+ *
+ * @param pkg Applet info
+ * @param target Buffer to store import info
+ * @param offset Offset into Import.cap
+ * @param length Length to read
+ * @return bytes read
+ */
+int context_read_import(package_t *pkg, u1 *target, u2 offset, u2 length);
+
 int context_create_static_image(package_t *pkg, u1 *data, u2 length);
 
 int context_read_static_image(package_t *pkg, u2 offset, u1 size, u1 *val);

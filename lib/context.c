@@ -442,3 +442,12 @@ int context_create_object(package_t *pkg, u2 class_index) {
 
   return package_metadata.object_cnt;
 }
+
+int context_write_imports(package_t *pkg, u1 *data, u2 length) {
+  return context_write_general(pkg, data, length, "/i");
+}
+
+int context_read_import(package_t *pkg, u1 *target, u2 offset, u2 length) {
+  offset += 1; // u1 count
+  return context_read_general(pkg, target, offset, length, "/i");
+}

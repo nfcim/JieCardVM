@@ -11,11 +11,14 @@ extern "C" {
 #include <stdio.h>
 #define DBG_MSG(format, ...)                                                   \
   printf("[DBG] %s(%dL): " format, __func__, __LINE__, ##__VA_ARGS__)
+#define DBG_PRINT(format, ...)                                                   \
+  printf(format, ##__VA_ARGS__)
 #define ERR_MSG(format, ...)                                                   \
   printf("[ERR] %s(%dL): " format, __func__, __LINE__, ##__VA_ARGS__)
 #define PRINT_HEX(...) print_hex(__VA_ARGS__)
 #else
 #define DBG_MSG(...)
+#define DBG_PRINT(format, ...)                                                   \
 #define ERR_MSG(...)
 #define PRINT_HEX(...)
 #endif

@@ -101,6 +101,13 @@ typedef struct __attribute__((__packed__)) {
   u1 nargs : 4;
 } method_header_info;
 
+typedef struct __attribute__((__packed__)) {
+  u1 minor_version;
+  u1 major_version;
+  u1 aid_length;
+  u1 aid[0];
+} package_info;
+
 typedef struct {
   u2 *base; // base memory
   u1 index;
