@@ -218,7 +218,7 @@ int context_read_applet(package_t *pkg, u1 *target, u2 offset, u2 length);
  * @param class_ref If the array is of type reference, the class_ref should be
  * provided
  * @param length Length of the array
- * @return Array ref
+ * @return Array ref starting from 1
  */
 int context_create_array(package_t *pkg, u1 type, u2 class_ref, u2 length);
 
@@ -282,7 +282,7 @@ int context_read_class(package_t *pkg, u1 *target, u2 offset, u2 length);
  *
  * @param pkg Package info
  * @param class_ref Class index in Class.cap
- * @return Object ref
+ * @return Object ref starting from 1
  */
 int context_create_object(package_t *pkg, u2 class_index);
 

@@ -440,5 +440,5 @@ int context_create_object(package_t *pkg, u2 class_index) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  return package_metadata.object_cnt - 1;
+  return package_metadata.object_cnt;
 }
