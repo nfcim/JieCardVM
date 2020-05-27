@@ -548,7 +548,7 @@ void ins_getstatic_abs(frame_t *f) {
 // 0x7f/0x80/0x81 Set static field from class
 void ins_putstatic_abs(frame_t *f) {
   u2 index = bytecode_read_u2();
-  i2 v = operand_stack_pop(&f->operand_stack);
+  u2 v = operand_stack_pop(&f->operand_stack);
   constant_pool_set(index, v);
 }
 
@@ -565,36 +565,60 @@ void ins_putfield_abs(frame_t *f) {
   u1 index = bytecode_read_u1();
   i2 value = operand_stack_pop(&f->operand_stack);
   i2 objRef = operand_stack_pop(&f->operand_stack);
+  DBG_MSG("Object %d field %d = %d\n", objRef, index, value);
   object_data_set(objRef, index, value);
 }
 
 // 0x8b Invoke instance method, dispatch based on class
 void ins_invokevirtual(frame_t *f) {
-  // TODO
   u2 index = bytecode_read_u2();
-  DBG_MSG("invokevirtual %d\n", index);
+  DBG_MSG("Invoke virtual %d\n", index);
+  cp_info cp;
+  context_read_constant(&current_package, index, (u1 *)&cp, sizeof(cp));
+  DBG_MSG("Constant type %d\n", cp.tag);
+  if (cp.tag == CONSTANT_VIRTUAL_METHOD_REF) {
+  }
 }
 
 // 0x8c Invoke instance method; special handling for superclass, private and
 // instance initialization method invocations
 void ins_invokespecial(frame_t *f) {
-  // TODO
   u2 index = bytecode_read_u2();
-  DBG_MSG("invokespecial %d\n", index);
+  DBG_MSG("Invoke special %d\n", index);
+  cp_info cp;
+  context_read_constant(&current_package, index, (u1 *)&cp, sizeof(cp));
+  DBG_MSG("Constant type %d\n", cp.tag);
+  if (cp.tag == CONSTANT_STATIC_METHOD_REF) {
+    if (cp.static_elem.external_ref.package_token & 0x80) {
+      // external
+      u1 package = cp.static_elem.external_ref.package_token & 0x7F;
+      DBG_MSG("Package token %d\n", package);
+      DBG_MSG("Class token %d\n", cp.static_elem.external_ref.class_token);
+      DBG_MSG("Token %d\n", cp.static_elem.external_ref.token);
+    } else {
+      u2 offset = htobe16(cp.static_elem.internal_ref.offset);
+      DBG_MSG("Method offset %d\n", offset);
+      push_frame(offset);
+    }
+  }
 }
 
 // 0x8d Invoke a class (static) method
 void ins_invokestatic(frame_t *f) {
-  // TODO
   u2 index = bytecode_read_u2();
   DBG_MSG("Invoke static at %d\n", index);
   cp_info cp;
   context_read_constant(&current_package, index, (u1 *)&cp, sizeof(cp));
   DBG_MSG("Constant type %d\n", cp.tag);
   if (cp.tag == CONSTANT_STATIC_METHOD_REF) {
-    u2 offset = htobe16(cp.static_elem.internal_ref.offset);
-    DBG_MSG("Method offset %d\n", offset);
-    push_frame(offset);
+    if (cp.static_elem.external_ref.package_token & 0x80) {
+      // external
+      DBG_MSG("Package token %d\n", cp.static_elem.external_ref.package_token);
+    } else {
+      u2 offset = htobe16(cp.static_elem.internal_ref.offset);
+      DBG_MSG("Method offset %d\n", offset);
+      push_frame(offset);
+    }
   }
 }
 
@@ -605,13 +629,13 @@ void ins_invokeinterface(frame_t *f) {
 
 // 0x8f Create new object
 void ins_new(frame_t *f) {
-  // TODO
   u2 index = bytecode_read_u2();
   cp_info info;
   context_read_constant(&current_package, index, (u1 *)&info, sizeof(info));
   u2 ref = htobe16(info.klass.internal_ref);
   u2 res = context_create_object(&current_package, ref);
   operand_stack_push(&f->operand_stack, res);
+  DBG_MSG("Created new object at index=%d\n", res);
 }
 
 // 0x90 Create new array
