@@ -1,7 +1,7 @@
 #ifndef JIECARDVM_COMMON_H
 #define JIECARDVM_COMMON_H
 
-#include "types.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,6 +9,21 @@ extern "C" {
 
 #define BYTECODE_WINDOW_SIZE 16
 #define TOTAL_FRAMES 100
+
+typedef int8_t i1;
+typedef int16_t i2;
+
+typedef uint8_t u1;
+typedef uint16_t u2;
+
+typedef uint32_t u4;
+
+enum ARRAY_TYPE {
+  ARRAY_T_BOOLEAN = 10,
+  ARRAY_T_BYTE = 11,
+  ARRAY_T_SHORT = 12,
+  ARRAY_T_REFERENCE = 14,
+};
 
 typedef struct {
   char aid_hex[64]; // will be reused as path

@@ -48,7 +48,7 @@ static void finalize() {
 TEST_CASE("aconst_null", "[instructions]") {
   init();
   ins_aconst_null(&frame);
-  REQUIRE((u2)operand_stack_get(&frame.operand_stack) == JNULL);
+  REQUIRE((u2)operand_stack_get(&frame.operand_stack) == 0);
   finalize();
 }
 

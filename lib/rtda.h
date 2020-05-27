@@ -4,7 +4,6 @@
 #include "common.h"
 #include "context.h"
 #include "lfs.h"
-#include "types.h"
 #include <stdint.h>
 
 #ifdef __cplusplus

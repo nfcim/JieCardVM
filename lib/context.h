@@ -3,7 +3,6 @@
 
 #include <lfs.h>
 #include <rtda.h>
-#include <types.h>
 
 #ifdef __cplusplus
 extern "C" {

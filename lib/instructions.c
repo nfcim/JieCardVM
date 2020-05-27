@@ -4,6 +4,7 @@
 
 #include "context.h"
 #include "instructions.h"
+#include "library.h"
 #include "rtda.h"
 #include "utils.h"
 
@@ -13,9 +14,7 @@ void ins_invalid(frame_t *f) { assert(false); }
 void ins_nop(frame_t *f) {}
 
 // 0x01 Push null
-void ins_aconst_null(frame_t *f) {
-  operand_stack_push(&f->operand_stack, JNULL);
-}
+void ins_aconst_null(frame_t *f) { operand_stack_push(&f->operand_stack, 0); }
 
 // 0x02 Push short constant
 void ins_sconst_m1(frame_t *f) { operand_stack_push(&f->operand_stack, -1); }
@@ -602,10 +601,19 @@ void ins_invokespecial(frame_t *f) {
       context_read_import(&current_package, (u1 *)aid_buffer, package + 3,
                           sizeof(aid_buffer));
       DBG_MSG("Imported from AID");
-      for (u1 i = 0; i < info.aid_length;i++) {
+      for (u1 i = 0; i < info.aid_length; i++) {
         DBG_PRINT(" %02X", aid_buffer[i]);
       }
       DBG_PRINT(", version %d.%d\n", info.major_version, info.minor_version);
+      for (u1 i = 0; i < LIBRARY_FUNCTION_COUNT; i++) {
+        if (info.aid_length == LIBRARY_FUNCTIONS[i].aid_length &&
+            memcmp(aid_buffer, LIBRARY_FUNCTIONS[i].aid,
+                   LIBRARY_FUNCTIONS[i].aid_length) == 0) {
+          DBG_MSG("Found handler\n");
+          LIBRARY_FUNCTIONS[i].handler();
+          break;
+        }
+      }
     } else {
       u2 offset = htobe16(cp.static_elem.internal_ref.offset);
       DBG_MSG("Internal static method: Method offset %d\n", offset);

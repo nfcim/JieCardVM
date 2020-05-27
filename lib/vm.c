@@ -1,6 +1,5 @@
 #include "instructions.h"
 #include "rtda.h"
-#include "types.h"
 #include "utils.h"
 #include <stdbool.h>
 #include <stdio.h>
