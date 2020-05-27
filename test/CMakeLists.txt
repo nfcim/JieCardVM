@@ -8,6 +8,7 @@ add_executable(${TEST_EXE}
         main.cpp
         instructions.cpp
         context.cpp
+        vm.cpp
         ../littlefs/bd/lfs_filebd.c
 )
 
