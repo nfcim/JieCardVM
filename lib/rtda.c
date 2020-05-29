@@ -1,7 +1,7 @@
 #include "rtda.h"
+#include "common.h"
 #include "context.h"
 #include "instructions.h"
-#include "common.h"
 #include "utils.h"
 #include "vm.h"
 #include <assert.h>
@@ -21,9 +21,7 @@ void operand_stack_push(operand_stack_t *s, i2 val) {
 
 i2 operand_stack_get(operand_stack_t *s) { return s->base[s->index - 1]; }
 
-i2 variable_table_get(variable_table_t *t, u1 index) {
-  return t->base[index];
-}
+i2 variable_table_get(variable_table_t *t, u1 index) { return t->base[index]; }
 
 void variable_table_set(variable_table_t *t, u1 index, i2 val) {
   t->base[index] = val;
@@ -84,8 +82,12 @@ void run() {
     u2 pc = bytecode.method.method_offset + bytecode.index -
             frames[current_frame].method_offset - 2;
     u1 opcode = bytecode_read_u1();
-    DBG_MSG("Frame %d Opcode %02x pc %d stack %d\n", current_frame, opcode, pc,
+    DBG_MSG("Frame %d Opcode %02x pc %d stack %d:", current_frame, opcode, pc,
             frames[current_frame].operand_stack.index);
+    for (int i = 0; i < frames[current_frame].operand_stack.index; i++) {
+      DBG_PRINT(" %04X", frames[current_frame].operand_stack.base[i]);
+    }
+    DBG_PRINT("\n");
     opcodes[opcode](&frames[current_frame]);
   }
 }
@@ -113,10 +115,22 @@ int push_frame(u2 method_offset) {
 
   // set frame info
   frames[current_frame].operand_stack.max_stack = header.max_stack;
-  frames[current_frame].operand_stack.base = stack_buffer;
+  if (current_frame >= 1) {
+    frames[current_frame].operand_stack.base =
+        frames[current_frame - 1].operand_stack.base +
+        frames[current_frame - 1].operand_stack.max_stack;
+  } else {
+    frames[current_frame].operand_stack.base = stack_buffer;
+  }
   frames[current_frame].operand_stack.index = 0;
   frames[current_frame].variable_table.max_locals = header.max_locals;
-  frames[current_frame].variable_table.base = variable_buffer;
+  if (current_frame >= 1) {
+    frames[current_frame].variable_table.base =
+        frames[current_frame - 1].variable_table.base +
+        frames[current_frame - 1].variable_table.max_locals;
+  } else {
+    frames[current_frame].variable_table.base = variable_buffer;
+  }
   frames[current_frame].info = header;
   return 0;
 }
