@@ -422,7 +422,8 @@ int context_create_object(package_t *pkg, u2 class_index) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  sprintf(pkg->aid_hex + pkg->aid_hex_length, "/a%u",
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  sprintf(pkg->aid_hex + pkg->aid_hex_length, "/c%u",
           ++package_metadata.object_cnt);
   lfs_file_t f;
   err = lfs_file_open(&g_lfs, &f, pkg->aid_hex,
@@ -430,7 +431,11 @@ int context_create_object(package_t *pkg, u2 class_index) {
   if (err < 0)
     return CONTEXT_ERR_UNKNOWN;
 
-  // TODO: object metadata
+  // metadata: class index
+  err = lfs_setattr(&g_lfs, pkg->aid_hex, LFS_ATTR_METADATA, &class_index,
+                    sizeof(class_index));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
 
   err = lfs_file_close(&g_lfs, &f);
   if (err < 0)

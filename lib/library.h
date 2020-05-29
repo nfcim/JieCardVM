@@ -10,6 +10,7 @@ extern "C" {
 typedef void (*library_function_handler)();
 
 const u1 JAVACARD_FRAMEWORK_AID[] = {0xa0, 0x00, 0x00, 0x00, 0x62, 0x01, 0x01};
+const u2 JAVACARD_FRAMEWORK_APPLET_TOKEN = 3;
 
 struct library_function {
   const u2 aid_length;
@@ -24,12 +25,12 @@ void javacard_framework_applet_register();
 
 const struct library_function LIBRARY_FUNCTIONS[] = {
     // javacard/framework/Applet."<init>"
-    {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID, 3, 0,
-     javacard_framework_applet_init},
+    {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID,
+     JAVACARD_FRAMEWORK_APPLET_TOKEN, 0, javacard_framework_applet_init},
     // javacard/framework/Applet."register"
-    {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID, 3, 1,
-     javacard_framework_applet_register},
-     };
+    {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID,
+     JAVACARD_FRAMEWORK_APPLET_TOKEN, 1, javacard_framework_applet_register},
+};
 
 const int LIBRARY_FUNCTION_COUNT =
     sizeof(LIBRARY_FUNCTIONS) / sizeof(struct library_function);
