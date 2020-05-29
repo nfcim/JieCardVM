@@ -9,7 +9,10 @@ extern "C" {
 
 typedef void (*library_function_handler)();
 
+// well known aid
 const u1 JAVACARD_FRAMEWORK_AID[] = {0xa0, 0x00, 0x00, 0x00, 0x62, 0x01, 0x01};
+const u1 JAVA_LANG_AID[] = {0xa0, 0x00, 0x00, 0x00, 0x62, 0x00, 0x01};
+
 const u2 JAVACARD_FRAMEWORK_APPLET_TOKEN = 3;
 
 struct library_function {

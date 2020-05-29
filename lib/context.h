@@ -195,6 +195,15 @@ int context_read_class(package_t *pkg, u1 *target, u2 offset, u2 length);
 int context_create_object(package_t *pkg, u2 class_index);
 
 /**
+ * Get class ref of object
+ *
+ * @param pkg Package info
+ * @param object_ref Object ref starting from 1
+ * @return Class ref
+ */
+int context_get_object_class(package_t *pkg, u2 ref);
+
+/**
  * Write Import.cap into current package
  *
  * @param pkg Package info

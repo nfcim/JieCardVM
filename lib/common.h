@@ -75,8 +75,8 @@ typedef struct __attribute__((__packed__)) {
 } static_ref;
 
 typedef struct __attribute__((__packed__)) {
-  u1 flags : 4;
   u1 interface_count : 4;
+  u1 flags : 4;
   class_ref super_class_ref;
   u1 declared_instance_size;
   u1 first_reference_token;

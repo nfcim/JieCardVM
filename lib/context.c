@@ -456,3 +456,16 @@ int context_read_import(package_t *pkg, u1 *target, u2 offset, u2 length) {
   offset += 1; // u1 count
   return context_read_general(pkg, target, offset, length, "/i");
 }
+
+int context_get_object_class(package_t *pkg, u2 ref) {
+  pkg->aid_hex[pkg->aid_hex_length] = 0;
+  sprintf(pkg->aid_hex + pkg->aid_hex_length, "/c%u",
+          ref);
+  u2 class_index;
+  // metadata: class index
+  int err = lfs_getattr(&g_lfs, pkg->aid_hex, LFS_ATTR_METADATA, &class_index,
+                    sizeof(class_index));
+  if (err < 0)
+    return CONTEXT_ERR_UNKNOWN;
+  return class_index;
+}
