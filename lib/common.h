@@ -139,7 +139,6 @@ typedef struct {
   variable_table_t variable_table;
   u2 method_offset;        // method offset in Method.cap
   u2 bytecode_offset;      // bytecode offset in Method.cap
-  u2 this_ref;             // reference to `this`
   method_header_info info; // method info
 } frame_t;
 

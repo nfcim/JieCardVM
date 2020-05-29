@@ -597,8 +597,7 @@ void ins_invokevirtual(frame_t *f) {
         if (info.aid_length == LIBRARY_FUNCTIONS[i].aid_length &&
             cp.virtual_method.klass.external_ref.class_token ==
                 LIBRARY_FUNCTIONS[i].class_token &&
-            cp.virtual_method.token ==
-                LIBRARY_FUNCTIONS[i].token &&
+            cp.virtual_method.token == LIBRARY_FUNCTIONS[i].token &&
             memcmp(aid_buffer, LIBRARY_FUNCTIONS[i].aid,
                    LIBRARY_FUNCTIONS[i].aid_length) == 0) {
           DBG_MSG("Found handler\n");
@@ -657,13 +656,11 @@ void ins_invokespecial(frame_t *f) {
       DBG_MSG("Internal static method: Method offset %d\n", offset);
       push_frame(offset);
       // copy args from previous frame
-      for (int i = 0; i < frames[current_frame].info.nargs - 1; i++) {
+      for (int i = 0; i < frames[current_frame].info.nargs; i++) {
         u2 data = operand_stack_pop(&frames[current_frame - 1].operand_stack);
-        variable_table_set(&frames[current_frame].variable_table, i, data);
+        variable_table_set(&frames[current_frame].variable_table,
+                           frames[current_frame].info.nargs - 1 - i, data);
       }
-      // set this pointer
-      u2 ref = operand_stack_pop(&frames[current_frame - 1].operand_stack);
-      frames[current_frame].this_ref = ref;
     }
   }
 }
