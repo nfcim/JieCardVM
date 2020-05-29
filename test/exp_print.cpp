@@ -157,9 +157,9 @@ int main(int argc, char *argv[]) {
       cur += 2;
       u2 descriptor_index = ntohs(*(u2 *)cur);
       cur += 2;
-      printf("\t%d: token %d access flags 0x%x name %d(%s) desc %d\n", j, token,
-             access_flags, name_index, name_mapping[name_index].c_str(),
-             descriptor_index);
+      printf("\t%d: token %d access flags 0x%x name %d(%s) desc %d(%s)\n", j,
+             token, access_flags, name_index, name_mapping[name_index].c_str(),
+             descriptor_index, name_mapping[descriptor_index].c_str());
     }
     u1 inheritable_public_method_token_count = *cur++;
   }
