@@ -109,7 +109,7 @@ TEST_CASE("vm_install_applet_empty", "[context]") {
   init();
   // EmptyApplet
   u1 aid[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x00, 0x00, 0x02};
-  int res = vm_install_applet(aid, sizeof(aid));
+  int res = vm_install_applet(aid, sizeof(aid), NULL, 0, 0, 0);
   REQUIRE(res == 0);
   finalize();
 }
@@ -118,7 +118,7 @@ TEST_CASE("vm_install_applet_simple", "[context]") {
   init();
   // SimpleApplet
   u1 aid[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x00, 0x00, 0x03};
-  int res = vm_install_applet(aid, sizeof(aid));
+  int res = vm_install_applet(aid, sizeof(aid), NULL, 0, 0, 0);
   REQUIRE(res == 0);
   finalize();
 }

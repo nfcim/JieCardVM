@@ -67,26 +67,27 @@ int vm_load_import(u1 *data, u4 length) {
   return VM_ERR_OK;
 }
 
-int vm_install_applet(u1 *target_aid, u2 length) {
+int vm_install_applet(u1 *target_aid, u2 aid_length, u1 *params, u2 length,
+                      u2 offset_arg, u1 length_arg) {
   u1 count;
   int res = context_read_applet(&current_package, &count, 0, sizeof(count));
   if (res != 1)
     return VM_ERR_UNKNOWN;
   u2 offset = 1;
   for (u1 i = 0; i < count; i++) {
-    u1 aid_length;
-    res = context_read_applet(&current_package, &aid_length, offset,
-                              sizeof(aid_length));
+    u1 cur_aid_length;
+    res = context_read_applet(&current_package, &cur_aid_length, offset,
+                              sizeof(cur_aid_length));
     if (res != 1)
       return VM_ERR_UNKNOWN;
     offset += 1;
 
     u1 aid[64];
-    res = context_read_applet(&current_package, aid, offset, aid_length);
-    if (res != aid_length)
+    res = context_read_applet(&current_package, aid, offset, cur_aid_length);
+    if (res != cur_aid_length)
       return VM_ERR_UNKNOWN;
-    offset += aid_length;
-    if (aid_length == length && memcmp(aid, target_aid, length) == 0) {
+    offset += cur_aid_length;
+    if (cur_aid_length == aid_length && memcmp(aid, target_aid, aid_length) == 0) {
       // found
       DBG_MSG("Found applet at index %d\n", i);
       u2 install_method_offset;
@@ -99,6 +100,27 @@ int vm_install_applet(u1 *target_aid, u2 length) {
       DBG_MSG("Install method is at %d\n", install_method_offset);
 
       init_frame(install_method_offset);
+
+      // initialize params
+      if (params != NULL) {
+        // first arg is params byte[]
+        u2 ref =
+            context_create_array(&current_package, ARRAY_T_BYTE, 0, length);
+        // TODO: optimize
+        for (u2 i = 0; i < length; i++) {
+          context_write_array(&current_package, ref, ARRAY_T_BYTE, i,
+                              params[i]);
+        }
+        variable_table_set(&frames[current_frame].variable_table, 0, ref);
+      } else {
+        // null
+        variable_table_set(&frames[current_frame].variable_table, 0, 0);
+      }
+      // offset
+      variable_table_set(&frames[current_frame].variable_table, 1, offset_arg);
+      // length
+      variable_table_set(&frames[current_frame].variable_table, 2, length_arg);
+
       run();
       return VM_ERR_OK;
     } else {

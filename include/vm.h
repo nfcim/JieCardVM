@@ -80,10 +80,15 @@ int vm_load_import(u1 *data, u4 length);
  * Run install(byte[],short,byte) method of the applet
  *
  * @param aid AID of applet in binary
- * @param length Length of aid
+ * @param aid_length Length of aid
+ * @param params Copied to first argument of install()
+ * @param length Total length of params
+ * @param offset_arg Second argument of install()
+ * @param length_arg Third argument of install()
  * @return VM_ERR_OK on success
  */
-int vm_install_applet(u1 *aid, u2 length);
+int vm_install_applet(u1 *aid, u2 aid_length, u1 *params, u2 length, u2 offset_arg,
+                      u1 length_arg);
 
 #ifdef __cplusplus
 };
