@@ -17,12 +17,13 @@ void javacard_framework_Applet_register() {
   DBG_MSG("Applet.register(%d)\n", this);
 }
 
-void javacard_framework_APDU_getBuffer() {
-  // no args, only this
+void javacard_framework_APDU_setOutgoingAndSend() {
+  // two args and this
+  u2 length = operand_stack_pop(&current_operand_stack);
+  u2 offset = operand_stack_pop(&current_operand_stack);
   u2 this = operand_stack_pop(&current_operand_stack);
-  DBG_MSG("APDU.getBuffer(%d)\n", this);
-  // return buffer
-  operand_stack_push(&current_operand_stack, 0);
+  DBG_MSG("APDU.getBuffer(%d, %d, %d)\n", this, offset, length);
+  // no return
 }
 
 // well known aid
@@ -40,9 +41,10 @@ const struct library_function LIBRARY_FUNCTIONS[] = {
     // javacard/framework/Applet."register"
     {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID,
      JAVACARD_FRAMEWORK_APPLET_TOKEN, 1, javacard_framework_Applet_register},
-    // javacard/framework/APDU."getBuffer"
+    // javacard/framework/APDU."setOutgoingAndSend"
     {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID,
-     JAVACARD_FRAMEWORK_APDU_TOKEN, 8, javacard_framework_APDU_getBuffer},
+     JAVACARD_FRAMEWORK_APDU_TOKEN, 8,
+     javacard_framework_APDU_setOutgoingAndSend},
 };
 
 const int JAVACARD_FRAMEWORK_APPLET_PROCESS_TOKEN = 7;
