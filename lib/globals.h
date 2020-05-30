@@ -23,6 +23,9 @@ extern frame_t frames[TOTAL_FRAMES];
 // current package
 extern package_t current_package;
 
+#define current_operand_stack (frames[current_frame].operand_stack)
+#define current_variable_table (frames[current_frame].variable_table)
+
 
 #ifdef __cplusplus
 };

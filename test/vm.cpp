@@ -123,6 +123,17 @@ TEST_CASE("vm_install_applet_simple", "[context]") {
   finalize();
 }
 
+TEST_CASE("vm_process_apdu", "[context]") {
+  init();
+  // run process() of SimpleApplet
+  u2 ref = 1; // TODO: get this from install_applet()
+  u1 cmd_apdu[] = {0x00, 0x01, 0x02, 0x03};
+  u1 resp_apdu[128];
+  int res = vm_process_apdu(ref, cmd_apdu, sizeof(cmd_apdu), resp_apdu, sizeof(resp_apdu));
+  REQUIRE(res == 0);
+  finalize();
+}
+
 TEST_CASE("vm_delete_cap", "[context]") {
   init();
   int ret = context_delete_cap(&pkg);

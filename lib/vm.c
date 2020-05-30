@@ -1,7 +1,8 @@
+#include "globals.h"
 #include "instructions.h"
+#include "library.h"
 #include "rtda.h"
 #include "utils.h"
-#include "globals.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -86,7 +87,8 @@ int vm_install_applet(u1 *target_aid, u2 aid_length, u1 *params, u2 length,
     if (res != cur_aid_length)
       return VM_ERR_UNKNOWN;
     offset += cur_aid_length;
-    if (cur_aid_length == aid_length && memcmp(aid, target_aid, aid_length) == 0) {
+    if (cur_aid_length == aid_length &&
+        memcmp(aid, target_aid, aid_length) == 0) {
       // found
       DBG_MSG("Found applet at index %d\n", i);
       u2 install_method_offset;
@@ -129,4 +131,34 @@ int vm_install_applet(u1 *target_aid, u2 aid_length, u1 *params, u2 length,
     }
   }
   return VM_ERR_NO_ENT;
+}
+
+int vm_process_apdu(u2 ref, u1 *cmd_apdu, u2 cmd_len, u1 *resp_apdu,
+                    u2 resp_len) {
+
+  u2 class_index = context_get_object_class(&current_package, ref);
+  class_info info;
+  context_read_class(&current_package, (u1 *)&info, class_index, sizeof(info));
+  DBG_MSG("Class at %d, interface count %d, public base %d count %d, package "
+          "base %d "
+          "count %d\n",
+          class_index, info.interface_count, info.public_method_table_base,
+          info.public_method_table_count, info.package_method_table_base,
+          info.package_method_table_count);
+
+  // find method overriding javacard/framework/Applet."process"
+  if (info.public_method_table_base <=
+          JAVACARD_FRAMEWORK_APPLET_PROCESS_TOKEN &&
+      info.public_method_table_base + info.public_method_table_count >
+          JAVACARD_FRAMEWORK_APPLET_PROCESS_TOKEN) {
+    u2 i =
+        JAVACARD_FRAMEWORK_APPLET_PROCESS_TOKEN - info.public_method_table_base;
+    u2 method_index;
+    context_read_class(&current_package, (u1 *)&method_index,
+                       class_index + sizeof(info) + 2 * i,
+                       sizeof(method_index));
+    method_index = htobe16(method_index);
+    DBG_MSG("Found process() method %d\n", method_index);
+  }
+  return VM_ERR_OK;
 }

@@ -85,8 +85,21 @@ int vm_load_import(u1 *data, u4 length);
  * @param length_arg Third argument of install()
  * @return VM_ERR_OK on success
  */
-int vm_install_applet(u1 *aid, u2 aid_length, u1 *params, u2 length, u2 offset_arg,
-                      u1 length_arg);
+int vm_install_applet(u1 *aid, u2 aid_length, u1 *params, u2 length,
+                      u2 offset_arg, u1 length_arg);
+
+/**
+ * Run process(APDU) method of the applet
+ *
+ * @param obj_ref Object ref of Applet
+ * @param cmd_apdu Command APDU
+ * @param cmd_len Length of Command APDU
+ * @param resp_apdu Response APDU
+ * @param resp_len Length of Resp APDU
+ * @return Actual Resp APDU length
+ */
+int vm_process_apdu(u2 ref, u1 *cmd_apdu, u2 cmd_len, u1 *resp_apdu,
+                    u2 resp_len);
 
 #ifdef __cplusplus
 };
