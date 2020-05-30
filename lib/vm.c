@@ -1,12 +1,11 @@
 #include "instructions.h"
 #include "rtda.h"
 #include "utils.h"
+#include "globals.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <vm.h>
-
-package_t current_package;
 
 u1 bytecode_buffer[TOTAL_FRAMES][16];
 

@@ -2,6 +2,7 @@
 #include "rtda.h"
 #include "utils.h"
 #include "vm.h"
+#include "globals.h"
 
 void javacard_framework_applet_init() {
   // no args, only this

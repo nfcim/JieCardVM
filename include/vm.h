@@ -14,8 +14,6 @@ enum vm_error {
   VM_ERR_NO_ENT = -3,      // No entry found
 };
 
-extern package_t current_package;
-
 /**
  * Initialize JieCardVM
  *

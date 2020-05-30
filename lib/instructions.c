@@ -4,6 +4,7 @@
 
 #include "context.h"
 #include "instructions.h"
+#include "globals.h"
 #include "library.h"
 #include "rtda.h"
 #include "utils.h"

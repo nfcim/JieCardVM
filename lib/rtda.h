@@ -10,13 +10,6 @@
 extern "C" {
 #endif
 
-// index of current frame
-extern int current_frame;
-// whether vm is running
-extern int running;
-// frames
-extern frame_t frames[TOTAL_FRAMES];
-
 i2 operand_stack_pop(operand_stack_t *s);
 
 void operand_stack_push(operand_stack_t *s, i2 val);

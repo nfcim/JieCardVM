@@ -4,14 +4,12 @@
 #include "instructions.h"
 #include "utils.h"
 #include "vm.h"
+#include "globals.h"
 #include <assert.h>
 
 static bytecode_t bytecode;
 static u2 stack_buffer[128];
 static i2 variable_buffer[128];
-frame_t frames[TOTAL_FRAMES];
-int current_frame;
-int running;
 
 i2 operand_stack_pop(operand_stack_t *s) { return s->base[--s->index]; }
 
