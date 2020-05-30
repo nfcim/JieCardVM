@@ -224,12 +224,6 @@ int context_write_imports(package_t *pkg, u1 *data, u2 length);
  */
 int context_read_import(package_t *pkg, u1 *target, u2 offset, u2 length);
 
-int context_create_static_image(package_t *pkg, u1 *data, u2 length);
-
-int context_read_static_image(package_t *pkg, u2 offset, u1 size, u1 *val);
-
-int context_write_static_image(package_t *pkg, u2 offset, u1 size, u2 val);
-
 #ifdef __cplusplus
 }
 #endif

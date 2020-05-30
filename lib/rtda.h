@@ -24,6 +24,11 @@ u1 bytecode_read_u1(void);
 
 u2 bytecode_read_u2(void);
 
+/**
+ * Jump relative offset in bytecode
+ *
+ * @param offset Offset of bytecode to jump
+ */
 void bytecode_jump_offset(int16_t offset);
 
 /**
@@ -61,6 +66,7 @@ int push_frame(u2 method_offset);
  */
 frame_t *pop_frame();
 
+// get index of bytecode, for testing only
 u2 _bytecode_get_index(void);
 
 u2 constant_pool_get(u2 index);
@@ -71,6 +77,9 @@ i2 object_data_get(i2 objRef, i2 index);
 
 void object_data_set(i2 objRef, i2 index, i2 value);
 
+/** 
+ * Start run loop from root frame
+*/
 void run();
 
 #ifdef __cplusplus
