@@ -17,9 +17,6 @@ struct library_function {
   const library_function_handler handler;
 };
 
-void javacard_framework_applet_init();
-void javacard_framework_applet_register();
-
 extern const struct library_function LIBRARY_FUNCTIONS[];
 extern const int LIBRARY_FUNCTION_COUNT;
 

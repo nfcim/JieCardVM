@@ -158,7 +158,15 @@ int vm_process_apdu(u2 ref, u1 *cmd_apdu, u2 cmd_len, u1 *resp_apdu,
                        class_index + sizeof(info) + 2 * i,
                        sizeof(method_index));
     method_index = htobe16(method_index);
-    DBG_MSG("Found process() method %d\n", method_index);
+    DBG_MSG("Running process() method at %d\n", method_index);
+
+    init_frame(method_index);
+    // self
+    variable_table_set(&current_variable_table, 0, ref);
+    // TODO: init APDU instance in variable table
+    run();
+    return VM_ERR_OK;
+  } else {
+    return VM_ERR_NO_ENT;
   }
-  return VM_ERR_OK;
 }

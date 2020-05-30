@@ -1,10 +1,10 @@
 #include "rtda.h"
 #include "common.h"
 #include "context.h"
+#include "globals.h"
 #include "instructions.h"
 #include "utils.h"
 #include "vm.h"
-#include "globals.h"
 #include <assert.h>
 
 static bytecode_t bytecode;
@@ -80,12 +80,19 @@ void run() {
     u2 pc = bytecode.method.method_offset + bytecode.index -
             frames[current_frame].method_offset - 2;
     u1 opcode = bytecode_read_u1();
-    DBG_MSG("Frame %d Opcode %02x pc %d stack %d:", current_frame, opcode, pc,
-            frames[current_frame].operand_stack.index);
+
+    // debugging
+    DBG_MSG("Frame %d Opcode %02x pc %d var %d:", current_frame, opcode, pc,
+            frames[current_frame].variable_table.max_locals);
+    for (int i = 0; i < frames[current_frame].variable_table.max_locals; i++) {
+      DBG_PRINT(" %04X", frames[current_frame].variable_table.base[i]);
+    }
+    printf(" stack %d:", frames[current_frame].operand_stack.index);
     for (int i = 0; i < frames[current_frame].operand_stack.index; i++) {
       DBG_PRINT(" %04X", frames[current_frame].operand_stack.base[i]);
     }
     DBG_PRINT("\n");
+
     opcodes[opcode](&frames[current_frame]);
   }
 }
@@ -121,7 +128,9 @@ int push_frame(u2 method_offset) {
     frames[current_frame].operand_stack.base = stack_buffer;
   }
   frames[current_frame].operand_stack.index = 0;
-  frames[current_frame].variable_table.max_locals = header.max_locals;
+  // actual local count: max_locals + nargs
+  frames[current_frame].variable_table.max_locals =
+      header.max_locals + header.nargs;
   if (current_frame >= 1) {
     frames[current_frame].variable_table.base =
         frames[current_frame - 1].variable_table.base +

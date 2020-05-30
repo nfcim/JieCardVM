@@ -1,23 +1,48 @@
+#include "library.h"
 #include "common.h"
+#include "globals.h"
 #include "rtda.h"
 #include "utils.h"
 #include "vm.h"
-#include "globals.h"
-#include "library.h"
+
+void javacard_framework_Applet_init() {
+  // no args, only this
+  u2 this = operand_stack_pop(&current_operand_stack);
+  DBG_MSG("Applet.<init>(%d)\n", this);
+}
+
+void javacard_framework_Applet_register() {
+  // no args, only this
+  u2 this = operand_stack_pop(&current_operand_stack);
+  DBG_MSG("Applet.register(%d)\n", this);
+}
+
+void javacard_framework_APDU_getBuffer() {
+  // no args, only this
+  u2 this = operand_stack_pop(&current_operand_stack);
+  DBG_MSG("APDU.getBuffer(%d)\n", this);
+  // return buffer
+  operand_stack_push(&current_operand_stack, 0);
+}
 
 // well known aid
 const u1 JAVACARD_FRAMEWORK_AID[] = {0xa0, 0x00, 0x00, 0x00, 0x62, 0x01, 0x01};
 const u1 JAVA_LANG_AID[] = {0xa0, 0x00, 0x00, 0x00, 0x62, 0x00, 0x01};
 
+// class tokens
 const u2 JAVACARD_FRAMEWORK_APPLET_TOKEN = 3;
+const u2 JAVACARD_FRAMEWORK_APDU_TOKEN = 10;
 
 const struct library_function LIBRARY_FUNCTIONS[] = {
     // javacard/framework/Applet."<init>"
     {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID,
-     JAVACARD_FRAMEWORK_APPLET_TOKEN, 0, javacard_framework_applet_init},
+     JAVACARD_FRAMEWORK_APPLET_TOKEN, 0, javacard_framework_Applet_init},
     // javacard/framework/Applet."register"
     {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID,
-     JAVACARD_FRAMEWORK_APPLET_TOKEN, 1, javacard_framework_applet_register},
+     JAVACARD_FRAMEWORK_APPLET_TOKEN, 1, javacard_framework_Applet_register},
+    // javacard/framework/APDU."getBuffer"
+    {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID,
+     JAVACARD_FRAMEWORK_APDU_TOKEN, 8, javacard_framework_APDU_getBuffer},
 };
 
 const int JAVACARD_FRAMEWORK_APPLET_PROCESS_TOKEN = 7;
@@ -33,16 +58,3 @@ const struct library_virtual_function LIBRARY_VIRTUAL_FUNCTIONS[] = {
     {sizeof(JAVACARD_FRAMEWORK_AID), JAVACARD_FRAMEWORK_AID,
      JAVACARD_FRAMEWORK_APPLET_TOKEN, JAVACARD_FRAMEWORK_APPLET_PROCESS_TOKEN},
 };
-
-
-void javacard_framework_applet_init() {
-  // no args, only this
-  u2 this = operand_stack_pop(&current_operand_stack);
-  DBG_MSG("Applet.<init>(%d)\n", this);
-}
-
-void javacard_framework_applet_register() {
-  // no args, only this
-  u2 this = operand_stack_pop(&current_operand_stack);
-  DBG_MSG("Applet.register(%d)\n", this);
-}
