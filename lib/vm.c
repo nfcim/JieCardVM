@@ -135,6 +135,11 @@ int vm_install_applet(u1 *target_aid, u2 aid_length, u1 *params, u2 length,
 
 int vm_process_apdu(u2 ref, u1 *cmd_apdu, u2 cmd_len, u1 *resp_apdu,
                     u2 resp_len) {
+  DBG_MSG("APDU ->");
+  for (u1 i = 0; i < cmd_len; i++) {
+    DBG_PRINT(" %02X", cmd_apdu[i]);
+  }
+  DBG_PRINT("\n");
 
   u2 class_index = context_get_object_class(&current_package, ref);
   class_info info;
@@ -164,8 +169,16 @@ int vm_process_apdu(u2 ref, u1 *cmd_apdu, u2 cmd_len, u1 *resp_apdu,
     // self
     variable_table_set(&current_variable_table, 0, ref);
     // TODO: init APDU instance in variable table
+    current_resp_apdu = resp_apdu;
+    current_resp_apdu_len = resp_len;
     run();
-    return VM_ERR_OK;
+    DBG_MSG("APDU <-");
+    for (int i = 0; i < current_resp_apdu_len; i++) {
+      DBG_PRINT(" %02X", current_resp_apdu[i]);
+    }
+    DBG_PRINT("\n");
+
+    return current_resp_apdu_len;
   } else {
     return VM_ERR_NO_ENT;
   }

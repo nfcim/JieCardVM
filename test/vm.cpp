@@ -130,7 +130,10 @@ TEST_CASE("vm_process_apdu", "[context]") {
   u1 cmd_apdu[] = {0x00, 0x01, 0x02, 0x03};
   u1 resp_apdu[128];
   int res = vm_process_apdu(ref, cmd_apdu, sizeof(cmd_apdu), resp_apdu, sizeof(resp_apdu));
-  REQUIRE(res == 0);
+  // 0x90 0x00
+  REQUIRE(resp_apdu[0] == 0x90);
+  REQUIRE(resp_apdu[1] == 0x00);
+  REQUIRE(res == 2);
   finalize();
 }
 

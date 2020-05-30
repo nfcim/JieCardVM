@@ -1,8 +1,8 @@
 #ifndef JIECARDVM_GLOBALS_H
 #define JIECARDVM_GLOBALS_H
 
-#include "lfs.h"
 #include "common.h"
+#include "lfs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +26,11 @@ extern package_t current_package;
 #define current_operand_stack (frames[current_frame].operand_stack)
 #define current_variable_table (frames[current_frame].variable_table)
 
+// current processing apdu
+extern u1 *current_resp_apdu;
+
+// apdu resp length
+extern u2 current_resp_apdu_len;
 
 #ifdef __cplusplus
 };

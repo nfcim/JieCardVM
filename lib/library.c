@@ -22,8 +22,12 @@ void javacard_framework_APDU_setOutgoingAndSend() {
   u2 length = operand_stack_pop(&current_operand_stack);
   u2 offset = operand_stack_pop(&current_operand_stack);
   u2 this = operand_stack_pop(&current_operand_stack);
-  DBG_MSG("APDU.getBuffer(%d, %d, %d)\n", this, offset, length);
+  DBG_MSG("APDU.setOutgoingAndSend(%d, %d, %d)\n", this, offset, length);
   // no return
+  // send 90 00
+  current_resp_apdu[0] = 0x90;
+  current_resp_apdu[1] = 0x00;
+  current_resp_apdu_len = 2;
 }
 
 // well known aid
