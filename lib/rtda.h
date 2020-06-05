@@ -10,18 +10,39 @@
 extern "C" {
 #endif
 
+/**
+ * Pop one value from operand stack
+ */
 i2 operand_stack_pop(operand_stack_t *s);
 
+/**
+ * Push one value to operand stack
+ */
 void operand_stack_push(operand_stack_t *s, i2 val);
 
+/**
+ * Peek one value from operand stack
+ */
 i2 operand_stack_get(operand_stack_t *s);
 
+/**
+ * Read one value from operand stack
+ */
 i2 variable_table_get(variable_table_t *t, u1 index);
 
+/**
+ * Write one value from operand stack
+ */
 void variable_table_set(variable_table_t *t, u1 index, i2 val);
 
+/**
+ * Read 1-byte bytecode
+ */
 u1 bytecode_read_u1(void);
 
+/**
+ * Read 2-bytes bytecode
+ */
 u2 bytecode_read_u2(void);
 
 /**
@@ -69,6 +90,7 @@ frame_t *pop_frame();
 // get index of bytecode, for testing only
 u2 _bytecode_get_index(void);
 
+// below are TODO
 u2 constant_pool_get(u2 index);
 
 void constant_pool_set(u2 index, u2 val);
